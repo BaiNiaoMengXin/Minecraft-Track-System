@@ -63,7 +63,7 @@ export class TrainType {
 					length = parseInt(remainingSplit[0]);
 					width = parseInt(remainingSplit[1]);
 				} catch (error) {
-					throw error;
+					console.error(error);
 				}
 
 				trainTypeCallback(transportMode, Math.max(length, 1), Math.max(width, 1));

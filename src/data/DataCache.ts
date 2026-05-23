@@ -110,6 +110,7 @@ export class DataCache {
 			this.blockPosToStation.clear();
 			this.syncAdditional();
 		} catch (e) {
+		    console.error(e)
 		}
 
 		this.lastRefreshedTime = currentTimeMillis();

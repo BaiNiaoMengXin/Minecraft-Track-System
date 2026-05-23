@@ -417,7 +417,7 @@ export abstract class TrainBase extends NameColorDataBase {
 				}
 			}
 		} catch (e) {
-			throw new Error("Error simulating train " + this.trainId + ": " + e);
+			console.error(e);
 		}
 	}
 

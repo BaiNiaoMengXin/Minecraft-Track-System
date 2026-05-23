@@ -128,8 +128,10 @@ export class Depot extends AreaBase implements IReducedSaveData {
 						}
 					}
 				});
+				console.log("Finished path generation" + (this.name == "" ? "" : " for " + this.name));
 			} catch (e) {
-				
+				console.log("Failed to generate path" + (this.name == "" ? "" : " for " + this.name));
+				console.error(e);
 			}
 		})();
 	}

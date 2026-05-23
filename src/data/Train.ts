@@ -142,73 +142,69 @@ export class Train extends TrainBase {
         entity?.setProperty("mts:z_rotation", 0.0);
 
         // HandlePlayerRiding
-        try {
-            for (const [player, data] of this.ridingEntities) {
-                if (!player) {
-                    this.removeRidingPlayer(player);
-                    continue;
-                }
-                if (data.ridingCar != ridingCar) {
-                    continue;
-                }
-
-                // 获取玩家输入
-                const move: Vector2 = player.inputInfo.getMovementVector?.() || { x: 0, y: 0 };
-
-                // 只在玩家有输入时更新偏移量
-                if (move.x !== 0 || move.y !== 0) {
-                    const SPEED = 0.2;
-                    const playerRotation = player.getRotation();
-                    let offset = new Vec3(Math.sign(-move.y) * SPEED, 0, Math.sign(move.x) * SPEED)
-                    let offset2 = (offset.yRot_Degrees(-playerRotation.y + 90)).yRot(carYaw);
-                    data.offsets.z += offset2.z;
-                    data.offsets.x += offset2.x;
-                }
-
-                const newRidingPos: Vec3 = new Vec3(carX, carY, carZ).add(data.offsets.yRot(-carYaw));
-
-                data.carrier.teleport(newRidingPos)
+        for (const [player, data] of this.ridingEntities) {
+            if (!player) {
+                this.removeRidingPlayer(player);
+                continue;
+            }
+            if (data.ridingCar != ridingCar) {
+                continue;
             }
 
-            for (const player of world.getAllPlayers()) {
-                const model: EntityModelStructure = {
-                    position: { x: carX, y: carY + 3 / 2, z: carZ },
-                    rotation: { x: carPitch, y: -carYaw },
-                    size: { x: 3, y: 3, z: this.spacing + this.width }
-                };
+            // 获取玩家输入
+            const move: Vector2 = player.inputInfo.getMovementVector?.() || { x: 0, y: 0 };
 
-                const isColliding = CollisionDetector.isPlayerCollidingWithModel(player, model);
-                if (isColliding && !this.isPlayerRiding(player)) {
-                    this.addRidingPlayer(
-                        ridingCar, player,
-                        carX, carY, carZ,
-                        carYaw, carPitch
-                    );
-                } else if (!isColliding && this.isPlayerRiding(player) && this.ridingEntities.get(player)?.ridingCar == ridingCar) {
-
-
-                    // const model2: EntityModelStructure = {
-                    //     position: { x: pos.x, y: pos.y + 3 / 2, z: pos.z},
-                    //     rotation: { x: rot.x, y: -rot.y },
-                    //     size: { x: 3.1, y: 3, z: this.spacing + this.width }
-                    // };
-                    // const isColliding2 = CollisionDetector.isPlayerCollidingWithModel(player, model2);
-
-                    // if (!isColliding2)
-                    // {
-                    this.removeRidingPlayer(player);
-                    // }
-                }
+            // 只在玩家有输入时更新偏移量
+            if (move.x !== 0 || move.y !== 0) {
+                const SPEED = 0.2;
+                const playerRotation = player.getRotation();
+                let offset = new Vec3(Math.sign(-move.y) * SPEED, 0, Math.sign(move.x) * SPEED)
+                let offset2 = (offset.yRot_Degrees(-playerRotation.y + 90)).yRot(carYaw);
+                data.offsets.z += offset2.z;
+                data.offsets.x += offset2.x;
             }
 
-            for (const entity of this.trainEntities.values()) {
-                (entity.getComponent(EntityComponentTypes.Health) as EntityHealthComponent).setCurrentValue(9999)
-            }
-            for (const data of this.ridingEntities.values()) {
-                (data.carrier.getComponent(EntityComponentTypes.Health) as EntityHealthComponent).setCurrentValue(9999)
-            }
-        } catch (error) {
+            const newRidingPos: Vec3 = new Vec3(carX, carY, carZ).add(data.offsets.yRot(-carYaw));
 
+            data.carrier.teleport(newRidingPos)
+        }
+
+        for (const player of world.getAllPlayers()) {
+            const model: EntityModelStructure = {
+                position: { x: carX, y: carY + 3 / 2, z: carZ },
+                rotation: { x: carPitch, y: -carYaw },
+                size: { x: 3, y: 3, z: this.spacing + this.width }
+            };
+
+            const isColliding = CollisionDetector.isPlayerCollidingWithModel(player, model);
+            if (isColliding && !this.isPlayerRiding(player)) {
+                this.addRidingPlayer(
+                    ridingCar, player,
+                    carX, carY, carZ,
+                    carYaw, carPitch
+                );
+            } else if (!isColliding && this.isPlayerRiding(player) && this.ridingEntities.get(player)?.ridingCar == ridingCar) {
+
+
+                // const model2: EntityModelStructure = {
+                //     position: { x: pos.x, y: pos.y + 3 / 2, z: pos.z},
+                //     rotation: { x: rot.x, y: -rot.y },
+                //     size: { x: 3.1, y: 3, z: this.spacing + this.width }
+                // };
+                // const isColliding2 = CollisionDetector.isPlayerCollidingWithModel(player, model2);
+
+                // if (!isColliding2)
+                // {
+                this.removeRidingPlayer(player);
+                // }
+            }
+        }
+
+        for (const entity of this.trainEntities.values()) {
+            (entity.getComponent(EntityComponentTypes.Health) as EntityHealthComponent).setCurrentValue(9999)
+        }
+        for (const data of this.ridingEntities.values()) {
+            (data.carrier.getComponent(EntityComponentTypes.Health) as EntityHealthComponent).setCurrentValue(9999)
         }
     }
 
