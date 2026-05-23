@@ -1,4 +1,4 @@
-export const OutputAddonFileName = "MTS Alpha[VERSION]"
+export const OutputAddonFileName = "MTS Alpha-[VERSION]"
 
 // 从项目根目录开始计算
 export const BP_DefinitionPath = './behavior';

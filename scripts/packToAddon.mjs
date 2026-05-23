@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import AdmZip from 'adm-zip'
 import * as Constants from './Constants.mjs'
+import { execSync } from 'child_process'
 
 function copyRecursive(src, dest) {
     if (!fs.existsSync(src)) return;
@@ -23,29 +24,34 @@ function copyRecursive(src, dest) {
     });
 }
 
+function getLatestCommitHash() {
+    try {
+        return execSync('git rev-parse --short HEAD').toString().trim();
+    } catch (error) {
+        console.error('Failed to getting latest commit hash: ', error);
+        const result = Math.floor(Date.now() / 1000).toString();
+        console.log("Use timestamp in seconds: " + result);
+        return result;
+    }
+}
+
 if (fs.existsSync(Constants.BP_DefinitionPath) && fs.existsSync(Constants.RP_Path)) {
     console.log('Copy BP definition files');
     copyRecursive(Constants.BP_DefinitionPath, Constants.BP_BuildPath);
     console.log('Copy RP resources files');
     copyRecursive(Constants.RP_Path, Constants.RP_BuildPath);
 
-    // auto update
-    const tmepJsonPath = "./scripts/temp.json"
-    const tempJson = JSON.parse(fs.readFileSync(tmepJsonPath).toString())
-    tempJson.version[2] += 1;
-    fs.writeFileSync(tmepJsonPath, JSON.stringify(tempJson))
+    // function processManifest(filePath) {
+        // const json = JSON.parse(fs.readFileSync(filePath).toString());
+        // json.header.version = tempJson.version;
+        // for (const module of json.modules) {
+            // module.version = tempJson.version;
+        // }
+        // fs.writeFileSync(filePath, JSON.stringify(json, null, 2))
+    // }
 
-    function processManifest(filePath) {
-        const json = JSON.parse(fs.readFileSync(filePath).toString());
-        json.header.version = tempJson.version;
-        for (const module of json.modules) {
-            module.version = tempJson.version;
-        }
-        fs.writeFileSync(filePath, JSON.stringify(json, null, 2))
-    }
-
-    processManifest(path.join(Constants.BP_BuildPath, "manifest.json"))
-    processManifest(path.join(Constants.RP_BuildPath, "manifest.json"))
+    // processManifest(path.join(Constants.BP_BuildPath, "manifest.json"))
+    // processManifest(path.join(Constants.RP_BuildPath, "manifest.json"))
 
     console.log("packing to zip(mcaddon)...");
     const zip = new AdmZip()
@@ -56,6 +62,6 @@ if (fs.existsSync(Constants.BP_DefinitionPath) && fs.existsSync(Constants.RP_Pat
         const folderPath = path.join(buildPath, folder.name);
         zip.addLocalFolder(folderPath, folder.name);
     })
-    zip.writeZip(path.join(buildPath, (Constants.OutputAddonFileName.replaceAll("[VERSION]", tempJson.version.join(".")) + ".mcaddon")))
+    zip.writeZip(path.join(buildPath, (Constants.OutputAddonFileName.replaceAll("[VERSION]", getLatestCommitHash()) + ".mcaddon")))
     console.log("Done!")
 }
