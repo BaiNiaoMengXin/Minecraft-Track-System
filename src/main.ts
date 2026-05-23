@@ -27,21 +27,32 @@ world.afterEvents.worldLoad.subscribe(event => {
 
 
 export function LoadData() {
-    system.runTimeout(() => {
+    system.run(() => {
         const sharedDataBase2 = new ShardDataBase<string>("mts")
         const data = sharedDataBase2.get("RailwayData")
         if (data) {
             const packed = new Uint8Array(Array.from(data as string, char => char.charCodeAt(0)));
-            MTS.railwayData.load(decode(packed) as any);
+            MTS.railwayData.load(decode(packed, { useBigInt64: true }) as any);
             world.sendMessage("§a铁路数据、存档已加载完成。");
         }
-    }, 10);
+    });
 }
 
 export function SaveData() {
-    const packed = encode(MTS.railwayData.toMessagePack())
+    function bufferToStr(arr: Uint8Array) {
+        const chunkSize = 1000;
+        let result = '';
+        
+        for (let i = 0; i < arr.length; i += chunkSize) {
+            const chunk = arr.slice(i, i + chunkSize);
+            result += String.fromCharCode(...chunk);
+        }
+        
+        return result;
+    }
+    const packed = encode(MTS.railwayData.toMessagePack(), { useBigInt64: true })
 
-    gSharedDataBase.set("RailwayData", String.fromCharCode(...packed))
+    gSharedDataBase.set("RailwayData", bufferToStr(packed))
     gSharedDataBase.save()
     world.sendMessage("§a铁路数据、存档已保存完成。");
 }
