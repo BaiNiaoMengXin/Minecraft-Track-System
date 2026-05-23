@@ -26,7 +26,8 @@ export namespace MTS {
                 entity.addEffect("minecraft:invisibility", 20000000, { showParticles: false });
             });
             railsSet.add(rail);
-            RenderRail.particleRenderRailStandard(rail, 0.0625 + RenderRail.SMALL_OFFSET, 1, 1, player, true, RAIL_RENDER_DURATION);
+            // TODO fix render duration
+            RenderRail.particleRenderRailStandard(rail, 0.0625 + RenderRail.SMALL_OFFSET, 1, 1, player, true, RAIL_RENDER_DURATION + 1);
         }
     }
 

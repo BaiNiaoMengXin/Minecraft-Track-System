@@ -11,6 +11,8 @@ export namespace RenderRail {
     export const SMALL_OFFSET: number = 0.003125;
 
     export const MAX_RAIL_DISTANCE: number = 3 * 16;
+    
+    const MIN_RENDER_PRECISION = 1.25;
 
     function getRailInLengthLeftRightPoints(rail: Rail, length: number, railWidth: number): [Vec3, Vec3] {
         const point = rail.getPosition(length);
@@ -43,9 +45,9 @@ export namespace RenderRail {
         const dz = playerPos.z - pos.z;
         const distance =  Math.sqrt(dx * dx + dy * dy + dz * dz);
         // Linear mapping: (0 -> 1.25), (48 -> 8)
-        // Slope: (8 - 1.25) / 48
-        const k = 6.75 / 48;
-        return 0.75 + k * distance;
+        // Slope
+        const k = (8 - MIN_RENDER_PRECISION) / 48;
+        return MIN_RENDER_PRECISION + k * distance;
     }
 
     export function particleRenderRailStandard(rail: Rail, yOffset: number, opacity: number, railWidth: number, player: Player | null, useLOD: boolean, duration: number): void {
@@ -56,7 +58,7 @@ export namespace RenderRail {
             let lastPoints = getRailInLengthLeftRightPoints(rail, 0, railWidth + (2 / 16));// particle texture width is 2px
             
             let flag = false;
-            for (let i = useLOD ? getLODResolution(player, lastPoints[0]) : 0.75; ; i += useLOD ? getLODResolution(player, lastPoints[0]) : 0.75) {
+            for (let i = useLOD ? getLODResolution(player, lastPoints[0]) : MIN_RENDER_PRECISION; ; i += useLOD ? getLODResolution(player, lastPoints[0]) : MIN_RENDER_PRECISION) {
                 if (i > railLength) {
                     if (!flag) {
                         flag = true;
