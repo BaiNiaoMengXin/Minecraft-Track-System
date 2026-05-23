@@ -4,16 +4,13 @@ export class ExtensionRegistry {
     protected mRegistry: Registry | undefined = undefined;
 
     constructor() {
-        // world.afterEvents.worldLoad.subscribe(() => {
-            system.runTimeout(() => 
+        world.afterEvents.worldLoad.subscribe(() => {
+            if (world.scoreboard.getObjective("mtsExtensionRegistry"))
             {
-                if (world.scoreboard.getObjective("mtsExtensionRegistry"))
-                {
-                    this.mRegistry = JSON.parse(world.scoreboard.getObjective("mtsExtensionRegistry")!.displayName)
-                    world.sendMessage("§a所有追加包已加载完毕!");
-                }
-            }, 20 * 2)
-        // })
+                this.mRegistry = JSON.parse(world.scoreboard.getObjective("mtsExtensionRegistry")!.displayName)
+                world.sendMessage("§a所有追加包已加载完毕!");
+            }
+        })
     }
 
     getAllRailExtension(): ExtensionRail[] | undefined {
