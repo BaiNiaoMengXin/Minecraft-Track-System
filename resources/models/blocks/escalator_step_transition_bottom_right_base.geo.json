@@ -1,0 +1,69 @@
+{
+	"format_version": "1.21.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.escalator_step_transition_bottom_right_base",
+				"texture_width": 22,
+				"texture_height": 22,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "bb_main",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{
+							"origin": [-8, 16, -3],
+							"size": [16, 0, 11],
+							"uv": {
+								"up": {"uv": [0, 15.7055], "uv_size": [3.1411, -3.1411], "uv_rotation": 270}
+							}
+						},
+						{
+							"origin": [0.7, -1.6, -8],
+							"size": [11.2, 11.2, 5.03],
+							"pivot": [2.3, 8, -11],
+							"rotation": [0, 0, -45],
+							"uv": {
+								"north": {"uv": [0, 16.64602], "uv_size": [1.5741, 1.57414]},
+								"east": {"uv": [1.56922, 16.64602], "uv_size": [-0.49192, 1.57414]},
+								"south": {"uv": [0, 16.64602], "uv_size": [0.68869, 1.57414]},
+								"up": {"uv": [1.57414, 16.6534], "uv_size": [-1.57414, 0.49192]}
+							}
+						},
+						{
+							"origin": [-8, 0, -8],
+							"size": [16, 16, 5],
+							"uv": {
+								"north": {"uv": [1.56923, 16.64602], "uv_size": [-1.56923, 1.18061]},
+								"west": {"uv": [1.02981, 16.64602], "uv_size": [0.53942, 1.57414]},
+								"up": {"uv": [1.56923, 16.64602], "uv_size": [-1.56923, 0.49192], "uv_rotation": 180}
+							}
+						},
+						{
+							"origin": [-8, 0, -8],
+							"size": [16, 4, 16],
+							"uv": {
+								"up": {"uv": [4.51646, 19.34805], "uv_size": [-1.57414, -1.57414], "uv_rotation": 270},
+								"down": {"uv": [4.51646, 17.7739], "uv_size": [-1.57414, 1.57414], "uv_rotation": 90}
+							}
+						},
+						{
+							"origin": [2.35, -2.4, -8],
+							"size": [4.3, 1.42, 16],
+							"pivot": [2.3, 5.6, 0],
+							"rotation": [0, 0, -45],
+							"uv": {
+								"up": {"uv": [4.51646, 19.34805], "uv_size": [-1.56923, -0.73558], "uv_rotation": 270},
+								"down": {"uv": [4.51646, 18.51439], "uv_size": [-1.56923, -0.73558], "uv_rotation": 90}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,40 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.rail.curve": {
+			"loop": true,
+			"bones": {
+				"seg1": {
+					"rotation": ["v.seg1_x_rot", "v.seg1_y_rot", 0],
+					"position": ["v.seg1_x", "v.seg1_y", "v.seg1_z"],
+					"scale": ["(v.seg1_x == 360 && v.seg1_y == 360 && v.seg1_z == 360) ? 0 : 1", "(v.seg1_x == 360 && v.seg1_y == 360 && v.seg1_z == 360) ? 0 : 1", "(v.seg1_x == 360 && v.seg1_y == 360 && v.seg1_z == 360) ? 0 : 1"]
+				},
+				"seg2": {
+					"rotation": ["v.seg2_x_rot", "v.seg2_y_rot", 0],
+					"position": ["v.seg2_x", "v.seg2_y", "v.seg2_z"],
+					"scale": ["(v.seg2_x == 360 && v.seg2_y == 360 && v.seg2_z == 360) ? 0 : 1", "(v.seg2_x == 360 && v.seg2_y == 360 && v.seg2_z == 360) ? 0 : 1", "(v.seg2_x == 360 && v.seg2_y == 360 && v.seg2_z == 360) ? 0 : 1"]
+				},
+				"seg3": {
+					"rotation": ["v.seg3_x_rot", "v.seg3_y_rot", 0],
+					"position": ["v.seg3_x", "v.seg3_y", "v.seg3_z"],
+					"scale": ["(v.seg3_x == 360 && v.seg3_y == 360 && v.seg3_z == 360) ? 0 : 1", "(v.seg3_x == 360 && v.seg3_y == 360 && v.seg3_z == 360) ? 0 : 1", "(v.seg3_x == 360 && v.seg3_y == 360 && v.seg3_z == 360) ? 0 : 1"]
+				},
+				"seg4": {
+					"rotation": ["v.seg4_x_rot", "v.seg4_y_rot", 0],
+					"position": ["v.seg4_x", "v.seg4_y", "v.seg4_z"],
+					"scale": ["(v.seg4_x == 360 && v.seg4_y == 360 && v.seg4_z == 360) ? 0 : 1", "(v.seg4_x == 360 && v.seg4_y == 360 && v.seg4_z == 360) ? 0 : 1", "(v.seg4_x == 360 && v.seg4_y == 360 && v.seg4_z == 360) ? 0 : 1"]
+				},
+				"seg5": {
+					"rotation": ["v.seg5_x_rot", "v.seg5_y_rot", 0],
+					"position": ["v.seg5_x", "v.seg5_y", "v.seg5_z"],
+					"scale": ["(v.seg5_x == 360 && v.seg5_y == 360 && v.seg5_z == 360) ? 0 : 1", "(v.seg5_x == 360 && v.seg5_y == 360 && v.seg5_z == 360) ? 0 : 1", "(v.seg5_x == 360 && v.seg5_y == 360 && v.seg5_z == 360) ? 0 : 1"]
+				},
+				"seg6": {
+					"rotation": ["v.seg6_x_rot", "v.seg6_y_rot", 0],
+					"position": ["v.seg6_x", "v.seg6_y", "v.seg6_z"],
+					"scale": ["(v.seg6_x == 360 && v.seg6_y == 360 && v.seg6_z == 360) ? 0 : 1", "(v.seg6_x == 360 && v.seg6_y == 360 && v.seg6_z == 360) ? 0 : 1", "(v.seg6_x == 360 && v.seg6_y == 360 && v.seg6_z == 360) ? 0 : 1"]
+				}
+			}
+		}
+	}
+}

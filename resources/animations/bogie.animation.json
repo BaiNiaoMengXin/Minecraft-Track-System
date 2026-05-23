@@ -1,0 +1,13 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.bogie.rotation": {
+			"loop": true,
+            "bones": {
+                "body": {
+                    "rotation": ["v.x_rot", "v.y_rot", "v.z_rot"]
+                }
+            }
+		}
+	}
+}

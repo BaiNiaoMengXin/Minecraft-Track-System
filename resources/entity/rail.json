@@ -1,0 +1,99 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mts:rail",
+      "min_engine_version": "1.8.0",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/rails/rail"
+      },
+      "geometry": {
+        "default": "geometry.rail_base"
+      },
+      "scripts": {
+        "animate": [
+          "rotation"
+        ],
+        "initialize": [
+          "variable.seg1_x_rot = 0.0;",
+          "variable.seg2_x_rot = 0.0;",
+          "variable.seg3_x_rot = 0.0;",
+          "variable.seg4_x_rot = 0.0;",
+          "variable.seg5_x_rot = 0.0;",
+          "variable.seg6_x_rot = 0.0;",
+          
+          "variable.seg1_y_rot = 0.0;",
+          "variable.seg2_y_rot = 0.0;",
+          "variable.seg3_y_rot = 0.0;",
+          "variable.seg4_y_rot = 0.0;",
+          "variable.seg5_y_rot = 0.0;",
+          "variable.seg6_y_rot = 0.0;",
+
+          "variable.seg1_x = 0.0;",
+          "variable.seg2_x = 0.0;",
+          "variable.seg3_x = 0.0;",
+          "variable.seg4_x = 0.0;",
+          "variable.seg5_x = 0.0;",
+          "variable.seg6_x = 0.0;",
+          
+          "variable.seg1_y = 0.0;",
+          "variable.seg2_y = 0.0;",
+          "variable.seg3_y = 0.0;",
+          "variable.seg4_y = 0.0;",
+          "variable.seg5_y = 0.0;",
+          "variable.seg6_y = 0.0;",
+          
+          "variable.seg1_z = 0.0;",
+          "variable.seg2_z = 0.0;",
+          "variable.seg3_z = 0.0;",
+          "variable.seg4_z = 0.0;",
+          "variable.seg5_z = 0.0;",
+          "variable.seg6_z = 0.0;"
+        ],
+        "pre_animation": [
+          "variable.seg1_x_rot = query.property('mts:seg1_x_rot') != 0.0 ? query.property('mts:seg1_x_rot') : variable.seg1_x_rot;",
+          "variable.seg2_x_rot = query.property('mts:seg2_x_rot') != 0.0 ? query.property('mts:seg2_x_rot') : variable.seg2_x_rot;",
+          "variable.seg3_x_rot = query.property('mts:seg3_x_rot') != 0.0 ? query.property('mts:seg3_x_rot') : variable.seg3_x_rot;",
+          "variable.seg4_x_rot = query.property('mts:seg4_x_rot') != 0.0 ? query.property('mts:seg4_x_rot') : variable.seg4_x_rot;",
+          "variable.seg5_x_rot = query.property('mts:seg5_x_rot') != 0.0 ? query.property('mts:seg5_x_rot') : variable.seg5_x_rot;",
+          "variable.seg6_x_rot = query.property('mts:seg6_x_rot') != 0.0 ? query.property('mts:seg6_x_rot') : variable.seg6_x_rot;",
+          
+          "variable.seg1_y_rot = query.property('mts:seg1_y_rot') != 0.0 ? query.property('mts:seg1_y_rot') : variable.seg1_y_rot;",
+          "variable.seg2_y_rot = query.property('mts:seg2_y_rot') != 0.0 ? query.property('mts:seg2_y_rot') : variable.seg2_y_rot;",
+          "variable.seg3_y_rot = query.property('mts:seg3_y_rot') != 0.0 ? query.property('mts:seg3_y_rot') : variable.seg3_y_rot;",
+          "variable.seg4_y_rot = query.property('mts:seg4_y_rot') != 0.0 ? query.property('mts:seg4_y_rot') : variable.seg4_y_rot;",
+          "variable.seg5_y_rot = query.property('mts:seg5_y_rot') != 0.0 ? query.property('mts:seg5_y_rot') : variable.seg5_y_rot;",
+          "variable.seg6_y_rot = query.property('mts:seg6_y_rot') != 0.0 ? query.property('mts:seg6_y_rot') : variable.seg6_y_rot;",
+          
+          "variable.seg1_x = query.property('mts:seg1_x') != 0.0 ? query.property('mts:seg1_x') : variable.seg1_x;",
+          "variable.seg2_x = query.property('mts:seg2_x') != 0.0 ? query.property('mts:seg2_x') : variable.seg2_x;",
+          "variable.seg3_x = query.property('mts:seg3_x') != 0.0 ? query.property('mts:seg3_x') : variable.seg3_x;",
+          "variable.seg4_x = query.property('mts:seg4_x') != 0.0 ? query.property('mts:seg4_x') : variable.seg4_x;",
+          "variable.seg5_x = query.property('mts:seg5_x') != 0.0 ? query.property('mts:seg5_x') : variable.seg5_x;",
+          "variable.seg6_x = query.property('mts:seg6_x') != 0.0 ? query.property('mts:seg6_x') : variable.seg6_x;",
+          
+          "variable.seg1_y = query.property('mts:seg1_y') != 0.0 ? query.property('mts:seg1_y') : variable.seg1_y;",
+          "variable.seg2_y = query.property('mts:seg2_y') != 0.0 ? query.property('mts:seg2_y') : variable.seg2_y;",
+          "variable.seg3_y = query.property('mts:seg3_y') != 0.0 ? query.property('mts:seg3_y') : variable.seg3_y;",
+          "variable.seg4_y = query.property('mts:seg4_y') != 0.0 ? query.property('mts:seg4_y') : variable.seg4_y;",
+          "variable.seg5_y = query.property('mts:seg5_y') != 0.0 ? query.property('mts:seg5_y') : variable.seg5_y;",
+          "variable.seg6_y = query.property('mts:seg6_y') != 0.0 ? query.property('mts:seg6_y') : variable.seg6_y;",
+          
+          "variable.seg1_z = query.property('mts:seg1_z') != 0.0 ? query.property('mts:seg1_z') : variable.seg1_z;",
+          "variable.seg2_z = query.property('mts:seg2_z') != 0.0 ? query.property('mts:seg2_z') : variable.seg2_z;",
+          "variable.seg3_z = query.property('mts:seg3_z') != 0.0 ? query.property('mts:seg3_z') : variable.seg3_z;",
+          "variable.seg4_z = query.property('mts:seg4_z') != 0.0 ? query.property('mts:seg4_z') : variable.seg4_z;",
+          "variable.seg5_z = query.property('mts:seg5_z') != 0.0 ? query.property('mts:seg5_z') : variable.seg5_z;",
+          "variable.seg6_z = query.property('mts:seg6_z') != 0.0 ? query.property('mts:seg6_z') : variable.seg6_z;"
+        ]
+      },
+      "animations": {
+        "rotation": "animation.rail.curve"
+      },
+      "render_controllers": ["controller.render.default"]
+    }
+  }
+}

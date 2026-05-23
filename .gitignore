@@ -1,0 +1,26 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directory
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Backup files
+*.bak
+*.disabled
+
+# VS Code settings files
+.vscode/
+
+# MTR source code
+references/
+
+# Build files
+build/

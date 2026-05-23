@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "outDir": "./build/TrackSystemBP/scripts",
+    "declaration": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build"]
+}

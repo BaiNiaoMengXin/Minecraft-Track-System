@@ -1,0 +1,476 @@
+import { Rail } from "./Rail";
+import { Station } from "./Station"
+import { Platform } from "./Platform"
+import { generateUniqueNumberID } from "./Base";
+import { BetterMap } from "./BetterMap";
+import { Depot } from "./Depot";
+import { Route } from "./Route";
+import { TransportMode } from "./TransportMode";
+import { Player, Vector3, world } from "@minecraft/server";
+import { DataCache } from "./DataCache";
+import { RailType } from "./RailType";
+import { SavedRailBase } from "./SavedRailBase";
+import { Siding } from "./Siding";
+import { BlockPos } from "util/math/BlockPos";
+import { SerializedDataBase } from "./SerializedDataBase";
+import { SignalBlocks } from "./SignalBlocks";
+import { TrainDelay } from "./TrainDelay";
+import { RailwayDataFileSaveModule } from "./RailwayDataFileSaveModule";
+import { ArrayList } from "jLib/ArrayList";
+import { ScheduleEntry } from "./ScheduleEntry";
+import { UUID } from "jLib/UUID";
+import { DyeColor } from "util/DyeColor";
+import { PathData } from "path/PathData";
+import { BlockNode } from "block/BlockNode";
+import { RailwayDataPathGenerationModle } from "./RailwayDataPathGenerationModle";
+import { RailAngle } from "./RailAngle";
+
+export class RailwayData extends SerializedDataBase {
+
+	public readonly stations : Set<Station>  = new Set();
+	public readonly platforms : Set<Platform>  = new Set();
+	public readonly sidings: Set<Siding> = new Set();
+	public readonly routes : Set<Route>  = new Set();
+	public readonly depots : Set<Depot>  = new Set();
+	public readonly dataCache: DataCache = new DataCache(this.stations, this.platforms, this.sidings, this.routes, this.depots);
+
+	public readonly railwayDataPathGenerationMoudle: RailwayDataPathGenerationModle;
+
+	private prevPlatformCount: number = 0;
+	private prevSidingCount: number = 0;
+	private useTimeAndWindSync: boolean = false;
+
+	private readonly railNodes: BetterMap<BlockPos, RailAngle> = new BetterMap();
+    private readonly rails : BetterMap<BlockPos, BetterMap<BlockPos, Rail>> = new BetterMap();
+	private readonly signalBlocks: SignalBlocks = new SignalBlocks()
+
+	private readonly railwayDataFileSaveModule: RailwayDataFileSaveModule;
+
+	private readonly trainPositions: ArrayList<BetterMap<UUID, bigint>>  = new ArrayList(2);
+	private readonly schedulesForPlatform: Map<number, Array<ScheduleEntry>> = new Map();
+	private readonly trainDelays: Map<number, BetterMap<BlockPos, TrainDelay>> = new Map()
+
+	private static readonly DATA_VERSION = 1;
+
+	private static readonly NAME = "mts_train_data";
+	private static readonly KEY_DATA_VERSION = "mts_data_version";
+
+	public constructor() { 
+		super();
+		this.trainPositions[0] = new BetterMap();
+		this.trainPositions[1] = new BetterMap();
+
+		this.railwayDataFileSaveModule = new RailwayDataFileSaveModule(this, this.rails, this.signalBlocks, this.railNodes);
+		this.railwayDataPathGenerationMoudle = new RailwayDataPathGenerationModle(this, this.rails);
+	}
+
+	public load(packet: ReturnType<this['toMessagePack']>) {
+		if (packet[RailwayData.KEY_DATA_VERSION] > RailwayData.DATA_VERSION) {
+			world.sendMessage("§c§l你不能使用更高MTS版本的存档来加载至此版本!")
+			throw new RangeError("Unsupported data version");
+		}
+		this.railwayDataFileSaveModule.load(packet[RailwayData.NAME]);
+		this.validateData();
+		this.dataCache.sync();
+		this.signalBlocks.writeCache();
+
+		this.useTimeAndWindSync = packet.use_time_and_wind_sync;
+		this.runRealTimeSync();
+	}
+
+	public override toMessagePack() {
+		return {
+			[RailwayData.KEY_DATA_VERSION]: RailwayData.DATA_VERSION,
+			[RailwayData.NAME]: this.railwayDataFileSaveModule.toMessagePack(),
+
+			use_time_and_wind_sync: this.useTimeAndWindSync
+		} as const;
+	}
+
+	public simulateTrains(): void {
+		this.trainPositions.remove(0);
+		this.trainPositions.push(new BetterMap());
+		this.schedulesForPlatform.clear();
+		this.signalBlocks.resetOccupied();
+		this.sidings.forEach(siding => {
+			siding.setSidingData(this.dataCache.sidingIdToDepot.get(siding.id) ?? null, this.rails);
+			siding.simulateTrain(this.dataCache, this.trainPositions, this.signalBlocks, this.schedulesForPlatform, this.trainDelays);
+		});
+		this.depots.forEach(depot => depot.deployTrain(this));
+
+		if (this.prevPlatformCount != this.platforms.size || this.prevSidingCount != this.sidings.size) {
+			this.dataCache.sync();
+		}
+		this.prevPlatformCount = this.platforms.size;
+		this.prevSidingCount = this.sidings.size;
+	}
+
+	// writing data
+
+	public addRail(player: Player, transportMode: TransportMode, posStart: BlockPos, posEnd: BlockPos, rail: Rail, validate: boolean): number {
+		const newId = validate ? generateUniqueNumberID() : 0;
+		RailwayData.addRail(this.rails, this.platforms, this.sidings, transportMode, posStart, posEnd, rail, newId);
+
+		if (validate) {
+			this.validateData();
+		}
+
+		return newId;
+	}
+
+	public addSignal(player: Player, color: DyeColor, posStart: BlockPos, posEnd: BlockPos): number {
+		world.sendMessage(`${player.name}, SignalBlock, , "color:${color}", ${posStart.asJson()}, ${posEnd.asJson()}`);
+		return this.signalBlocks.add(0, color, PathData.getRailProduct(posStart, posEnd));
+	}
+
+	public removeNode(player: Player, pos: BlockPos, transportMode: TransportMode): void {
+		RailwayData.removeNode(this.rails, pos);
+		this.validateData();
+	}
+
+	public removeRailConnection(player: Player, pos1: BlockPos, pos2: BlockPos): void {
+		RailwayData.removeRailConnection(this.rails, pos1, pos2);
+		this.validateData();
+	}
+
+	public hasSavedRail(pos: BlockPos): boolean {
+		return this.rails.has(pos) && Array.from(this.rails.get(pos)!.values()).some(rail => rail.railType.hasSavedRail);
+	}
+
+	public containsRail(pos1: BlockPos, pos2: BlockPos): boolean {
+		return RailwayData.containsRail(this.rails, pos1, pos2);
+	}
+
+	public removeSignal(player: Player, color: DyeColor, posStart: BlockPos, posEnd: BlockPos): number {
+		return this.signalBlocks.remove(0, color, PathData.getRailProduct(posStart, posEnd));
+	}
+
+	public getSchedulesForStation( schedulesForStation: Map<number, Array<ScheduleEntry>>, stationId: number): void {
+		this.schedulesForPlatform.forEach((schedules, platformId) => {
+			const station = this.dataCache.platformIdToStation.get(platformId);
+			if (station != null && station.id == stationId) {
+				schedulesForStation.set(platformId, schedules);
+			}
+		});
+	}
+
+	public getSchedulesAtPlatform(platformId: number): Array<ScheduleEntry> | null  {
+		return this.schedulesForPlatform.get(platformId) ?? null;
+	}
+
+	public getTrainDelays(): Map<number, BetterMap<BlockPos, TrainDelay>>  {
+		return this.trainDelays;
+	}
+
+	public resetTrainDelays(depot: Depot): void {
+		depot.routeIds.forEach(v => this.trainDelays.delete(v));
+	}
+
+	public getUseTimeAndWindSync(): boolean {
+		return this.useTimeAndWindSync;
+	}
+
+	public setUseTimeAndWindSync(useTimeAndWindSync: boolean): void {
+		this.useTimeAndWindSync = useTimeAndWindSync;
+		this.runRealTimeSync();
+	}
+
+	private validateData(): void {
+		RailwayData.removeSavedRailS2C(this.platforms, this.rails);
+		RailwayData.removeSavedRailS2C(this.sidings, this.rails);
+
+		const railsToRemove = new Array<BlockPos>();
+		this.rails.forEach((railMap, startPos) => railMap.forEach((rail, endPos) => {
+			if (rail.railType.hasSavedRail && SavedRailBase.isInvalidSavedRail(this.rails, endPos, startPos)) {
+				railsToRemove.push(startPos);
+				railsToRemove.push(endPos);
+			}
+		}));
+		for (let i = 0; i < railsToRemove.length - 1; i += 2) {
+			RailwayData.removeRailConnection(this.rails, railsToRemove[i], railsToRemove[i+ 1]);
+		}
+	}
+
+	private runRealTimeSync(): void {
+		if (this.useTimeAndWindSync) {
+			const date = new Date();
+			const ticks = Math.round((date.getHours() + Depot.HOURS_IN_DAY - 6) * 1000 + date.getMinutes() / 0.06 + date.getSeconds() / 3.6) % 24000;
+			try {
+				world.setTimeOfDay(ticks);
+			} catch (e) {
+				world.sendMessage(`§cFailed to set world time to real time: ${e}`);
+			}
+		}
+	}
+
+	public getRails(): ReadonlyMap<BlockPos, ReadonlyMap<BlockPos, Rail>> {
+		return this.rails;
+	}
+
+	public addRailNodeBlock(player: Player, pos: BlockPos): void {
+        const facing = RailwayData.getRailAngleFromPlayerFacing(player);
+        this.railNodes.set(pos, facing);
+
+        BlockNode.updateRailNodeState(pos, facing);
+    }
+
+	public removeRailNodeBlock(player: Player, pos: BlockPos): void {
+		// TODO temporary code
+		this.removeNode(player, pos, TransportMode.TRAIN);
+		// TODO temporary code end
+
+        this.railNodes.delete(pos);
+    }
+
+	public getRailNodeAngle(pos: BlockPos): RailAngle | null {
+		return this.railNodes.get(pos) ?? null;
+	}
+
+	// static finders
+
+	public static getPlatformByPos(platforms: Set<Platform>, pos: BlockPos): Platform | null {
+		return Array.from(platforms).find(platform => platform.containsPos(pos)) ?? null;
+	}
+
+	// other
+
+	public static addRail(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>, platforms: Set<Platform>, sidings: Set<Siding>, transportMode: TransportMode, posStart: BlockPos, posEnd: BlockPos, rail: Rail, savedRailId: number): void {
+		if (!rails.has(posStart)) {
+			rails.set(posStart, new BetterMap());
+		}
+		rails.get(posStart)!.set(posEnd, rail);
+
+		if (savedRailId != 0) {
+			if (rail.railType == RailType.PLATFORM && Array.from(platforms).every(platform => !platform.containsPos(posStart) || platform.containsPos(posEnd))) {
+				platforms.add(new Platform(savedRailId, transportMode, posStart, posEnd));
+			} else if (rail.railType == RailType.SIDING && Array.from(sidings).every(siding => !siding.containsPos(posStart) || siding.containsPos(posEnd))) {
+				sidings.add(new Siding(savedRailId, transportMode, posStart, posEnd, Math.floor(rail.getLength())));
+			}
+		}
+	}
+
+	public static removeNode(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>, pos: BlockPos): void {
+		try {
+			rails.get(pos)?.forEach((rail, posEnd) => {
+				rail.destroyEntities();
+			})
+			rails.delete(pos);
+			rails.forEach((railMap, startPos) => {
+				railMap.get(pos)?.destroyEntities();
+				railMap.delete(pos);
+				if (railMap.isEmpty() && world != null) {
+					BlockNode.resetRailNode(startPos);
+				}
+			});
+            RailwayData.validateRails(rails);
+		} catch (e) {
+		}
+	}
+
+	public static removeRailConnection(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>, pos1: BlockPos, pos2: BlockPos): void {
+		try {
+			if (rails.has(pos1)) {
+				rails.get(pos1)!.get(pos2)?.destroyEntities();
+				rails.get(pos1)!.delete(pos2);
+				if (rails.get(pos1)!.isEmpty()) {
+					BlockNode.resetRailNode(pos1);
+				}
+			}
+			if (rails.has(pos2)) {
+				rails.get(pos2)!.get(pos1)?.destroyEntities();
+				rails.get(pos2)!.delete(pos1);
+				if (rails.get(pos2)!.isEmpty()) {
+					BlockNode.resetRailNode(pos2);
+				}
+			}
+			if (world != null) {
+	            RailwayData.validateRails(rails);
+			}
+		} catch (e) {
+		}
+	}
+
+	public static containsRail(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>, pos1: BlockPos, pos2: BlockPos): boolean {
+		return rails.has(pos1) && rails.get(pos1)!.has(pos2);
+	}
+
+	public static getStation(stations: Set<Station>, dataCache: DataCache, pos: BlockPos) {
+		if (dataCache.blockPosToStation.has(pos)) {
+			return dataCache.blockPosToStation.get(pos)!;
+		} else {
+			return Array.from(stations).find(station => station.inArea(pos.getX(), pos.getZ())) ?? null;
+		}
+	}
+
+	public static getClosePlatformId(platforms: Set<Platform>, dataCache: DataCache, pos: BlockPos): number;
+	public static getClosePlatformId(platforms: Set<Platform>, dataCache: DataCache, pos: BlockPos, radius: number, lower: number, upper: number): number;
+
+	public static getClosePlatformId(platforms: Set<Platform>, dataCache: DataCache, pos: BlockPos, radius?: number, lower?: number, upper?: number): number {
+		if (radius == undefined || lower == undefined || upper == undefined) {
+			return RailwayData.getClosePlatformId(platforms, dataCache, pos, 5, 0, 4);
+		}
+
+		const posLong = pos.asLong();
+		if (dataCache.blockPosToPlatformId.has(posLong)) {
+			return dataCache.blockPosToPlatformId.get(posLong)!;
+		} else {
+			let platformId = 0;
+			for (let i = 1; i <= radius; i++) {
+				const searchRadius = i;
+				platformId = Array.from(platforms).filter(platform => platform.isCloseToSavedRail(pos, searchRadius, lower, upper)).sort((a, b) => a.getMidPos().distManhattan(pos) - b.getMidPos().distManhattan(pos))[0]?.id || 0;
+				if (platformId != 0) {
+					break;
+				}
+			}
+			dataCache.blockPosToPlatformId.set(posLong, platformId);
+			return platformId;
+		}
+	}
+
+	public static useRoutesAndStationsFromIndex(stopIndex: number, routeIds: number[], dataCache: DataCache, routeAndStationsCallback: (currentStationIndex: number, thisRoute: Route, nextRoute: Route | null, thisStaion: Station | null, nextStaion: Station | null, lastStation: Station | null) => void): boolean {
+		if (stopIndex < 0) {
+			return false;
+		}
+
+		let sum = 0;
+		for (let i = 0; i < routeIds.length; i++) {
+			const thisRoute = dataCache.routeIdMap.get(routeIds[i]);
+			const nextRoute = i < routeIds.length - 1 && !dataCache.routeIdMap.get(routeIds[i + 1])!.isHidden ? dataCache.routeIdMap.get(routeIds[i + 1]) : undefined;
+			if (thisRoute != null) {
+				const difference = stopIndex - sum;
+				sum += thisRoute.platformIds.length;
+				if (thisRoute.platformIds.length != 0 && nextRoute != null && nextRoute.platformIds.length != 0 && thisRoute.getLastPlatformId() == nextRoute.getFirstPlatformId()) {
+					sum--;
+				}
+				if (stopIndex < sum) {
+					const thisStation = dataCache.platformIdToStation.get(thisRoute.platformIds[difference].platformId);
+					const nextStation = difference < thisRoute.platformIds.length - 1 ? dataCache.platformIdToStation.get(thisRoute.platformIds[difference + 1].platformId) : undefined;
+					const lastStation = thisRoute.platformIds.length == 0 ? undefined : dataCache.platformIdToStation.get(thisRoute.getLastPlatformId());
+					routeAndStationsCallback(difference, thisRoute, nextRoute ?? null, thisStation ?? null, nextStation ?? null, lastStation ?? null);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
+
+	public static newBlockPos(x: number, y: number, z: number): BlockPos;
+    public static newBlockPos(vec3: Vector3): BlockPos;
+
+	public static newBlockPos(arg1: number | Vector3, y?: number, z?: number): BlockPos {
+		if (typeof arg1 === 'number') {
+			return new BlockPos(arg1, y!, z!);
+		}
+		return new BlockPos(arg1.x, arg1.y, arg1.y);
+	}
+
+	public static offsetBlockPos(pos: BlockPos, x: number, y: number, z: number): BlockPos {
+		return x == 0 && y == 0 && z == 0 ? pos : this.newBlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
+	}
+
+	public static round(value: number, decimalPlaces: number): number {
+		let factor = 1;
+		for (let i = 0; i < decimalPlaces; i++) {
+			factor *= 10;
+		}
+		return Math.round(value * factor) / factor;
+	}
+
+	public static chunkLoaded(pos: BlockPos): boolean {
+		const chunX = Math.floor(pos.getX() / 16);
+		const chunZ = Math.floor(pos.getZ() / 16);
+		try {
+			const chunk = world.getDimension("overworld").getBlock({x: chunX * 16, y: 0, z: chunZ * 16});
+			return chunk != undefined;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	public static isBetween(value: number, value1: number, value2: number, padding: number = 0): boolean {
+		return value >= Math.min(value1, value2) - padding && value <= Math.max(value1, value2) + padding;
+	}
+
+	public static getRailAngleFromPlayerFacing(player: Player): RailAngle {
+        const rotation = player.getRotation();
+        let yaw = rotation.y;
+        
+        while (yaw < 0) yaw += 360;
+        while (yaw >= 360) yaw -= 360;
+        
+        return RailAngle.fromAngle(yaw - 90);
+    }
+
+
+	private static validateRails(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
+		const railsToRemove = new Array<BlockPos>();
+		const railsNodesToRemove = new Array<BlockPos>();
+		rails.forEach((railMap, startPos) => {
+			const chunkLoaded = RailwayData.chunkLoaded(startPos);
+			if (chunkLoaded && !(world.getDimension("overworld").getBlock(startPos.asJson())!.typeId == BlockNode.RAIL_NODE_BLOCK_KEY_NAME)) {
+				railsNodesToRemove.push(startPos);
+			}
+
+			if (railMap.isEmpty()) {
+				railsToRemove.push(startPos);
+			}
+		});
+		railsToRemove.forEach(v => {
+			rails.get(v)?.forEach((rail, posEnd) => rail.destroyEntities())
+			rails.delete(v)
+		});
+		railsNodesToRemove.forEach(pos => RailwayData.removeNode(rails, pos));
+	}
+
+	private static removeSavedRailS2C<T extends SavedRailBase>(savedRailBases: Set<T> , rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
+		for (const savedRailBase of savedRailBases) {
+			if (savedRailBase.isInvalidSavedRail(rails)) {
+				savedRailBases.delete(savedRailBase);
+			}
+		};
+	}
+}
+
+// TODO temporary code start
+
+/** @deprecated */
+export class RailEntry extends SerializedDataBase {
+
+	public readonly pos: BlockPos;
+	public readonly connections: BetterMap<BlockPos, Rail>;
+
+	public constructor(pos: BlockPos, connections: BetterMap<BlockPos, Rail>);
+
+	public constructor(map: Record<string, unknown>);
+
+	public constructor(arg1: BlockPos | object, arg2?: BetterMap<BlockPos, Rail>) {
+		super()
+		if (arg2 !== undefined) {
+			this.pos = arg1 as BlockPos;
+			this.connections = arg2;
+		} else {
+			const packet = arg1 as ReturnType<this["toMessagePack"]>;
+			this.pos = BlockPos.fromLong(BigInt(packet.node_pos));
+			this.connections = new BetterMap();
+			packet.rail_connections.forEach(value => {
+				this.connections.set(BlockPos.fromLong(BigInt(value.node_pos)), new Rail(value))
+			})
+		}
+	}
+
+	public override toMessagePack() {
+		return {
+			node_pos: this.pos.asLong().toString(),
+			rail_connections: Array.from(this.connections, ([pos1, rail]) => {
+				return {
+					node_pos: pos1.asLong().toString(),
+					...rail.toMessagePack()
+				} as const;
+			})
+		} as const;
+	}
+}
+
+// TODO temporary code end

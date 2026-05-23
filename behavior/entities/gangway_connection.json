@@ -1,0 +1,113 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "mts:gangway_connection",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false,
+        "properties": {
+            "mts:gangway_face1_x": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            },
+            "mts:gangway_face1_y": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            },
+            "mts:gangway_face1_z": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            },
+            "mts:gangway_face1_rot_x": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            },
+            "mts:gangway_face1_rot_y": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            },
+            
+            
+            "mts:gangway_face2_x": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            },
+            "mts:gangway_face2_y": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            },
+            "mts:gangway_face2_z": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            },
+            "mts:gangway_face2_rot_x": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            },
+            "mts:gangway_face2_rot_y": {
+                "type": "float",
+                "default": 0.0,
+                "range": [-360.0, 360.0],
+                "client_sync": true
+            }
+        }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": ["mts"]
+      },
+      "minecraft:collision_box": {
+        "width": 0,
+        "height": 0
+      },
+      "minecraft:knockback_resistance": {
+        "value": 1.0
+      },
+      "minecraft:physics": {
+        "has_gravity": false,
+        "has_collision": false
+      },
+      
+      "minecraft:movement": {
+        "value": 0.0 
+      },
+      "minecraft:jump.static": {}, 
+      "minecraft:movement.basic": {
+        "max_turn": 0.0            
+      },
+      "minecraft:navigation.generic": {
+          "can_path_over_water": false,
+          "can_sink": false,
+          "can_walk": false,
+          "can_breach": false,
+          "can_jump": false,
+          "can_swim": false,
+          "can_pass_doos": false,
+          "avois_water": false
+      },
+      "minecraft:nameable": {}
+    },
+    
+    "component_groups": {},
+    "events": {}
+  }
+}

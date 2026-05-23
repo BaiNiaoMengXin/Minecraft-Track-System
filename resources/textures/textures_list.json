@@ -1,0 +1,9 @@
+{
+    "resource_pack_name": "MTS Addon",
+    "texture_name": "atlas.terrain",
+    "texture_data": {
+        "rail": {
+            "textures": "textures/rails/rail"
+        }
+    }
+}

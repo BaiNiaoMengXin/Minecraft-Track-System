@@ -1,0 +1,265 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:block": {
+    "description": {
+      "minecraft:icon": "escalator",
+      "identifier": "mts:escalator",
+      "menu_category": {
+        "category": "construction"
+      },
+      "states": {
+        "mts:facing": [0, 90, 180, 270],
+        "mts:escalator": [
+          "side_landing_left",
+          "side_slope_left",
+          "side_transition_bottom_left",
+          "side_transition_top_left",
+
+
+          "step_flat_left_down",
+          "step_flat_left_stop",
+          "step_flat_left_up",
+
+          "step_slope_left_down",
+          "step_slope_left_stop",
+          "step_slope_left_up",
+
+          "step_transition_bottom_left_down",
+          "step_transition_bottom_left_stop",
+          "step_transition_bottom_left_up",
+          
+          "side_flat",
+
+          "step_landing"
+        ]
+      }
+    },
+    "components": {
+      "minecraft:geometry": "geometry.escalator_step_flat_left_base",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "escalator_down",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2.0
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 6.0
+      },
+      "minecraft:friction": 0.6,
+      "minecraft:map_color": "#A7A7A7",
+      "minecraft:light_dampening": 0
+    },
+    "permutations": [
+      {
+        "condition": "query.block_state('mts:facing') == 0",
+        "components": { "minecraft:transformation": { "rotation": [ 0, 0, 0 ] } }
+      },
+      {
+        "condition": "query.block_state('mts:facing') == 90",
+        "components": { "minecraft:transformation": { "rotation": [ 0, 90, 0 ] } }
+      },
+      {
+        "condition": "query.block_state('mts:facing') == 180",
+        "components": { "minecraft:transformation": { "rotation": [ 0, 180, 0 ] } }
+      },
+      {
+        "condition": "query.block_state('mts:facing') == 270",
+        "components": { "minecraft:transformation": { "rotation": [ 0, 270, 0 ] } }
+      },
+
+
+
+      {
+        "condition": "query.block_state('mts:escalator') == 'side_flat'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_side_flat",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'side_landing_left'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_side_landing_left",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'side_slope_left'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_side_slope_left",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'side_transition_bottom_left'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_side_transition_bottom_left",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'side_transition_top_left'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_side_transition_top_left",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+
+
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_flat_left_down'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_flat_left_base",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator_down",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_flat_left_stop'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_flat_left_base",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator_stop",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_flat_left_up'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_flat_left_base",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator_up",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+
+      
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_landing'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_landing",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      
+      
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_slope_left_down'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_slope_left_base",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator_down",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_slope_left_stop'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_slope_left_base",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator_stop",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_slope_left_up'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_slope_left_base",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator_up",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+
+      
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_transition_bottom_left_down'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_transition_bottom_left_base",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator_down",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_transition_bottom_left_stop'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_transition_bottom_left_base",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator_stop",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:escalator') == 'step_transition_bottom_left_up'",
+        "components": {
+          "minecraft:geometry": "geometry.escalator_step_transition_bottom_left_base",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "escalator_up",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

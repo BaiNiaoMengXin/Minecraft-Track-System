@@ -1,0 +1,17 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "MTS Addon Resource Pack",
+    "description": "Minecraft Track System - Resource Pack",
+    "uuid": "9c7e8297-0ac7-47a0-8608-cd6692a45f09",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 20, 0]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "5f075661-6608-463c-88ab-7e6d96a14605",
+      "version": [1, 0, 0]
+    }
+  ]
+}

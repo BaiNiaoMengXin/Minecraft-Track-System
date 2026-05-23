@@ -1,0 +1,19 @@
+{
+  "name": "minecraft-track-system",
+  "version": "1.0.0",
+  "description": "Minecraft Track System",
+  "scripts": {
+    "build": "node scripts/cleanBuildTemp.mjs && tsc && node scripts/packToAddon.mjs",
+    "copy": "node scripts/copy-to-dev.mjs",
+    "dev": "npm run build && npm run copy"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@minecraft/server": "^2.6.0",
+    "@minecraft/server-ui": "^2.1.0-beta.1.26.30-preview.21",
+    "adm-zip": "^0.5.17"
+  },
+  "type": "module"
+}

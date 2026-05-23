@@ -1,0 +1,55 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mts:gangway_connection",
+      "min_engine_version": "1.8.0",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/gangway_connection"
+      },
+      "geometry": {
+        "default": "geometry.gangway_connection"
+      },
+      "scripts": {
+        "animate": [
+          "deformation"
+        ],
+        "initialize": [
+          "variable.face1_x = 0.0;",
+          "variable.face1_y = 0.0;",
+          "variable.face1_z = 0.0;",
+          "variable.face1_rot_X = 0.0;",
+          "variable.face1_rot_y = 0.0;",
+          
+          "variable.face2_x = 0.0;",
+          "variable.face2_y = 0.0;",
+          "variable.face2_z = 0.0;",
+          "variable.face2_rot_X = 0.0;",
+          "variable.face2_rot_y = 0.0;"
+        ],
+        "pre_animation": [
+          "variable.face1_x = query.property('mts:gangway_face1_x') != 0.0 ? query.property('mts:gangway_face1_x') : variable.face1_x;",
+          "variable.face1_y = query.property('mts:gangway_face1_y') != 0.0 ? query.property('mts:gangway_face1_y') : variable.face1_y;",
+          "variable.face1_z = query.property('mts:gangway_face1_z') != 0.0 ? query.property('mts:gangway_face1_z') : variable.face1_z;",
+          "variable.face1_rot_x = query.property('mts:gangway_face1_rot_x') != 0.0 ? query.property('mts:gangway_face1_rot_x') : variable.face1_rot_x;",
+          "variable.face1_rot_y = query.property('mts:gangway_face1_rot_y') != 0.0 ? query.property('mts:gangway_face1_rot_y') : variable.face1_rot_y;",
+          
+          "variable.face2_x = query.property('mts:gangway_face2_x') != 0.0 ? query.property('mts:gangway_face2_x') : variable.face2_x;",
+          "variable.face2_y = query.property('mts:gangway_face2_y') != 0.0 ? query.property('mts:gangway_face2_y') : variable.face2_y;",
+          "variable.face2_z = query.property('mts:gangway_face2_z') != 0.0 ? query.property('mts:gangway_face2_z') : variable.face2_z;",
+          "variable.face2_rot_x = query.property('mts:gangway_face2_rot_x') != 0.0 ? query.property('mts:gangway_face2_rot_x') : variable.face2_rot_x;",
+          "variable.face2_rot_y = query.property('mts:gangway_face2_rot_y') != 0.0 ? query.property('mts:gangway_face2_rot_y') : variable.face2_rot_y;"
+        ]
+      },
+      "animations": {
+        "deformation": "animation.gangway_connection.deformation"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

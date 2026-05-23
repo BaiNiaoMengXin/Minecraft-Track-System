@@ -1,0 +1,29 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:attachable": {
+        "description": {
+            "identifier": "mts:rail_connector_120",
+            "materials": {
+                "default": "entity",
+                "enchanted": "entity_glint"
+            },
+            "textures": {
+                "default": "textures/items/rail_connector_120",
+                "enchanted": "textures/misc/enchanted_item_glint"
+            },
+            "geometry": {
+                "default": "geometry.large_item"
+            },
+            "animations": {
+                "hold": "animation.large_item.hold"
+            },
+            "scripts": {
+                "pre_animation": [
+                    "v.is_first_person = query.is_first_person;"
+                ],
+                "animate": ["hold"]
+            },
+            "render_controllers": ["controller.render.item_default"]
+        }
+    }
+}

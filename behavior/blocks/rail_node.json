@@ -1,0 +1,176 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:block": {
+    "description": {
+      "identifier": "mts:rail_node",
+      "menu_category": {
+        "category": "construction"
+      },
+      "states": {
+        "mts:hide": [
+          0,
+          1
+        ],
+        "mts:node_facing": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    },
+    "components": {
+      "minecraft:geometry": "geometry.rail_node",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "rail_node",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2.0
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 6.0
+      },
+      "minecraft:collision_box": false,
+      "minecraft:friction": 0.6,
+      "minecraft:map_color": "#A7A7A7",
+      "minecraft:light_dampening": 0
+    },
+    "permutations": [
+      {
+        "condition": "query.block_state('mts:hide') == 0",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "rail_node",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:hide') == 1",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "rail_node_hide",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+
+      
+      {
+        "condition": "q.block_state('mts:node_facing') == 0",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              0,
+              0
+            ]
+          },
+          "minecraft:geometry": "geometry.rail_node"
+        }
+      },
+      {
+        "condition": "q.block_state('mts:node_facing') == 1",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              0,
+              0
+            ]
+          },
+          "minecraft:geometry": "geometry.rail_node_22_5"
+        }
+      },
+      {
+        "condition": "q.block_state('mts:node_facing') == 2",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              45,
+              0
+            ]
+          },
+          "minecraft:geometry": "geometry.rail_node_45"
+        }
+      },
+      {
+        "condition": "q.block_state('mts:node_facing') == 3",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              45,
+              0
+            ]
+          },
+          "minecraft:geometry": "geometry.rail_node_67_5"
+        }
+      },
+      {
+        "condition": "q.block_state('mts:node_facing') == 4",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              90,
+              0
+            ]
+          },
+          "minecraft:geometry": "geometry.rail_node"
+        }
+      },
+      {
+        "condition": "q.block_state('mts:node_facing') == 5",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              90,
+              0
+            ]
+          },
+          "minecraft:geometry": "geometry.rail_node_22_5"
+        }
+      },
+      {
+        "condition": "q.block_state('mts:node_facing') == 6",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              135,
+              0
+            ]
+          },
+          "minecraft:geometry": "geometry.rail_node_45"
+        }
+      },
+      {
+        "condition": "q.block_state('mts:node_facing') == 7",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              135,
+              0
+            ]
+          },
+          "minecraft:geometry": "geometry.rail_node_67_5"
+        }
+      }
+    ]
+  }
+}

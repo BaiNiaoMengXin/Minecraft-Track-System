@@ -1,0 +1,66 @@
+{
+  "resource_pack_name": "MTS Addon",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "rail_connector_20": {
+      "textures": "textures/items/rail_connector_20"
+    },
+    "rail_connector_20_one_way": {
+      "textures": "textures/items/rail_connector_20_one_way"
+    },
+    "rail_connector_40": {
+      "textures": "textures/items/rail_connector_40"
+    },
+    "rail_connector_40_one_way": {
+      "textures": "textures/items/rail_connector_40_one_way"
+    },
+    "rail_connector_60": {
+      "textures": "textures/items/rail_connector_60"
+    },
+    "rail_connector_60_one_way": {
+      "textures": "textures/items/rail_connector_60_one_way"
+    },
+    "rail_connector_80": {
+      "textures": "textures/items/rail_connector_80"
+    },
+    "rail_connector_80_one_way": {
+      "textures": "textures/items/rail_connector_80_one_way"
+    },
+    "rail_connector_120": {
+      "textures": "textures/items/rail_connector_120"
+    },
+    "rail_connector_120_one_way": {
+      "textures": "textures/items/rail_connector_120_one_way"
+    },
+    "rail_connector_platform": {
+      "textures": "textures/items/rail_connector_platform"
+    },
+    "rail_connector_siding": {
+      "textures": "textures/items/rail_connector_siding"
+    },
+    "rail_connector_turn_back": {
+      "textures": "textures/items/rail_connector_turn_back"
+    },
+    "railway_dashboard": {
+      "textures": "textures/items/railway_dashboard"
+    },
+    "mts_brush": {
+      "textures": "textures/items/mts_brush"
+    },
+    "bridge_creator_3": {
+      "textures": "textures/items/bridge_creator_3"
+    },
+    "bridge_creator_5": {
+      "textures": "textures/items/bridge_creator_5"
+    },
+    "bridge_creator_7": {
+      "textures": "textures/items/bridge_creator_7"
+    },
+    "bridge_creator_9": {
+      "textures": "textures/items/bridge_creator_9"
+    },
+    "escalator": {
+      "textures": "textures/items/escalator"
+    }
+  }
+}

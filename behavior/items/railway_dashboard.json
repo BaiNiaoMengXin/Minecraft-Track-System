@@ -1,0 +1,19 @@
+{
+  "format_version": "1.20.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "mts:railway_dashboard",
+      "menu_category": {
+        "category": "equipment",
+        "group": "itemGroup.name.dashboard"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "texture": "railway_dashboard"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true
+    }
+  }
+}

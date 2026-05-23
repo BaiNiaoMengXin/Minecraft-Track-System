@@ -1,0 +1,19 @@
+{
+  "format_version": "1.8.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mts:ticker",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": ""
+      },
+      "geometry": {
+        "default": "geometry.null"
+      },
+      "render_controllers": ["controller.render.default"],
+      "enable_attachables": false
+    }
+  }
+}

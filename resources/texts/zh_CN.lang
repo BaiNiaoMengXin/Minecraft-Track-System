@@ -1,0 +1,16 @@
+tile.mts:rail_node.name=轨道节点
+tile.mts:escalator.name=扶梯
+
+item.mts:brush=刷
+item.mts:railway_dashboard=铁路仪表板
+item.mts:bridge_creator_3=桥梁创建器
+item.mts:bridge_creator_5=桥梁创建器
+item.mts:bridge_creator_7=桥梁创建器
+item.mts:bridge_creator_9=桥梁创建器
+item.mts:rail_connector_20=木制轨道连接器
+item.mts:rail_connector_40=石制轨道连接器
+item.mts:rail_connector_60=绿宝石制铁轨连接器
+item.mts:rail_connector_80=铁轨连接器
+item.mts:rail_connector_120=黑曜石制轨道连接器
+item.mts:rail_connector_platform=站台轨道连接器
+item.mts:rail_connector_siding=侧线轨道连接器

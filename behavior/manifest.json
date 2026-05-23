@@ -1,0 +1,37 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "MTS Addon Behavior Pack",
+    "description": "Minecraft Track System - Behavior Pack",
+    "uuid": "67c8b888-ee51-4f0e-87e5-b03c8625cffe",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 20, 0]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "e296077c-c250-481f-a245-5c636c08c156",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "cd428a7d-a1d1-4aa3-80ed-ff32cbbbce3c",
+      "version": [1, 0, 0],
+      "entry": "scripts/main.js"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.0.0"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "2.0.0"
+    }
+  ],
+  "capabilities": [
+    "script_eval"
+  ]
+}

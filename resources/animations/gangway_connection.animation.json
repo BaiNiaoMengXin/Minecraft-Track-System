@@ -1,0 +1,310 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.gangway_connection.deformation": {
+			"loop": true,
+			"bones": {
+				"segment_1": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 0.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 0.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 0.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 0.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 0.0/24.0;",
+						0
+					]
+				},
+				"segment_2": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 1.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 1.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 1.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 1.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 1.0/24.0;",
+						0
+					]
+				},
+				"segment_3": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 2.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 2.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 2.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 2.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 2.0/24.0;",
+						0
+					]
+				},
+				"segment_4": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 3.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 3.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 3.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 3.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 3.0/24.0;",
+						0
+					]
+				},
+				"segment_5": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 4.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 4.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 4.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 4.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 4.0/24.0;",
+						0
+					]
+				},
+				"segment_6": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 5.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 5.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 5.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 5.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 5.0/24.0;",
+						0
+					]
+				},
+				"segment_7": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 6.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 6.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 6.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 6.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 6.0/24.0;",
+						0
+					]
+				},
+				"segment_8": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 7.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 7.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 7.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 7.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 7.0/24.0;",
+						0
+					]
+				},
+				"segment_9": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 8.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 8.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 8.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 8.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 8.0/24.0;",
+						0
+					]
+				},
+				"segment_10": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 9.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 9.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 9.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 9.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 9.0/24.0;",
+						0
+					]
+				},
+				"segment_11": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *10.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *10.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *10.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *10.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *10.0/24.0;",
+						0
+					]
+				},
+				"segment_12": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 11.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 11.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 11.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 11.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 11.0/24.0;",
+						0
+					]
+				},
+				"segment_13": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *12.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *12.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *12.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *12.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *12.0/24.0;",
+						0
+					]
+				},
+				"segment_14": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *13.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *13.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *13.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *13.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *13.0/24.0;",
+						0
+					]
+				},
+				"segment_15": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *14.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *14.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *14.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *14.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *14.0/24.0;",
+						0
+					]
+				},
+				"segment_16": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *15.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *15.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *15.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *15.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *15.0/24.0;",
+						0
+					]
+				},
+				"segment_17": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *16.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *16.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *16.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *16.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *16.0/24.0;",
+						0
+					]
+				},
+				"segment_18": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *17.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *17.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *17.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *17.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *17.0/24.0;",
+						0
+					]
+				},
+				"segment_19": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *18.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *18.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *18.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *18.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *18.0/24.0;",
+						0
+					]
+				},
+				"segment_20": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *19.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *19.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *19.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *19.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *19.0/24.0;",
+						0
+					]
+				},
+				"segment_21": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *20.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *20.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *20.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *20.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *20.0/24.0;",
+						0
+					]
+				},
+				"segment_22": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *21.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *21.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *21.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *21.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *21.0/24.0;",
+						0
+					]
+				},
+				"segment_23": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *22.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *22.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *22.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *22.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *22.0/24.0;",
+						0
+					]
+				},
+				"segment_24": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) *23.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) *23.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) *23.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) *23.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) *23.0/24.0;",
+						0
+					]
+				},
+				"segment_25": {
+					"position": [
+						"variable.face1_x + (variable.face2_x - variable.face1_x) * 24.0/24.0;",
+						"variable.face1_y + (variable.face2_y - variable.face1_y) * 24.0/24.0;",
+						"variable.face1_z + (variable.face2_z - variable.face1_z) * 24.0/24.0;"
+					],
+					"rotation": [
+						"variable.face1_rot_x + (variable.face2_rot_x - variable.face1_rot_x) * 24.0/24.0;",
+						"variable.face1_rot_y + (variable.face2_rot_y - variable.face1_rot_y) * 24.0/24.0;",
+						0
+					]
+				}
+			}
+		}
+	}
+}

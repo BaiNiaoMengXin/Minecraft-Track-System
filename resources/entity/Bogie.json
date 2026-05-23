@@ -1,0 +1,34 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mts:bogie",
+      "min_engine_version": "1.8.0",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "geometry": {
+        "default": "geometry.bogie"
+      },
+      "scripts": {
+        "animate": [
+          "rotation"
+        ],
+        "initialize": [
+          "variable.x_rot = 0.0;",
+          "variable.y_rot = 0.0;",
+          "variable.z_rot = 0.0;"
+        ],
+        "pre_animation": [
+          "variable.x_rot = query.property('mts:x_rotation') != 0.0 ? query.property('mts:x_rotation') : variable.x_rot;",
+          "variable.y_rot = query.property('mts:y_rotation') != 0.0 ? query.property('mts:y_rotation') : variable.y_rot;",
+          "variable.z_rot = query.property('mts:z_rotation') != 0.0 ? query.property('mts:z_rotation') : variable.z_rot;"
+        ]
+      },
+      "animations": {
+        "rotation": "animation.bogie.rotation"
+      },
+      "render_controllers": ["controller.render.default"]
+    }
+  }
+}

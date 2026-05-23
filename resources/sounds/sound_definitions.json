@@ -1,0 +1,22 @@
+{
+    "mts:train_door_open": {
+        "category": "neutral",
+        "max_distance": 256.0,
+        "sounds": [
+            {
+                "name": "sounds/door_open",
+                "volume": 1.0
+            }
+        ]
+    },
+    "mts:train_door_close": {
+        "category": "neutral",
+        "max_distance": 256.0,
+        "sounds": [
+            {
+                "name": "sounds/door_close",
+                "volume": 1.0
+            }
+        ]
+    }
+}

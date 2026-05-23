@@ -1,0 +1,58 @@
+{
+	"format_version": "1.8.0",
+	"minecraft:entity": {
+		"description": {
+			"identifier": "mts:transparent_carrier",
+			"is_spawnable": false,
+			"is_summonable": true,
+			"is_experimental": false
+		},
+		"components": {
+			"minecraft:type_family": {
+				"family": [
+					"mts"
+				]
+			},
+			"minecraft:navigation.walk": {
+				"can_float": false
+			},
+			"minecraft:rideable": {
+				"seat_count": 1,
+				"family_types": [
+					"player"
+				],
+				"seats": [
+					{
+						"position": [
+							0,
+							0,
+							0
+						]
+					}
+				]
+			},
+			"minecraft:input_ground_controlled": {},
+			"minecraft:nameable": {},
+			"minecraft:movement": {
+				"value": 0.1
+			},
+			"minecraft:movement.basic": {
+				"value": 0.1
+			},
+			"minecraft:fall_damage": {
+				"value": 0
+			},
+			"minecraft:is_stackable": {},
+			"minecraft:knockback_resistance": {
+				"value": 1
+			},
+      "minecraft:physics": {
+        "has_gravity": false,
+        "has_collision": false
+      },
+			"minecraft:can_climb": {}
+		},
+		"minecraft:movement.basic": {}
+	},
+	"events": {}
+}

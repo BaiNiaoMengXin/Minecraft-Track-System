@@ -1,0 +1,33 @@
+{
+    "resource_pack_name": "MTS Addon",
+    "texture_name": "atlas.terrain",
+    "texture_data": {
+        "rail_node": {
+            "textures": "textures/blocks/rail_node"
+        },
+        "rail_node_hide": {
+            "textures": "textures/blocks/rail_node_hide"
+        },
+        "rail": {
+            "textures": "textures/rails/rail"
+        },
+        "escalator": {
+            "textures": "textures/blocks/escalator"
+        },
+        "escalator_stop": {
+            "textures": "textures/blocks/escalator_stop"
+        },
+        "escalator_down": {
+            "textures": {
+                "path": "textures/blocks/escalator_down",
+                "size": [448, 448]
+            }
+        },
+        "escalator_up": {
+            "textures": {
+                "path": "textures/blocks/escalator_up",
+                "size": [448, 448]
+            }
+        }
+    }
+}
