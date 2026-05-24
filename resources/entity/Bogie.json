@@ -7,6 +7,9 @@
       "materials": {
         "default": "entity_alphatest"
       },
+      "textures": {
+        "default": ""
+      },
       "geometry": {
         "default": "geometry.bogie"
       },

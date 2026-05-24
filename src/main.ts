@@ -14,7 +14,7 @@ import { MTSClient } from 'MTSClient';
 import { MTS } from 'MTS';
 import { Vec3 } from 'util/math/Vec3';
 import { Mth } from 'util/math/Mth';
-import { decode, encode } from 'libs/MessagePack';
+import { decode, encode } from 'libs/MessagePack/index';
 
 export const DEBUG: boolean = true;
 
