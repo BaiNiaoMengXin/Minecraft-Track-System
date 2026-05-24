@@ -22,7 +22,7 @@ export class PathData extends SerializedDataBase {
 
     constructor(arg1: Rail | Record<string, unknown>, savedRailBaseId?: number, dwellTime?: number, startingPos?: BlockPos, endingPos?: BlockPos, stopIndex?: number) {
         super();
-        if (savedRailBaseId) {
+        if (savedRailBaseId !== undefined) {
             this.rail = arg1 as Rail;
             this.savedRailBaseId = savedRailBaseId;
             this.dwellTime = dwellTime!;
