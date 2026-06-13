@@ -17,12 +17,12 @@ export class RailAngle {
     static NEE = new RailAngle(337.5);
 
     
-	public angleDegrees : number;
-	public angleRadians : number;
-	public sin : number;
-	public cos : number;
-	public tan : number;
-	public halfTan : number;
+    public angleDegrees : number;
+    public angleRadians : number;
+    public sin : number;
+    public cos : number;
+    public tan : number;
+    public halfTan : number;
 
     static DEGREES_IN_CIRCLE = 360;
     static QUADRANTS = 16;
@@ -38,51 +38,68 @@ export class RailAngle {
     }
 
     getOpposite() {
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.E)) return RailAngle.W;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SEE)) return RailAngle.NWW;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SE)) return RailAngle.NW;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SSE)) return RailAngle.NNW;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.S)) return RailAngle.N;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SSW)) return RailAngle.NNE;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SW)) return RailAngle.NE;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SWW)) return RailAngle.NEE;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.W)) return RailAngle.E;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NWW)) return RailAngle.SEE;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NW)) return RailAngle.SE;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NNW)) return RailAngle.SSE;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.N)) return RailAngle.S;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NNE)) return RailAngle.SSW;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NE)) return RailAngle.SW;
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NEE)) return RailAngle.SWW;
-        return RailAngle.W;
+        switch (this) {
+			default:
+				return RailAngle.W;
+			case RailAngle.SEE:
+				return RailAngle.NWW;
+			case RailAngle.SE:
+				return RailAngle.NW;
+			case RailAngle.SSE:
+				return RailAngle.NNW;
+			case RailAngle.S:
+				return RailAngle.N;
+			case RailAngle.SSW:
+				return RailAngle.NNE;
+			case RailAngle.SW:
+				return RailAngle.NE;
+			case RailAngle.SWW:
+				return RailAngle.NEE;
+			case RailAngle.W:
+				return RailAngle.E;
+			case RailAngle.NWW:
+				return RailAngle.SEE;
+			case RailAngle.NW:
+				return RailAngle.SE;
+			case RailAngle.NNW:
+				return RailAngle.SSE;
+			case RailAngle.N:
+				return RailAngle.S;
+			case RailAngle.NNE:
+				return RailAngle.SSW;
+			case RailAngle.NE:
+				return RailAngle.SW;
+			case RailAngle.NEE:
+				return RailAngle.SWW;
+		}
     }
 
-    add(railAngle : RailAngle) {
+    add(railAngle: RailAngle) {
         return RailAngle.fromAngle(this.angleDegrees + railAngle.angleDegrees);
     }
 
-    sub(railAngle : RailAngle) {
+    sub(railAngle: RailAngle) {
         return RailAngle.fromAngle(this.angleDegrees - railAngle.angleDegrees);
     }
 
-    isParallel(railAngle : RailAngle) {
+    isParallel(railAngle: RailAngle) {
         return this === railAngle || this === railAngle.getOpposite();
     }
 
-    similarFacing(newAngleDegrees : number) {
+    similarFacing(newAngleDegrees: number) {
         return RailAngle.similarFacing(this.angleDegrees, newAngleDegrees);
     }
 
-    static similarFacing(angleDegrees1 : number, angleDegrees2 : number) {
+    static similarFacing(angleDegrees1: number, angleDegrees2: number) {
         return Math.abs(RailAngle.normalizeAngle(angleDegrees1 - angleDegrees2)) < RailAngle.DEGREES_IN_CIRCLE / 4;
     }
 
-    static getQuadrant(angleDegrees : number, include225 : boolean) {
+    static getQuadrant(angleDegrees: number, include225: boolean) {
         const factor = include225 ? 1 : 2;
         return Math.round((RailAngle.normalizeAngle(angleDegrees) + RailAngle.DEGREES_IN_CIRCLE) / RailAngle.ANGLE_INCREMENT / factor) % (RailAngle.QUADRANTS / factor);
     }
 
-    static fromAngle(angleDegrees : number) {
+    static fromAngle(angleDegrees: number) {
         const values = [
             RailAngle.E, RailAngle.SEE, RailAngle.SE, RailAngle.SSE,
             RailAngle.S, RailAngle.SSW, RailAngle.SW, RailAngle.SWW,
@@ -92,7 +109,7 @@ export class RailAngle {
         return values[RailAngle.getQuadrant(angleDegrees, true)];
     }
 
-    static normalizeAngle(angleDegrees : number) {
+    static normalizeAngle(angleDegrees: number) {
         let additional = 0;
         while (angleDegrees + additional < -RailAngle.DEGREES_IN_CIRCLE / 2) {
             additional += RailAngle.DEGREES_IN_CIRCLE;
@@ -103,45 +120,81 @@ export class RailAngle {
         return angleDegrees + additional;
     }
     
-    public toString() {
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.E)) return "E";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SEE)) return "SEE";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SE)) return "SE";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SSE)) return "SSE";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.S)) return "S";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SSW)) return "SSW";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SW)) return "SW";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.SWW)) return "SWW";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.W)) return "W";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NWW)) return "NWW";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NW)) return "NW";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NNW)) return "NNW";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.N)) return "N";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NNE)) return "NNE";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NE)) return "NE";
-        if (JSON.stringify(this) == JSON.stringify(RailAngle.NEE)) return "NEE";
-        return "undefined";
+    toString() {
+        switch (this) {
+            case RailAngle.E:
+                return "E";
+            case RailAngle.SEE:
+                return "SEE";
+            case RailAngle.SE:
+                return "SE";
+            case RailAngle.SSE:
+                return "SSE";
+            case RailAngle.S:
+                return "S";
+            case RailAngle.SSW:
+                return "SSW";
+            case RailAngle.SW:
+                return "SW";
+            case RailAngle.SWW:
+                return "SWW";
+            case RailAngle.W:
+                return "W";
+            case RailAngle.NWW:
+                return "NWW";
+            case RailAngle.NW:
+                return "NW";
+            case RailAngle.NNW:
+                return "NNW";
+            case RailAngle.N:
+                return "N";
+            case RailAngle.NNE:
+                return "NNE";
+            case RailAngle.NE:
+                return "NE";
+            case RailAngle.NEE:
+                return "NEE";
+            default:
+                return "undefined";
+        }
     }
 
-    static fromString(angleStr : string) {
+    static fromString(angleStr: string) {
         switch (angleStr) {
-            case "E": return RailAngle.E;
-            case "SEE": return RailAngle.SEE;
-            case "SE": return RailAngle.SE;
-            case "SSE": return RailAngle.SSE;
-            case "S": return RailAngle.S;
-            case "SSW": return RailAngle.SSW;
-            case "SW": return RailAngle.SW;
-            case "SWW": return RailAngle.SWW;
-            case "W": return RailAngle.W;
-            case "NWW": return RailAngle.NWW;
-            case "NW": return RailAngle.NW;
-            case "NNW": return RailAngle.NNW;
-            case "N": return RailAngle.N;
-            case "NNE": return RailAngle.NNE;
-            case "NE": return RailAngle.NE;
-            case "NEE": return RailAngle.NEE;
-            default: return RailAngle.E;
+            case "E":
+                return RailAngle.E;
+            case "SEE":
+                return RailAngle.SEE;
+            case "SE":
+                return RailAngle.SE;
+            case "SSE":
+                return RailAngle.SSE;
+            case "S":
+                return RailAngle.S;
+            case "SSW":
+                return RailAngle.SSW;
+            case "SW":
+                return RailAngle.SW;
+            case "SWW":
+                return RailAngle.SWW;
+            case "W":
+                return RailAngle.W;
+            case "NWW":
+                return RailAngle.NWW;
+            case "NW":
+                return RailAngle.NW;
+            case "NNW":
+                return RailAngle.NNW;
+            case "N":
+                return RailAngle.N;
+            case "NNE":
+                return RailAngle.NNE;
+            case "NE":
+                return RailAngle.NE;
+            case "NEE":
+                return RailAngle.NEE;
+            default:
+                return RailAngle.E;
         }
     }
 }
