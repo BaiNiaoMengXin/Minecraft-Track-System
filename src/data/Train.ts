@@ -54,7 +54,7 @@ export class Train extends TrainBase {
             this.timeSegments = arg12 as TimeSegment[];
 
             for (let i = 0; i < this.trainCars; i++) {
-                const entity = world.getDimension("overworld").spawnEntity("mts:train", this.path[0].startingPos.asJson());
+                const entity = world.getDimension("overworld").spawnEntity<string>("mts:train", this.path[0].startingPos.asJson());
                 entity.playAnimation("animation.train.rotation");
                 this.trainEntities.push(entity);
             }
@@ -514,7 +514,7 @@ export class Train extends TrainBase {
 
         playerPos.y = carY + 0.3;
 
-        const carrier = world.getDimension("overworld").spawnEntity("mts:transparent_carrier", playerPos);
+        const carrier = world.getDimension("overworld").spawnEntity<string>("mts:transparent_carrier", playerPos);
         carrier.getComponent("rideable")?.addRider(player);
 
         // 计算玩家相对于车厢的局部坐标（考虑旋转）

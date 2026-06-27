@@ -11,8 +11,9 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@minecraft/server": "^2.6.0",
-    "@minecraft/server-ui": "^2.1.0-beta.1.26.30-preview.21",
+    "@minecraft/debug-utilities": "^1.0.0-beta.1.26.40-preview.20",
+    "@minecraft/server": "^2.10.0-beta.1.26.40-preview.20",
+    "@minecraft/server-ui": "^2.2.0-beta.1.26.40-preview.20",
     "adm-zip": "^0.5.17"
   },
   "type": "module"

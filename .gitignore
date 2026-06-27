@@ -24,3 +24,7 @@ references/
 
 # Build files
 build/
+
+# AI generated files
+.deepseek/
+.claude/

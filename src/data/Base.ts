@@ -1,4 +1,4 @@
-import { Entity, Vector2, Player, Vector3, Dimension, MolangVariableMap, RGB, RGBA, world, VectorXZ, EntityType, SpawnEntityOptions, system, DimensionLocation, BlockPermutation, RawMessage } from "@minecraft/server";
+import { Entity, Vector2, Player, Vector3, Dimension, MolangVariableMap, RGB, RGBA, world, VectorXZ, EntityType, SpawnEntityOptions, system, DimensionLocation, BlockPermutation, RawMessage, EntityTypes } from "@minecraft/server";
 import { Vec3 } from "util/math/Vec3";
 import { Mth } from "util/math/Mth";
 
@@ -696,14 +696,14 @@ export function canSpawnEntity(playerPos: Vector3, pos: Vector3): boolean {
  * 
  * @returns 在指定位置新创建的实体。
  */
-export function mandatorySpawnEntity(dimensionId: string, playerLocation: Vector3, identifier: string | EntityType, location: Vector3, options?: SpawnEntityOptions): Promise<Entity> {
+export function mandatorySpawnEntity(dimensionId: string, playerLocation: Vector3, identifier: string, location: Vector3, options?: SpawnEntityOptions): Promise<Entity> {
     const theDimension: Dimension = world.getDimension(dimensionId);
 
     return new Promise(async (resolve) => {
         let resultEntity: Entity | undefined = undefined
 
         try {
-            resultEntity = theDimension.spawnEntity(identifier, location, options)
+            resultEntity = theDimension.spawnEntity<string>(identifier, location, options)
         } catch (error) {
         }
 
@@ -716,7 +716,7 @@ export function mandatorySpawnEntity(dimensionId: string, playerLocation: Vector
         let index = 0;
         const intervalId = system.runInterval(() => {
             try {
-                resultEntity = theDimension.spawnEntity(identifier, location, options)
+                resultEntity = theDimension.spawnEntity<string>(identifier, location, options)
             } catch (error) {
             }
             if (resultEntity !== undefined) {
@@ -795,7 +795,7 @@ export class TickerManager {
         }
 
         // 创建新Ticker
-        const tickerEntity = world.getDimension("overworld").spawnEntity("mts:ticker", playerPos);
+        const tickerEntity = world.getDimension("overworld").spawnEntity<string>("mts:ticker", playerPos);
         const newTicker: Ticker = {
             entity: tickerEntity,
             isUsing: true
