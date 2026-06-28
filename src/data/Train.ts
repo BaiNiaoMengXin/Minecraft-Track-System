@@ -14,6 +14,7 @@ import { SignalBlocks } from "./SignalBlocks";
 import { Mth } from "util/math/Mth";
 import { Vec3 } from "util/math/Vec3";
 import { BetterMap } from "./BetterMap";
+import { TrigCache } from "TrigCache";
 import { MessagePackHelper } from "./MessagePackHelper";
 
 export class Train extends TrainBase {
@@ -320,22 +321,7 @@ export class Train extends TrainBase {
     }
 
     protected override asin(value: number): number {
-        function TrigCache_asin(value: number): number {
-            const INCREMENT = 0.01;
-            const ASIN_TABLE = new Array((2 / INCREMENT) + 1);
-
-
-            let j = -1;
-            for (let i = 0; i < ASIN_TABLE.length; i++) {
-                ASIN_TABLE[i] = Math.asin(j);
-                j += INCREMENT;
-            }
-
-
-            return ASIN_TABLE[Mth.clamp(Math.floor(Math.round(value / INCREMENT) + 100), 0, ASIN_TABLE.length - 1)];
-        }
-
-        return TrigCache_asin(value);
+        return TrigCache.asin(value);
     }
 
     public simulateTrain(ticksElapsed: number, depot: Depot, dataCache: DataCache, trainPositions: Map<UUID, bigint>[], schedulesForPlatform: Map<number, Array<ScheduleEntry>>, trainDelays: Map<number, BetterMap<BlockPos, TrainDelay>>): boolean {
