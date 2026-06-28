@@ -2,22 +2,18 @@ import { Entity, EntityComponent, EntityComponentTypes, Player, system, world } 
 import { Rail } from "data/Rail";
 import { RailwayData } from "data/RailwayData";
 import { Items } from "Items";
-import { Integer } from "jLib/Math";
 import { RenderRail } from "render/RenderRail";
-import { RailwayDashboard } from "screen/RailwayDashboard-severUi";
 import { BlockPos } from "util/math/BlockPos";
 
 export namespace MTS {
 
     export const railwayData: RailwayData = new RailwayData();
-    export let railwayDashboard: RailwayDashboard;
-    system.run(() => railwayDashboard = new RailwayDashboard(railwayData.dataCache));
 
     export const railsToStandardRender: Set<Rail> = new Set();
     const RAIL_RENDER_DURATION = 10;
  
     function posInPlayerRenderRange(pos: BlockPos, player: Player): boolean {
-        return pos.distanceTo((player.location as any) as BlockPos) < RenderRail.MAX_RAIL_DISTANCE;
+        return pos.distanceTo((player.location as any) as BlockPos) < player.clientSystemInfo.maxRenderDistance * 16;
     }
 
     function hideAndUseParticleRenderRail(rail: Rail, railsSet: Set<Rail>, player: Player): void {

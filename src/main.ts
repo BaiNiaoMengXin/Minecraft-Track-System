@@ -15,6 +15,7 @@ import { MTS } from 'MTS';
 import { Vec3 } from 'util/math/Vec3';
 import { Mth } from 'util/math/Mth';
 import { decode, encode } from 'libs/MessagePack/index';
+import { TrainDashboardClient } from 'screen/TrainDashboardClient';
 
 export const DEBUG: boolean = true;
 
@@ -185,14 +186,6 @@ world.afterEvents.itemUse.subscribe((event) => {
     // } else if (ItemType === "mts:bridge_creator_9") {
     //     gRailBuilder.UseItem(player, BuilderType.Bridge_9);
     } 
-    else if (ItemType === "mts:railway_dashboard") {
-        // const dashboard = MTSClient.dashBoardScreens.get(player)!;
-        // dashboard.use();
-        // TODO 对每个Player适配isOnAwait
-        if (!MTS.railwayDashboard.IsOnAwait) {
-            MTS.railwayDashboard.UseDashboard(player);
-        }
-    }
     else if (ItemType === "mts:brush") {
         itemBrush.itemUse(player, itemStack);
     }
@@ -209,14 +202,11 @@ system.runInterval(() => {
         const dz = a.z - b.z;
         return dx * dx + dz * dz;
     }
-    // MTSClient.dashBoardScreens.forEach((dashboard, player) => {
-    MTS.railwayDashboard.playersSecondChoices.forEach((secondPos, player) => {
-        // const secondPos = dashboard.playerSecondChoicesPos;
+    MTSClient.dashBoardScreens.forEach((dashboard, player) => {
+        const secondPos = dashboard.playerSecondChoicesPos;
+        if (!secondPos) return;
 
-        const block = player.getBlockFromViewDirection({ maxDistance: 10 })?.block;
-        if (!block) return;
-
-        const currentPos = block.location;
+        const currentPos = TrainDashboardClient.getPlayerFacingPos(player).asJson();
         currentPos.z += 0.5;
         currentPos.x += 0.5;
 
