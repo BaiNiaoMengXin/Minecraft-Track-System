@@ -11,7 +11,6 @@ import { BlockPos } from 'util/math/BlockPos.js';
 import { DataCache } from 'data/DataCache.js';
 import { CollisionDetector, TimeUnit } from 'data/Base.js';
 import { MTS } from 'MTS.js';
-import { PlayerEvents } from 'PlayerEvents.js';
 import { ParticleSystem } from 'rail/ParticleSystem.js';
 import { BetterMap } from 'data/BetterMap';
 enum SelectionType{
@@ -54,9 +53,8 @@ export class RailwayDashboard {
 
     
 	// private static PANELS_START: number = SQUARE_SIZE * 2 + TEXT_FIELD_PADDING;
-	private static SLIDER_WIDTH: number = 64;
-	private static MAX_TRAINS_PER_HOUR: number = 5;
-	private static SECONDS_PER_MC_HOUR: number = Depot.TICKS_PER_HOUR / 20;
+    private static readonly ITEM_TYPE_ID = "mts:railway_dashboard";
+	private static readonly MAX_TRAINS_PER_HOUR: number = 5;
 
     constructor(dataCache: DataCache) {
         this.dataCache = dataCache;
@@ -373,72 +371,69 @@ export class RailwayDashboard {
 
     private WaitForPlatformSelectResult(player: Player): Promise<Platform>
     {
-        return new Promise(async (resolve) => {
+        return new Promise((resolve) => {
             let resultPlatform: Platform | null = null;
-            const posToPlatfroms = new BetterMap<BlockPos, Array<Platform>>();
+            const posToPlatforms = new BetterMap<BlockPos, Array<Platform>>();
+            const playerPos = new BlockPos(player.location);
+            const renderDistance = player.clientSystemInfo.maxRenderDistance * 16;
             this.dataCache.platforms.forEach(savedRail => {
                 if (this.dataCache.platformIdToStation.has(savedRail.id)) {
                     const pos = savedRail.getMidPos();
-                    if (pos.distanceTo(new BlockPos(player.location)) < 64) {
-                        if (!posToPlatfroms.has(pos)) {
-                            posToPlatfroms.set(pos, new Array())
+                    if (pos.distanceTo(playerPos) < renderDistance) {
+                        if (!posToPlatforms.has(pos)) {
+                            posToPlatforms.set(pos, new Array())
                         }
-                        posToPlatfroms.get(pos)!.push(savedRail);
+                        posToPlatforms.get(pos)!.push(savedRail);
                     }
                 }
             })
-
-            const doSomehingWhilwWaiting = () => {
+            const doSomethingWhileWaiting = () => {
                 resultPlatform = null;
 
-                posToPlatfroms.forEach((savedRails, savedRailPos) => {
-                    console.log(Array.from(savedRails, v => v.id), savedRailPos.asJson)
+                posToPlatforms.forEach((savedRails, savedRailPos) => {
                     const savedRailCount = savedRails.length;
                     for (let i = 0; i < savedRailCount; i++) {
                         const x = savedRailPos.getX() + 0.5;
-                        const y = savedRailPos.getY() + 6;
+                        const y = savedRailPos.getY() + 4;
                         const z = savedRailPos.getZ() + (i + 0.5) / savedRailCount;
                         const text = savedRails[i].name;
 
                         let aColor: RGBA;
-                        const IsCollison = CollisionDetector.isPlayerLookingAtOBB(player, {
+                        const isCollision = CollisionDetector.isPlayerLookingAtOBB(player, {
                             center: { x: x, y: y, z: z },
-                            dimensions: {x: 2, y: 2, z: 2},
-                            rotation: {x: 0, y: 0}
+                            dimensions: { x: 2, y: 2, z: 2 },
+                            rotation: { x: 0, y: 0 }
                         }) && resultPlatform === null
-                        if (IsCollison)
-                        {
-                            aColor = {red: 0, green: 0.9, blue: 0, alpha: 0.8};
+                        if (isCollision) {
+                            aColor = { red: 0, green: 0.9, blue: 0, alpha: 0.8 };
                             resultPlatform = savedRails[i];
                         } else {
-                            aColor = {red: 0.8, green: 1, blue: 0.8, alpha: 0.5}
+                            aColor = { red: 0.8, green: 1, blue: 0.8, alpha: 0.5 }
                         }
 
                         ParticleSystem.layNumberlayParticle(
                             Number(text),
                             { x: x + 0.5, y: y, z: z + 0.5 },
-                            {x: 0, y: 0, z: 0},
-                            {x: 0, y: 0},
+                            { x: 0, y: 0, z: 0 },
+                            { x: 0, y: 0 },
                             aColor,
                             2
-                        )
+                        );
                     }
                 });
             }
 
             const intervalId = system.runInterval(() => {
-                
-                if (PlayerEvents.get(player).itemType == "mts:railway_dashboard" && resultPlatform)
-                {
-                    console.log("[WaitForPlatformSelectResult] getResult")
-                    PlayerEvents.set(player, "itemType", "");
-                    system.clearRun(intervalId)
-                    resolve(resultPlatform)
-                    return;
-                }
+                doSomethingWhileWaiting();
+            }, 4)
 
-                doSomehingWhilwWaiting();
-            }, 4)// 4tick
+            const callback = world.afterEvents.itemUse.subscribe(event => {
+                if (event.source.id === player.id && event.itemStack && event.itemStack.typeId === RailwayDashboard.ITEM_TYPE_ID && resultPlatform) {
+                    world.afterEvents.itemUse.unsubscribe(callback);
+                    system.clearRun(intervalId);
+                    resolve(resultPlatform);
+                }
+            });
         })
     }
 
