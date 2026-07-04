@@ -5,13 +5,16 @@
       "identifier": "mts:bridge_creator_5",
       "menu_category": {
         "category": "equipment",
-        "group": "mts:itemGroup.name.rail_builder"
+        "group": "mts:itemGroup.name.node_modifier"
       }
     },
     "components": {
       "minecraft:icon": "bridge_creator_5",
       "minecraft:max_stack_size": 1,
-      "minecraft:hand_equipped": true
+      "minecraft:hand_equipped": true,
+      "minecraft:custom_components": [
+        "mts:on_use_on"
+      ]
     }
   }
 }

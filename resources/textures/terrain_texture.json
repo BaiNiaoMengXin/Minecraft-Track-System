@@ -5,8 +5,8 @@
         "rail_node": {
             "textures": "textures/blocks/rail_node"
         },
-        "rail_node_hide": {
-            "textures": "textures/blocks/rail_node_hide"
+        "rail_node_connected": {
+            "textures": "textures/blocks/rail_node_connected"
         },
         "rail": {
             "textures": "textures/rails/rail"

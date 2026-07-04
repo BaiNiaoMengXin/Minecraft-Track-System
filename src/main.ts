@@ -1,8 +1,9 @@
-import { world, system, BlockPermutation, Player, Vector3, RGBA } from '@minecraft/server';
-import { RailConnectorManager } from "./rail/RailConnectorManager";
+import { world, system, BlockPermutation, EntityComponentTypes, ItemStack, Player, Vector3, RGBA } from '@minecraft/server';
 import { ParticleSystem, particleType } from "./rail/ParticleSystem";
 import { RailwayData } from "./data/RailwayData.js";
 import { RailType } from 'data/RailType';
+import { RailAngle } from 'data/RailAngle';
+import { Rail } from 'data/Rail';
 import { GetPlayerById, Position, TickerManager } from 'data/Base';
 import { DataCache } from 'data/DataCache';
 import { ExtensionRegistry } from 'ExtensionRegistry/ExtensionRegistry';
@@ -14,6 +15,7 @@ import { MTSClient } from 'MTSClient';
 import { MTS } from 'MTS';
 import { Vec3 } from 'util/math/Vec3';
 import { Mth } from 'util/math/Mth';
+import { Items } from 'Items';
 import { decode, encode } from 'libs/MessagePack/index';
 import { TrainDashboardClient } from 'screen/TrainDashboardClient';
 
@@ -76,7 +78,6 @@ export function ClearDebugData() {
 
 
 
-export const gRailConnectorManager = new RailConnectorManager();
 export const gExtensionRegistry = new ExtensionRegistry();
 
 
@@ -158,35 +159,9 @@ world.afterEvents.playerPlaceBlock.subscribe((event) => {
 world.afterEvents.itemUse.subscribe((event) => {
     const { source: player, itemStack } = event;
     
-    const ItemType = itemStack.typeId;
-
-    if (ItemType === 'mts:rail_connector_20') {
-        gRailConnectorManager.handleConnector(player, RailType.WOODEN);
-    } else if (ItemType === 'mts:rail_connector_40') {
-        gRailConnectorManager.handleConnector(player, RailType.STONE);
-    } else if (ItemType === 'mts:rail_connector_60') {
-        gRailConnectorManager.handleConnector(player, RailType.EMERALD);
-    } else if (ItemType === 'mts:rail_connector_80') {
-        gRailConnectorManager.handleConnector(player, RailType.IRON);
-    } else if (ItemType === 'mts:rail_connector_120') {
-        gRailConnectorManager.handleConnector(player, RailType.OBSIDIAN);
-    } else if (ItemType === 'mts:rail_connector_platform') {
-        gRailConnectorManager.handleConnector(player, RailType.PLATFORM);
-    } else if (ItemType === 'mts:rail_connector_siding') {
-        gRailConnectorManager.handleConnector(player, RailType.SIDING);
-    } else if (ItemType === 'mts:rail_connector_turn_back') {
-        gRailConnectorManager.handleConnector(player, RailType.TURN_BACK);
-    }
-    else if (ItemType === "mts:bridge_creator_3") {
-    //     gRailBuilder.UseItem(player, BuilderType.Bridge_3);
-    // } else if (ItemType === "mts:bridge_creator_5") {
-    //     gRailBuilder.UseItem(player, BuilderType.Bridge_5);
-    // } else if (ItemType === "mts:bridge_creator_7") {
-    //     gRailBuilder.UseItem(player, BuilderType.Bridge_7);
-    // } else if (ItemType === "mts:bridge_creator_9") {
-    //     gRailBuilder.UseItem(player, BuilderType.Bridge_9);
-    } 
-    else if (ItemType === "mts:brush") {
+    const itemType = itemStack.typeId;
+    
+    if (itemType === "mts:brush") {
         itemBrush.itemUse(player, itemStack);
     }
 });
@@ -325,18 +300,6 @@ system.runInterval(() => {
         )
     })
 }, 4)
-
-
-system.runInterval(() => {
-    gRailConnectorManager.playerSelections.forEach((firstNode, player) => {
-        gRailConnectorManager.UpdatePreviewRail(GetPlayerById(player)!);
-    });
-}, 2)
-
-
-
-
-
 
 
 system.runInterval(() => {

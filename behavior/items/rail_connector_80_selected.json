@@ -1,0 +1,20 @@
+{
+  "format_version": "1.21.80",
+  "minecraft:item": {
+    "description": {
+      "identifier": "mts:rail_connector_80_selected",
+      "menu_category": {
+        "category": "equipment",
+        "group": "mts:itemGroup.name.node_modifier"
+      }
+    },
+    "components": {
+      "minecraft:icon": "rail_connector_80_selected",
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:custom_components": [
+        "mts:on_use_on"
+      ]
+    }
+  }
+}

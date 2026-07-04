@@ -1,57 +1,40 @@
-import { BlockPermutation, world } from "@minecraft/server";
+import { BlockPermutation, Player, world } from "@minecraft/server";
 import { RailAngle } from "data/RailAngle";
 import { BlockPos } from "util/math/BlockPos";
 
 export class BlockNode {
 
     public static readonly RAIL_NODE_BLOCK_KEY_NAME = "mts:rail_node";
-    
-    private static readonly FACING = "mts:node_facing";
+
+    public static readonly FACING = "facing";
+    public static readonly IS_22_5 = "is_22_5";
+    public static readonly IS_45 = "is_45";
+    public static readonly IS_CONNECTED = "is_connected";
 
     public static resetRailNode(pos: BlockPos): void {
         try {
             const block = world.getDimension("overworld").getBlock(pos.asJson());
-            block!.setPermutation(BlockPermutation.resolve(BlockNode.RAIL_NODE_BLOCK_KEY_NAME, {"mts:hide": 0, [BlockNode.FACING]: block!.permutation.getState(BlockNode.FACING as any)!}));
+            block?.setPermutation(block.permutation.withState(BlockNode.IS_CONNECTED as any, false));
         } catch (e) {
-            world.sendMessage(`§cUnable to remove this rail node(${pos.getX()}, ${pos.getY()}, ${pos.getZ()}): ${e}`);
+            console.error(e);
         }
     }
 
-    public static updateRailNodeState(pos: BlockPos, facing: RailAngle) {
-        // TODO temporary code
+    public static updateRailNodeState(player: Player, pos: BlockPos) {
         const dimension = world.getDimension('overworld');
         const block = dimension.getBlock(pos.asJson());
-        
-        if (block && block.typeId === 'mts:rail_node') {
-            let quadrant = 0;
-            // TODO the code is shit
-            switch (facing.angleDegrees) {
-                case 0:         quadrant = 4;   break;
-                case 22.5:      quadrant = 5;   break;
-                case 45:        quadrant = 2;   break;
-                case 67.5:      quadrant = 7;   break;
 
-                case 90:        quadrant = 0;   break;
-                case 112.5:     quadrant = 1;   break;
-                case 135:       quadrant = 6;   break;
-                case 157.5:     quadrant = 3;   break;
-                case 180:       quadrant = 4;   break;
+        const quadrant = RailAngle.getQuadrant(player.getRotation().y, true);
+        const blockPermutation = BlockPermutation.resolve(this.RAIL_NODE_BLOCK_KEY_NAME, {
+            [this.FACING]: quadrant % 8 >= 4,
+            [this.IS_45]: quadrant % 4 >= 2,
+            [this.IS_22_5]: quadrant % 2 >= 1,
+            [this.IS_CONNECTED]: false
+        });
+        block?.trySetPermutation(blockPermutation);
+    }
 
-                case 202.5:     quadrant = 5;   break;
-                case 225:       quadrant = 2;   break;
-                case 247.5:     quadrant = 7;   break;
-                case 270:       quadrant = 0;   break;
-
-                case 292.5:     quadrant = 1;   break;
-                case 315:       quadrant = 6;   break;
-                case 337.5:     quadrant = 3;   break;
-                default:                        break;
-            }
-            block.setPermutation(BlockPermutation.resolve("mts:rail_node", {
-                "mts:node_facing": quadrant
-            }));
-            // TODO the code is shit end
-        }
-        // TODO temporary code end
+    public static getAngle(blockPermutation: BlockPermutation): number {
+        return ((blockPermutation.getState(BlockNode.FACING as any) as boolean) ? 0 : 90) + ((blockPermutation.getState(BlockNode.IS_22_5 as any) as boolean) ? 22.5 : 0) + ((blockPermutation.getState(BlockNode.IS_45 as any) as boolean) ? 45 : 0);
     }
 }

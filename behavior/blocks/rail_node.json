@@ -7,20 +7,10 @@
         "category": "construction"
       },
       "states": {
-        "mts:hide": [
-          0,
-          1
-        ],
-        "mts:node_facing": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7
-        ]
+        "mts:facing": [ false, true ],
+        "mts:is_22_5": [ false, true ],
+        "mts:is_45": [ false, true ],
+        "mts:is_connected": [ false, true ]
       }
     },
     "components": {
@@ -44,131 +34,20 @@
     },
     "permutations": [
       {
-        "condition": "query.block_state('mts:hide') == 0",
         "components": {
           "minecraft:material_instances": {
             "*": {
-              "texture": "rail_node",
-              "render_method": "alpha_test"
+              "texture": "query.block_state('mts:is_connected') ? rail_node_connected : rail_node"
             }
-          }
-        }
-      },
-      {
-        "condition": "query.block_state('mts:hide') == 1",
-        "components": {
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "rail_node_hide",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-
-      
-      {
-        "condition": "q.block_state('mts:node_facing') == 0",
-        "components": {
+          },
           "minecraft:transformation": {
             "rotation": [
               0,
-              0,
+              "query.block_state('mts:facing') ? 0 : 90",
               0
             ]
           },
-          "minecraft:geometry": "geometry.rail_node"
-        }
-      },
-      {
-        "condition": "q.block_state('mts:node_facing') == 1",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              0,
-              0
-            ]
-          },
-          "minecraft:geometry": "geometry.rail_node_22_5"
-        }
-      },
-      {
-        "condition": "q.block_state('mts:node_facing') == 2",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              45,
-              0
-            ]
-          },
-          "minecraft:geometry": "geometry.rail_node_45"
-        }
-      },
-      {
-        "condition": "q.block_state('mts:node_facing') == 3",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              45,
-              0
-            ]
-          },
-          "minecraft:geometry": "geometry.rail_node_67_5"
-        }
-      },
-      {
-        "condition": "q.block_state('mts:node_facing') == 4",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              90,
-              0
-            ]
-          },
-          "minecraft:geometry": "geometry.rail_node"
-        }
-      },
-      {
-        "condition": "q.block_state('mts:node_facing') == 5",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              90,
-              0
-            ]
-          },
-          "minecraft:geometry": "geometry.rail_node_22_5"
-        }
-      },
-      {
-        "condition": "q.block_state('mts:node_facing') == 6",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              135,
-              0
-            ]
-          },
-          "minecraft:geometry": "geometry.rail_node_45"
-        }
-      },
-      {
-        "condition": "q.block_state('mts:node_facing') == 7",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              135,
-              0
-            ]
-          },
-          "minecraft:geometry": "geometry.rail_node_67_5"
+          "minecraft:geometry": "query.block_state('mts:is_22_5') ? (query.block_state('mts:is_45') ? geometry.rail_node_67_5 : geometry.rail_node_22_5) : (query.block_state('mts:is_45') ? geometry.rail_node_45 : geometry.rail_node)"
         }
       }
     ]

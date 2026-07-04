@@ -5,13 +5,16 @@
       "identifier": "mts:rail_connector_20",
       "menu_category": {
         "category": "equipment",
-        "group": "mts:itemGroup.name.rail"
+        "group": "mts:itemGroup.name.node_modifier"
       }
     },
     "components": {
       "minecraft:icon": "rail_connector_20",
       "minecraft:max_stack_size": 1,
-      "minecraft:hand_equipped": true
+      "minecraft:hand_equipped": true,
+      "minecraft:custom_components": [
+        "mts:on_use_on"
+      ]
     }
   }
 }

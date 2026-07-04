@@ -27,11 +27,11 @@ import { RailAngle } from "./RailAngle";
 
 export class RailwayData extends SerializedDataBase {
 
-	public readonly stations : Set<Station>  = new Set();
-	public readonly platforms : Set<Platform>  = new Set();
+	public readonly stations: Set<Station> = new Set();
+	public readonly platforms: Set<Platform> = new Set();
 	public readonly sidings: Set<Siding> = new Set();
-	public readonly routes : Set<Route>  = new Set();
-	public readonly depots : Set<Depot>  = new Set();
+	public readonly routes: Set<Route> = new Set();
+	public readonly depots: Set<Depot> = new Set();
 	public readonly dataCache: DataCache = new DataCache(this.stations, this.platforms, this.sidings, this.routes, this.depots);
 
 	public readonly railwayDataPathGenerationMoudle: RailwayDataPathGenerationModle;
@@ -40,13 +40,12 @@ export class RailwayData extends SerializedDataBase {
 	private prevSidingCount: number = 0;
 	private useTimeAndWindSync: boolean = false;
 
-	private readonly railNodes: BetterMap<BlockPos, RailAngle> = new BetterMap();
-    private readonly rails : BetterMap<BlockPos, BetterMap<BlockPos, Rail>> = new BetterMap();
+	private readonly rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>> = new BetterMap();
 	private readonly signalBlocks: SignalBlocks = new SignalBlocks()
 
 	private readonly railwayDataFileSaveModule: RailwayDataFileSaveModule;
 
-	private readonly trainPositions: ArrayList<BetterMap<UUID, bigint>>  = new ArrayList(2);
+	private readonly trainPositions: ArrayList<BetterMap<UUID, bigint>> = new ArrayList(2);
 	private readonly schedulesForPlatform: Map<number, Array<ScheduleEntry>> = new Map();
 	private readonly trainDelays: Map<number, BetterMap<BlockPos, TrainDelay>> = new Map()
 
@@ -55,12 +54,12 @@ export class RailwayData extends SerializedDataBase {
 	private static readonly NAME = "mts_train_data";
 	private static readonly KEY_DATA_VERSION = "mts_data_version";
 
-	public constructor() { 
+	public constructor() {
 		super();
 		this.trainPositions[0] = new BetterMap();
 		this.trainPositions[1] = new BetterMap();
 
-		this.railwayDataFileSaveModule = new RailwayDataFileSaveModule(this, this.rails, this.signalBlocks, this.railNodes);
+		this.railwayDataFileSaveModule = new RailwayDataFileSaveModule(this, this.rails, this.signalBlocks);
 		this.railwayDataPathGenerationMoudle = new RailwayDataPathGenerationModle(this, this.rails);
 	}
 
@@ -145,7 +144,7 @@ export class RailwayData extends SerializedDataBase {
 		return this.signalBlocks.remove(0, color, PathData.getRailProduct(posStart, posEnd));
 	}
 
-	public getSchedulesForStation( schedulesForStation: Map<number, Array<ScheduleEntry>>, stationId: number): void {
+	public getSchedulesForStation(schedulesForStation: Map<number, Array<ScheduleEntry>>, stationId: number): void {
 		this.schedulesForPlatform.forEach((schedules, platformId) => {
 			const station = this.dataCache.platformIdToStation.get(platformId);
 			if (station != null && station.id == stationId) {
@@ -154,11 +153,11 @@ export class RailwayData extends SerializedDataBase {
 		});
 	}
 
-	public getSchedulesAtPlatform(platformId: number): Array<ScheduleEntry> | null  {
+	public getSchedulesAtPlatform(platformId: number): Array<ScheduleEntry> | null {
 		return this.schedulesForPlatform.get(platformId) ?? null;
 	}
 
-	public getTrainDelays(): Map<number, BetterMap<BlockPos, TrainDelay>>  {
+	public getTrainDelays(): Map<number, BetterMap<BlockPos, TrainDelay>> {
 		return this.trainDelays;
 	}
 
@@ -187,7 +186,7 @@ export class RailwayData extends SerializedDataBase {
 			}
 		}));
 		for (let i = 0; i < railsToRemove.length - 1; i += 2) {
-			RailwayData.removeRailConnection(this.rails, railsToRemove[i], railsToRemove[i+ 1]);
+			RailwayData.removeRailConnection(this.rails, railsToRemove[i], railsToRemove[i + 1]);
 		}
 	}
 
@@ -208,22 +207,13 @@ export class RailwayData extends SerializedDataBase {
 	}
 
 	public addRailNodeBlock(player: Player, pos: BlockPos): void {
-        const facing = RailwayData.getRailAngleFromPlayerFacing(player);
-        this.railNodes.set(pos, facing);
-
-        BlockNode.updateRailNodeState(pos, facing);
-    }
+		BlockNode.updateRailNodeState(player, pos);
+	}
 
 	public removeRailNodeBlock(player: Player, pos: BlockPos): void {
 		// TODO temporary code
 		this.removeNode(player, pos, TransportMode.TRAIN);
 		// TODO temporary code end
-
-        this.railNodes.delete(pos);
-    }
-
-	public getRailNodeAngle(pos: BlockPos): RailAngle | null {
-		return this.railNodes.get(pos) ?? null;
 	}
 
 	// static finders
@@ -262,8 +252,9 @@ export class RailwayData extends SerializedDataBase {
 					BlockNode.resetRailNode(startPos);
 				}
 			});
-            RailwayData.validateRails(rails);
+			RailwayData.validateRails(rails);
 		} catch (e) {
+			console.error(e);
 		}
 	}
 
@@ -284,7 +275,7 @@ export class RailwayData extends SerializedDataBase {
 				}
 			}
 			if (world != null) {
-	            RailwayData.validateRails(rails);
+				RailwayData.validateRails(rails);
 			}
 		} catch (e) {
 		}
@@ -357,7 +348,7 @@ export class RailwayData extends SerializedDataBase {
 
 
 	public static newBlockPos(x: number, y: number, z: number): BlockPos;
-    public static newBlockPos(vec3: Vector3): BlockPos;
+	public static newBlockPos(vec3: Vector3): BlockPos;
 
 	public static newBlockPos(arg1: number | Vector3, y?: number, z?: number): BlockPos {
 		if (typeof arg1 === 'number') {
@@ -382,7 +373,7 @@ export class RailwayData extends SerializedDataBase {
 		const chunX = Math.floor(pos.getX() / 16);
 		const chunZ = Math.floor(pos.getZ() / 16);
 		try {
-			const chunk = world.getDimension("overworld").getBlock({x: chunX * 16, y: 0, z: chunZ * 16});
+			const chunk = world.getDimension("overworld").getBlock({ x: chunX * 16, y: 0, z: chunZ * 16 });
 			return chunk != undefined;
 		} catch (e) {
 			return false;
@@ -392,17 +383,6 @@ export class RailwayData extends SerializedDataBase {
 	public static isBetween(value: number, value1: number, value2: number, padding: number = 0): boolean {
 		return value >= Math.min(value1, value2) - padding && value <= Math.max(value1, value2) + padding;
 	}
-
-	public static getRailAngleFromPlayerFacing(player: Player): RailAngle {
-        const rotation = player.getRotation();
-        let yaw = rotation.y;
-        
-        while (yaw < 0) yaw += 360;
-        while (yaw >= 360) yaw -= 360;
-        
-        return RailAngle.fromAngle(yaw - 90);
-    }
-
 
 	private static validateRails(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
 		const railsToRemove = new Array<BlockPos>();
@@ -424,7 +404,7 @@ export class RailwayData extends SerializedDataBase {
 		railsNodesToRemove.forEach(pos => RailwayData.removeNode(rails, pos));
 	}
 
-	private static removeSavedRailS2C<T extends SavedRailBase>(savedRailBases: Set<T> , rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
+	private static removeSavedRailS2C<T extends SavedRailBase>(savedRailBases: Set<T>, rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
 		for (const savedRailBase of savedRailBases) {
 			if (savedRailBase.isInvalidSavedRail(rails)) {
 				savedRailBases.delete(savedRailBase);
