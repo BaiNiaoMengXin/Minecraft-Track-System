@@ -34,20 +34,73 @@
     },
     "permutations": [
       {
+        "condition": "query.block_state('mts:is_connected') == true",
         "components": {
           "minecraft:material_instances": {
             "*": {
-              "texture": "query.block_state('mts:is_connected') ? rail_node_connected : rail_node"
+              "texture": "rail_node_connected",
+              "render_method": "alpha_test"
             }
-          },
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:is_connected') == false",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "rail_node",
+              "render_method": "alpha_test"
+            }
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:facing') == true",
+        "components": {
           "minecraft:transformation": {
             "rotation": [
               0,
-              "query.block_state('mts:facing') ? 0 : 90",
+              90,
               0
             ]
-          },
-          "minecraft:geometry": "query.block_state('mts:is_22_5') ? (query.block_state('mts:is_45') ? geometry.rail_node_67_5 : geometry.rail_node_22_5) : (query.block_state('mts:is_45') ? geometry.rail_node_45 : geometry.rail_node)"
+          }
+        }
+      },
+      {
+        "condition": "query.block_state('mts:facing') == false",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "(query.block_state('mts:is_22_5') == true) && (query.block_state('mts:is_45') == true)",
+        "components": {
+          "minecraft:geometry": "geometry.rail_node_67_5"
+        }
+      },
+      {
+        "condition": "(query.block_state('mts:is_22_5') == true) && (query.block_state('mts:is_45') == false)",
+        "components": {
+          "minecraft:geometry": "geometry.rail_node_22_5"
+        }
+      },
+      {
+        "condition": "(query.block_state('mts:is_22_5') == false) && (query.block_state('mts:is_45') == true)",
+        "components": {
+          "minecraft:geometry": "geometry.rail_node_45"
+        }
+      },
+      {
+        "condition": "(query.block_state('mts:is_22_5') == false) && (query.block_state('mts:is_45') == false)",
+        "components": {
+          "minecraft:geometry": "geometry.rail_node"
         }
       }
     ]
