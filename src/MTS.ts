@@ -92,7 +92,7 @@ export namespace MTS {
                     const typeId = itemComponentUseOnEvent.itemStack.typeId;
                     const isBlockClicking = registeredItem.has(typeId) ? (registeredItem.get(typeId) instanceof ItemBlockClickingBase) : (typeId.endsWith(ItemBlockClickingBase.SELECTED_END_FLAG) && registeredItem.has(typeId.substring(0, typeId.length - ItemBlockClickingBase.SELECTED_END_FLAG.length)) && (registeredItem.get(typeId.substring(0, typeId.length - ItemBlockClickingBase.SELECTED_END_FLAG.length)) instanceof ItemBlockClickingBase));
 
-                    const item = registeredItem.get(itemComponentUseOnEvent.itemStack.typeId);
+                    const item = registeredItem.get(typeId) ?? (isBlockClicking ? registeredItem.get(typeId.substring(0, typeId.length - ItemBlockClickingBase.SELECTED_END_FLAG.length)) : undefined);
                     if (isBlockClicking || item) {
                         item!.useOn(itemComponentUseOnEvent);
                     }
