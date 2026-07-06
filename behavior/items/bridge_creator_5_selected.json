@@ -4,8 +4,7 @@
     "description": {
       "identifier": "mts:bridge_creator_5_selected",
       "menu_category": {
-        "category": "equipment",
-        "group": "mts:itemGroup.name.node_modifier"
+        "category": "none"
       }
     },
     "components": {

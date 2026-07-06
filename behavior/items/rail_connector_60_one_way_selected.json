@@ -4,8 +4,7 @@
     "description": {
       "identifier": "mts:rail_connector_60_one_way_selected",
       "menu_category": {
-        "category": "equipment",
-        "group": "mts:itemGroup.name.node_modifier"
+        "category": "none"
       }
     },
     "components": {
