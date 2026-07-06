@@ -4,7 +4,7 @@
     "module": "ES2022",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "baseUrl": "./src",
     "rootDir": "./src",
     "outDir": "./build/TrackSystemBP/scripts",
