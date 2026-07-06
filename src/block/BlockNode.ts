@@ -6,10 +6,10 @@ export class BlockNode {
 
     public static readonly RAIL_NODE_BLOCK_KEY_NAME = "mts:rail_node";
 
-    public static readonly FACING = "facing";
-    public static readonly IS_22_5 = "is_22_5";
-    public static readonly IS_45 = "is_45";
-    public static readonly IS_CONNECTED = "is_connected";
+    public static readonly FACING = "mts:facing";
+    public static readonly IS_22_5 = "mts:is_22_5";
+    public static readonly IS_45 = "mts:is_45";
+    public static readonly IS_CONNECTED = "mts:is_connected";
 
     public static resetRailNode(pos: BlockPos): void {
         try {
@@ -31,7 +31,7 @@ export class BlockNode {
             [this.IS_22_5]: quadrant % 2 >= 1,
             [this.IS_CONNECTED]: false
         });
-        block?.trySetPermutation(blockPermutation);
+        block?.setPermutation(blockPermutation);
     }
 
     public static getAngle(blockPermutation: BlockPermutation): number {
