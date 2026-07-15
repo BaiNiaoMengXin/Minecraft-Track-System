@@ -27,6 +27,25 @@ enum SelectedTab {
     DEPOTS
 }
 
+class TrainForList extends NameColorDataBase {
+
+    readonly trainId: string;
+    readonly trainProperties: TrainProperties;
+    readonly isAvailable: boolean;
+
+    constructor(savedRailBase: Siding, trainId: string, trainProperties: TrainProperties) {
+        super();
+        this.trainId = trainId;
+        this.trainProperties = trainProperties;
+        this.isAvailable = savedRailBase.isValidVehicle(TrainType.getSpacing(trainProperties.baseTrainType));
+        this.name = (this.isAvailable ? "" : "⚠ ") + trainProperties.name;
+    }
+
+    override hasTransportMode(): boolean {
+        return false;
+    }
+}
+
 export class TrainDashboardClient {
     
     public static readonly ITEM_TYPE_ID = "mts:railway_dashboard";
@@ -62,7 +81,7 @@ export class TrainDashboardClient {
     private dataCache: DataCache;
 
     private static readonly MAX_TRAIN_PER_HOUR = 5;
-    
+
     private static readonly CREATE_LABEL = "新增";
     private static readonly STATION_LABEL = "车站";
     private static readonly ROUTE_LABEL = "路线";
@@ -171,6 +190,12 @@ export class TrainDashboardClient {
             this.sitesPages.close()
             this.showEditSitePage();
         });
+        if (this.selectedTab == SelectedTab.DEPOTS) {
+            this.sitesPages.spacer().button("选择一个侧线进行编辑", () => {
+                this.isOnAwait = true;
+                this.sitesPages.close()
+            }, { disabled: this.dataCache.sidingIdToDepot.size == 0 }).spacer();
+        }
         sites.forEach((site) => {
             this.sitesPages.button(site.name, () => {
                 this.isNew = false;
@@ -183,9 +208,89 @@ export class TrainDashboardClient {
     }
     
     private showSitesPage() {
-        system.run(() => this.sitesPages.show().then(onfulfilled => {
+        system.run(() => this.sitesPages.show().then(async (onfulfilled) => {
             if (onfulfilled == "ClientClosed") {
                 this.use();
+            } else if (onfulfilled == "ServerClosed" && this.isOnAwait) {
+                const siding = await this.waitForSavedRailSelectResult(true, false) as Siding;
+                this.isOnAwait = false;
+                const sidingPage = new CustomForm(this.player, "").closeButton()
+                let lastNumber = siding.name;
+                const sidingNumberField = new ObservableString(lastNumber, { clientWritable: true });
+                sidingNumberField.subscribe(newNumber => {
+                    const parsed = parseInt(newNumber);
+                    if (!isNaN(parsed) && !isFinite(parsed)) {
+                        lastNumber = newNumber;
+                    } else {
+                        sidingNumberField.setData(lastNumber)
+                    }
+                })
+                sidingPage.textField("侧线号码:", sidingNumberField);
+                const selectTrainButtonLabel = new ObservableUIRawMessage({ text: "" });
+                const updateSelectTrainButtonLabel = () => {
+                    selectTrainButtonLabel.setData({
+                        translate: "gui.mts.selected_vehicle",
+                        with: {
+                            rawtext: [
+                                {
+                                    translate: TrainRegistry.getTrainProperties(siding.getTrainId()).name
+                                }
+                            ]
+                        }
+                    });
+                }
+                updateSelectTrainButtonLabel();
+                sidingPage.spacer().button(selectTrainButtonLabel, () => {
+                    const selectTrainPage = new CustomForm(this.player, "更改车辆").closeButton();
+
+                    const searchString = new ObservableString("", { clientWritable: true })
+                    selectTrainPage.textField("搜索", searchString).spacer();
+
+                    const trainButtonVisibles: ObservableBoolean[] = []
+                    let trainsForListTemp = new ArrayList<TrainForList>();
+                    const trainsForListUnavailable: TrainForList[] = [];
+
+                    TrainRegistry.forEach(TransportMode.TRAIN, (id, trainProperties) => {
+                        const trainForList = new TrainForList(siding, id, trainProperties!);
+                        (trainForList.isAvailable ? trainsForListTemp : trainsForListUnavailable).push(trainForList);
+                    })
+
+                    trainsForListTemp.push(...trainsForListUnavailable);
+                    trainsForListTemp = trainsForListTemp.sort()
+                    trainsForListTemp.forEach((data, i) => {
+                        const visible = new ObservableBoolean(true);
+                        trainButtonVisibles.push(visible);
+
+                        selectTrainPage.button({ translate: data.name }, () => {
+                            const baseTrainType = data.trainProperties.baseTrainType;
+                            if (siding.isValidVehicle(TrainType.getSpacing(baseTrainType))) {
+                                siding.setTrainDelails(data.trainId, baseTrainType, false);
+                                siding.clearTrains();
+                                updateSelectTrainButtonLabel();
+                                selectTrainPage.close();
+                            }
+                        }, { visible: visible });
+                    });
+
+                    searchString.subscribe(newStr => {
+                        for (let i = 0; i < trainsForListTemp.length; i++) {
+                            if (trainsForListTemp[i].name.toLowerCase().includes(newStr.toLowerCase())) {
+                                trainButtonVisibles[i].setData(true);
+                            } else {
+                                trainButtonVisibles[i].setData(false)
+                            }
+                        }
+                    });
+
+                    sidingPage.close();
+                    system.run(() => selectTrainPage.show().then(onfulfilled => {
+                        system.run(() => sidingPage.show())
+                    }));
+                })
+
+                sidingPage.show().then(onfulfilled => {
+                    system.run(() => this.showSitesPage());
+                })
             }
         }));
     }
