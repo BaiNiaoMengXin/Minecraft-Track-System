@@ -167,6 +167,8 @@ export class BlockPos implements JavaObject {
     }
 
     static fromLong(packedPos: bigint): BlockPos {
+        packedPos = BigInt.asIntN(64, packedPos)
+
         let x = Number((packedPos >> this.BIT_SHIFT_X) & this.BITS_X);
         if (x & (1 << (this.SIZE_BITS_XZ - 1))) {
             x -= (1 << this.SIZE_BITS_XZ);

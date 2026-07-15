@@ -1,9 +1,6 @@
-import { Vector2, Vector3, VectorXZ } from "@minecraft/server";
-import { CollisionDetector, Position } from "./Base";
 import { NameColorDataBase } from "./NameColorDataBase";
 import { TransportMode } from "./TransportMode";
 import { Tuple } from "util/Tuple";
-import { FriendlyByteBuf } from "packet/FriendlyByteBuf";
 import { RailwayData } from "./RailwayData";
 import { BlockPos } from "util/math/BlockPos";
 import { MessagePackHelper } from "./MessagePackHelper";
@@ -69,31 +66,6 @@ export abstract class AreaBase extends NameColorDataBase {
 
     private inThis(areaBase: AreaBase) {
         return this.inArea(areaBase.corner1!.getA(), areaBase.corner1!.getB()) || this.inArea(areaBase.corner1!.getA(), areaBase.corner2!.getB()) || this.inArea(areaBase.corner2!.getA(), areaBase.corner1!.getB()) || this.inArea(areaBase.corner2!.getA(), areaBase.corner2!.getB());
-    }
-
-    public getTidiedPositionsToIndex(positions: Position[]): number[] {
-        const indices = positions.map((_, index) => index);
-        
-        indices.sort((a, b) => {
-            const posA = positions[a];
-            const posB = positions[b];
-            
-            // 先比较 z
-            if (posA.z !== posB.z) {
-            return posA.z - posB.z;
-            }
-            // z 相同则比较 x
-            return posA.x - posB.x;
-        });
-        
-        // 现在 indices 是按排序顺序排列的原始索引
-        // 我们要生成的是：oldIndex -> newIndex
-        const newIndices = new Array(positions.length);
-        indices.forEach((oldIndex, newIndex) => {
-            newIndices[oldIndex] = newIndex;
-        });
-        
-        return newIndices;
     }
 
     public static nonNullCorners(station: AreaBase | null): boolean {

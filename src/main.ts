@@ -4,7 +4,6 @@ import { RailwayData } from "./data/RailwayData.js";
 import { RailType } from 'data/RailType';
 import { RailAngle } from 'data/RailAngle';
 import { Rail } from 'data/Rail';
-import { GetPlayerById, Position, TickerManager } from 'data/Base';
 import { DataCache } from 'data/DataCache';
 import { ExtensionRegistry } from 'ExtensionRegistry/ExtensionRegistry';
 import { itemBrush } from 'item/itemBrush';
@@ -17,6 +16,7 @@ import { Vec3 } from 'util/math/Vec3';
 import { Mth } from 'util/math/Mth';
 import { Items } from 'Items';
 import { decode, encode } from 'libs/MessagePack/index';
+import { BlockNode } from 'block/BlockNode';
 import { TrainDashboardClient } from 'screen/TrainDashboardClient';
 
 export const DEBUG: boolean = true;
@@ -91,68 +91,16 @@ world.beforeEvents.playerLeave.subscribe((event) => {
 world.afterEvents.playerBreakBlock.subscribe((event) => {
     const { block, player } = event;
     
-    if (block.typeId === 'mts:rail_node') {
-        MTS.railwayData.removeRailNodeBlock(player, new BlockPos(block.location.x, block.location.y, block.location.z));
+    if (block.typeId === BlockNode.RAIL_NODE_BLOCK_KEY_NAME) {
+        MTS.railwayData.removeNode(player, new BlockPos(block.location.x, block.location.y, block.location.z), TransportMode.TRAIN);
     }
 });
 
 world.afterEvents.playerPlaceBlock.subscribe((event) => {
     const { block, player } = event;
     
-    if (block.typeId === 'mts:rail_node') {
-        MTS.railwayData.addRailNodeBlock(player, new BlockPos(block.location));
-    }
-
-    if (block.typeId === 'mts:escalator') {
-        const playerRotation = player.getRotation().y;
-        let facing = 0;
-        
-        if (playerRotation >= -45 && playerRotation < 45) facing = 90;      // 北
-        else if (playerRotation >= 45 && playerRotation < 135) facing = 0;  // 东
-        else if (playerRotation >= 135 || playerRotation < -135) facing = 270; // 南
-        else facing = 180; // 西
-        
-        block.setPermutation(BlockPermutation.resolve("mts:escalator", {
-        "mts:facing": facing, "mts:escalator": "step_landing"}));
-
-
-        let rightBlockPos: Position;
-        if (facing === 180){
-            rightBlockPos = { x: block.location.x, 
-                              y: block.location.y,
-                              z: block.location.z + 1 };
-        } else if (facing === 270){
-            rightBlockPos = { x: block.location.x + 1,
-                              y: block.location.y,
-                              z: block.location.z };
-        } else if (facing === 0){
-            rightBlockPos = { x: block.location.x,
-                              y: block.location.y,
-                              z: block.location.z - 1 };
-        } else {
-            rightBlockPos = { x: block.location.x - 1,
-                              y: block.location.y,
-                              z: block.location.z };
-        }
-
-        function offset(a:Position): Position {
-            return {x: a.x, y: a.y + 1, z: a.z}
-        }
-
-        const Dismension = world.getDimension("overworld")
-        if (!Dismension.getBlock(rightBlockPos) && (Dismension.getBlock(rightBlockPos)?.typeId != "minecraft:air" || Dismension.getBlock(rightBlockPos)?.typeId != "air")) {
-            block.setType("minecraft:air")
-        } else {
-            Dismension.setBlockPermutation(offset(block.location), 
-                    BlockPermutation.resolve("mts:escalator", {
-                    "mts:facing": facing, "mts:escalator": "side_landing_left"}));
-            Dismension.setBlockPermutation(rightBlockPos, 
-                    BlockPermutation.resolve("mts:escalator", {
-                    "mts:facing": facing, "mts:escalator": "step_landing"}));
-            Dismension.setBlockPermutation(offset(rightBlockPos), 
-                    BlockPermutation.resolve("mts:escalator2", {
-                    "mts:facing": facing, "mts:escalator2": "side_landing_right"}));
-        }
+    if (block.typeId === BlockNode.RAIL_NODE_BLOCK_KEY_NAME) {
+        BlockNode.updateRailNodeState(player, new BlockPos(block.location));
     }
 });
 
@@ -167,12 +115,11 @@ world.afterEvents.itemUse.subscribe((event) => {
 });
 
 system.runInterval(() => {
-    ParticleSystem.update();
     MTS.railwayData.simulateTrains()
 }, 1)
 
 system.runInterval(() => {
-    function XZPosDistSqr(a: Position, b: Position): number {
+    function XZPosDistSqr(a: Vector3, b: Vector3): number {
         const dx = a.x - b.x;
         const dz = a.z - b.z;
         return dx * dx + dz * dz;
@@ -181,11 +128,11 @@ system.runInterval(() => {
         const secondPos = dashboard.playerSecondChoicesPos;
         if (!secondPos) return;
 
-        const currentPos = TrainDashboardClient.getPlayerFacingPos(player).asJson();
+        const currentPos = TrainDashboardClient.getPlayerFacingPos(player);
         currentPos.z += 0.5;
         currentPos.x += 0.5;
 
-        const secondPos_Copy: Position = {x: secondPos.getX() + 0.5, y: secondPos.getY(), z: secondPos.getZ() + 0.5};
+        const secondPos_Copy: Vector3 = {x: secondPos.x + 0.5, y: secondPos.y, z: secondPos.z + 0.5};
 
         const playerPos = player.location;
 
@@ -300,26 +247,3 @@ system.runInterval(() => {
         )
     })
 }, 4)
-
-
-system.runInterval(() => {
-    SaveData();
-}, 60*5*20)// every 5 minutes
-
-
-
-
-
-
-system.runInterval(() => {
-    TickerManager.removeAllTickers()
-}, 30*20)// every 30 seconds to remove unused tickers
-
-
-
-
-if (DEBUG) {
-system.runTimeout(() => {
-    world.sendMessage("[MTS] Welcome to test MTS Alpha");
-}, 20);
-}

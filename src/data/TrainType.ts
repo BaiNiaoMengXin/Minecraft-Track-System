@@ -1,5 +1,4 @@
 import { TransportMode } from './TransportMode';
-import { ExtensionTrain } from 'ExtensionRegistry/ExtensionRegistry';
 
 type TrainTypeCallback = (transportMode: TransportMode, length: number, width: number) => void;
 

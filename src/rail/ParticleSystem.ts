@@ -1,5 +1,4 @@
 import { MolangVariableMap, RGBA, system, Vector2, Vector3, world } from '@minecraft/server';
-import { Position, generateUniqueNumberID } from 'data/Base';
 
 export enum particleType {
     blue_flame_particle = "minecraft:blue_flame_particle",
@@ -21,43 +20,9 @@ export enum particleType {
     rail_preview_right = "mts:rail_preview_right"
 }
 
-interface particleData {
-    type: particleType,
-    pos: Position,
-    rotAndSizeAndColor: MolangVariableMap,
-}
-
 export abstract class ParticleSystem {
 
-    public static activePos: Map<number, particleData> = new Map();
-
-    static update() {
-        const dimension = world.getDimension('overworld');
-        
-        this.activePos.forEach((data, number) => {try {
-                dimension.spawnParticle(data.type, data.pos, data.rotAndSizeAndColor);
-            } catch (e) {
-            }
-        })
-    }
-
-    static addParticle(type: particleType, pos: Position, rot: Vector3, size: Vector2, color: RGBA): number {
-        const id = generateUniqueNumberID();
-        const molang = new MolangVariableMap();
-        molang.setVector3("variable.rot", rot);
-        molang.setColorRGBA("variable.color", color);
-        molang.setFloat("variable.width", size.x);
-        molang.setFloat("variable.length", size.y);
-        this.activePos.set(id, {
-            type: type,
-            pos: pos,
-            rotAndSizeAndColor: molang
-        });
-
-        return id;
-    }
-
-    static layParticle(type: particleType, pos: Position, rot: Vector3, size: Vector2, color: RGBA, lifeTime?: number) {
+    static layParticle(type: particleType, pos: Vector3, rot: Vector3, size: Vector2, color: RGBA, lifeTime?: number) {
         const molang = new MolangVariableMap();
         molang.setVector3("variable.rot", rot);
         molang.setColorRGBA("variable.color", color);
@@ -74,7 +39,7 @@ export abstract class ParticleSystem {
         }
     }
 
-    static layNumberlayParticle(number: number, pos: Position, rot: Vector3, size: Vector2, color: RGBA, lifeTime?: number) {
+    static layNumberlayParticle(number: number, pos: Vector3, rot: Vector3, size: Vector2, color: RGBA, lifeTime?: number) {
         let offset = 0;
         for (const element of this.getTypeByNumbers(number)) {
             const molang = new MolangVariableMap();
@@ -142,13 +107,5 @@ export abstract class ParticleSystem {
             case 9: return particleType.nine;
             default: return particleType.show;
         }
-    }
-
-    static removeParticle(id: number) {
-        this.activePos.delete(id);
-    }
-
-    static clearAll() {
-        this.activePos.clear();
     }
 }

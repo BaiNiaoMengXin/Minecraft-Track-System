@@ -209,16 +209,6 @@ export class RailwayData extends SerializedDataBase {
 		return this.rails;
 	}
 
-	public addRailNodeBlock(player: Player, pos: BlockPos): void {
-		BlockNode.updateRailNodeState(player, pos);
-	}
-
-	public removeRailNodeBlock(player: Player, pos: BlockPos): void {
-		// TODO temporary code
-		this.removeNode(player, pos, TransportMode.TRAIN);
-		// TODO temporary code end
-	}
-
 	// static finders
 
 	public static getPlatformByPos(platforms: Set<Platform>, pos: BlockPos): Platform | null {

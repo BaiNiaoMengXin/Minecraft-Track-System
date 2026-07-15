@@ -1,7 +1,6 @@
 import { NameColorDataBase } from "./NameColorDataBase";
 import { RailwayData } from "./RailwayData";
 import { TransportMode } from "./TransportMode";
-import { Position, PosHelper } from "./Base";
 import { Platform } from "./Platform";
 import { BlockPos } from "util/math/BlockPos";
 import { AreaBase } from "./AreaBase";

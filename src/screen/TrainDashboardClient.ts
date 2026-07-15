@@ -1,5 +1,5 @@
-import { Player, RGBA, system, world } from "@minecraft/server";
-import { CustomForm, MessageBox, ObservableBoolean, ObservableNumber, ObservableString } from "@minecraft/server-ui";
+import { Player, RGBA, system, TextPrimitive, Vector3, world } from "@minecraft/server";
+import { CustomForm, MessageBox, ObservableBoolean, ObservableNumber, ObservableString, ObservableUIRawMessage } from "@minecraft/server-ui";
 import { CollisionDetector } from "data/Base";
 import { BetterMap } from "data/BetterMap";
 import { DataCache } from "data/DataCache";
@@ -26,7 +26,7 @@ export class TrainDashboardClient {
     
     public static readonly ITEM_TYPE_ID = "mts:railway_dashboard";
     
-    public playerSecondChoicesPos: BlockPos | null = null;
+    public playerSecondChoicesPos: Vector3 | null = null;
 
     private selectedTab = SelectedTab.NONE;
 
@@ -103,16 +103,20 @@ export class TrainDashboardClient {
         }
     }
 
-    public static getPlayerFacingPos(player: Player) {
+    public static getPlayerFacingPos(player: Player): Vector3 {
         const block = player.getBlockFromViewDirection({ maxDistance: 10 })?.block;
         if (!block) {
             const headLoc = player.getHeadLocation();
             const viewDirection = player.getViewDirection();
             const distance = 10;
-            return new BlockPos(Math.ceil(headLoc.x + viewDirection.x * distance) - 1, Math.ceil(headLoc.y + viewDirection.y * distance), Math.ceil(headLoc.z + viewDirection.z * distance) - 1);
+            return {
+                x: ~~Math.ceil(headLoc.x + viewDirection.x * distance) - 1,
+                y: ~~Math.ceil(headLoc.y + viewDirection.y * distance),
+                z: ~~Math.ceil(headLoc.z + viewDirection.z * distance) - 1
+            };
         }
         else {
-            return new BlockPos(block.location.x, block.location.y, block.location.z);
+            return block.location;
         }
     }
 
@@ -128,8 +132,8 @@ export class TrainDashboardClient {
                 }
                 else {
                     const pos2 = TrainDashboardClient.getPlayerFacingPos(this.player);
-                    this.tempCorner1 = new Tuple(this.playerSecondChoicesPos.getX(), this.playerSecondChoicesPos.getZ());
-                    this.tempCorner2 = new Tuple(pos2.getX(), pos2.getZ());
+                    this.tempCorner1 = new Tuple(this.playerSecondChoicesPos.x, this.playerSecondChoicesPos.z);
+                    this.tempCorner2 = new Tuple(pos2.x, pos2.z);
                     this.playerSecondChoicesPos = null;
                     this.isSelectingCorners = false;
                 }

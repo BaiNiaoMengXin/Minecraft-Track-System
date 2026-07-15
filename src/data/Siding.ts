@@ -278,11 +278,11 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
 		this.trains.clear();
 	}
 
-    private setTrainDelails(): void;
+    public setTrainDelails(): void;
 
-    private setTrainDelails(trainId: string, baseTrainType: string, force: boolean): void;
+    public setTrainDelails(trainId: string, baseTrainType: string, force: boolean): void;
 
-    private setTrainDelails(trainId?: string, baseTrainType?: string, force?: boolean): void {
+    public setTrainDelails(trainId?: string, baseTrainType?: string, force?: boolean): void {
         if (trainId == undefined || baseTrainType == undefined || force === undefined) {
             for (const trainType of TrainType.values()) {
                 if (TrainType.getTransportMode(trainType.baseTrainType) == this.transportMode && this.isValidVehicle(TrainType.getSpacing(trainType.baseTrainType)))
