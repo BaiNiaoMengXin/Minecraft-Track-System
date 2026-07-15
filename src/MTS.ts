@@ -96,6 +96,16 @@ export namespace MTS {
                     }
                 }
             })
+        });
+
+        system.runInterval(() => {
+            world.sendMessage("auto saving Minecraft Track System game data...");// debug
+            railwayData.autoSave();
+        }, 20 * 60 * 5);
+        world.beforeEvents.playerLeave.subscribe(event => {
+            system.run(() => {
+                railwayData.fullSave();
+            });
         })
     })()
 }

@@ -1,6 +1,5 @@
 import { ItemStack, Player, system, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
-import { ClearDebugData, LoadData, SaveData } from "main";
 
 export class itemBrush {
     static itemUse(player: Player, item: ItemStack): void {
@@ -43,25 +42,6 @@ export class itemBrush {
         // }
         // else
         // {
-
-
-            const DebugPage = new ActionFormData()
-                .title("调试")
-                .button("§c强制清空存档")
-                .button("§a加载存档")
-                .button("§a存档")
-
-            DebugPage.show(player).then((response) => {
-                if (response.selection === 0) {
-                    ClearDebugData()
-                }
-                else if (response.selection === 1) {
-                    LoadData()
-                }
-                else if (response.selection === 2) {
-                    SaveData()
-                }
-            });
         // }
     }
 }

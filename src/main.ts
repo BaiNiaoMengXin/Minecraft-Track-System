@@ -1,28 +1,18 @@
-import { world, system, BlockPermutation, EntityComponentTypes, ItemStack, Player, Vector3, RGBA } from '@minecraft/server';
-import { ParticleSystem, particleType } from "./rail/ParticleSystem";
-import { RailwayData } from "./data/RailwayData.js";
-import { RailType } from 'data/RailType';
-import { RailAngle } from 'data/RailAngle';
-import { Rail } from 'data/Rail';
-import { DataCache } from 'data/DataCache';
-import { CustomResources } from 'extensions/CustomResources';
-import { itemBrush } from 'item/itemBrush';
-import { ShardDataBase } from 'packet/ShardDataSave';
-import { BlockPos } from 'util/math/BlockPos';
-import { TransportMode } from 'data/TransportMode';
-import { MTS } from 'MTS';
-import { MTSClient } from 'MTSClient';
-import { Vec3 } from 'util/math/Vec3';
-import { Mth } from 'util/math/Mth';
-import { Items } from 'Items';
-import { decode, encode } from 'libs/MessagePack/index';
-import { BlockNode } from 'block/BlockNode';
-import { TrainDashboardClient } from 'screen/TrainDashboardClient';
-
-export const DEBUG: boolean = true;
-
-
-export let gSharedDataBase: ShardDataBase<string>
+import { BlockPermutation, CommandPermissionLevel, RGBA, system, Vector3, world } from "@minecraft/server";
+import { ActionFormData } from "@minecraft/server-ui";
+import { MTS } from "MTS";
+import { MTSClient } from "MTSClient";
+import { BlockNode } from "block/BlockNode";
+import { RailEntry } from "data/RailwayData";
+import { TransportMode } from "data/TransportMode";
+import { CustomResources } from "extensions/CustomResources";
+import { itemBrush } from "item/itemBrush";
+import { decode, encode } from "libs/MessagePack/index";
+import { ParticleSystem, particleType } from "rail/ParticleSystem";
+import { TrainDashboardClient } from "screen/TrainDashboardClient";
+import { BlockPos } from "util/math/BlockPos";
+import { Mth } from "util/math/Mth";
+import { Vec3 } from "util/math/Vec3";
 
 world.afterEvents.worldLoad.subscribe(event => {
     system.runTimeout(() => {
@@ -32,45 +22,10 @@ world.afterEvents.worldLoad.subscribe(event => {
             console.error(e)
         }
     }, 20 * 2);
-})
+});
 
+// TODO load railwayData
 
-export function LoadData() {
-    system.run(() => {
-        const sharedDataBase2 = new ShardDataBase<string>("mts")
-        const data = sharedDataBase2.get("RailwayData")
-        if (data) {
-            const packed = new Uint8Array(Array.from(data as string, char => char.charCodeAt(0)));
-            MTS.railwayData.load(decode(packed, { useBigInt64: true }) as any);
-            world.sendMessage("§a铁路数据、存档已加载完成。");
-        }
-    });
-}
-
-export function SaveData() {
-    function bufferToStr(arr: Uint8Array) {
-        const chunkSize = 1000;
-        let result = '';
-        
-        for (let i = 0; i < arr.length; i += chunkSize) {
-            const chunk = arr.slice(i, i + chunkSize);
-            result += String.fromCharCode(...chunk);
-        }
-        
-        return result;
-    }
-    const packed = encode(MTS.railwayData.toMessagePack(), { useBigInt64: true })
-
-    gSharedDataBase.set("RailwayData", bufferToStr(packed))
-    gSharedDataBase.save()
-    world.sendMessage("§a铁路数据、存档已保存完成。");
-}
-
-export function ClearDebugData() {
-    gSharedDataBase.set("RailwayData", undefined as any)
-    gSharedDataBase.save()
-    world.sendMessage("§c铁路数据、存档已强制清空。");
-}
 
 
 
@@ -137,10 +92,10 @@ system.runInterval(() => {
         const line3Pos = {x: secondPos_Copy.x, y: playerPos.y, z: currentPos.z};
         const line4Pos = {x: currentPos.x, y: playerPos.y, z: currentPos.z};
 
-        const line1W = lineWidth * Math.max(Math.pow(XZPosDistSqr(Vec3.fromVector3(line1Pos), Vec3.fromVector3(currentPos)), 1/4), 1);
-        const line2W = lineWidth * Math.max(Math.pow(XZPosDistSqr(Vec3.fromVector3(line2Pos), Vec3.fromVector3(currentPos)), 1/4), 1);
-        const line3W = lineWidth * Math.max(Math.pow(XZPosDistSqr(Vec3.fromVector3(line3Pos), Vec3.fromVector3(currentPos)), 1/4), 1);
-        const line4W = lineWidth * Math.max(Math.pow(XZPosDistSqr(Vec3.fromVector3(line4Pos), Vec3.fromVector3(currentPos)), 1/4), 1);
+        const line1W = lineWidth * Math.max(Math.pow(XZPosDistSqr(line1Pos, currentPos), 1/4), 1);
+        const line2W = lineWidth * Math.max(Math.pow(XZPosDistSqr(line2Pos, currentPos), 1/4), 1);
+        const line3W = lineWidth * Math.max(Math.pow(XZPosDistSqr(line3Pos, currentPos), 1/4), 1);
+        const line4W = lineWidth * Math.max(Math.pow(XZPosDistSqr(line4Pos, currentPos), 1/4), 1);
 
         ParticleSystem.layParticle(
             particleType.show,

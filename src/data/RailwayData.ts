@@ -24,7 +24,7 @@ import { RailwayDataPathGenerationModle } from "./RailwayDataPathGenerationModle
 import { RailwayDataRailActionsModule } from "./RailwayDataRailActionsModule";
 import { RailwayDataCoolDownModule } from "./RailwayDataCoolDownModule";
 
-export class RailwayData extends SerializedDataBase {
+export class RailwayData {
 
 	public readonly stations: Set<Station> = new Set();
 	public readonly platforms: Set<Platform> = new Set();
@@ -39,7 +39,7 @@ export class RailwayData extends SerializedDataBase {
 
 	private prevPlatformCount: number = 0;
 	private prevSidingCount: number = 0;
-	private useTimeAndWindSync: boolean = false;
+	private useTimeSync: boolean = false;
 
 	private readonly rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>> = new BetterMap();
 	private readonly signalBlocks: SignalBlocks = new SignalBlocks()
@@ -51,11 +51,10 @@ export class RailwayData extends SerializedDataBase {
 
 	private static readonly DATA_VERSION = 1;
 
-	private static readonly NAME = "mts_train_data";
 	private static readonly KEY_DATA_VERSION = "mts_data_version";
+	private static readonly KEY_USE_TIME_SYNC = "use_time_sync"
 
 	public constructor() {
-		super();
 		this.trainPositions[0] = new BetterMap();
 		this.trainPositions[1] = new BetterMap();
 
@@ -64,28 +63,37 @@ export class RailwayData extends SerializedDataBase {
 		this.railwayDataRailActionsModule = new RailwayDataRailActionsModule(this, this.rails);
 		this.railwayDataCoolDownModule = new RailwayDataCoolDownModule(this, this.rails);
 	}
-
-	public load(packet: ReturnType<this['toMessagePack']>) {
-		if (packet[RailwayData.KEY_DATA_VERSION] > RailwayData.DATA_VERSION) {
-			world.sendMessage("§c§l你不能使用更高MTS版本的存档来加载至此版本!")
-			throw new RangeError("Unsupported data version");
-		}
-		this.railwayDataFileSaveModule.load(packet[RailwayData.NAME]);
+	public load() {
+		
+		this.railwayDataFileSaveModule.load();
 		this.validateData();
 		this.dataCache.sync();
 		this.signalBlocks.writeCache();
 
-		this.useTimeAndWindSync = packet.use_time_and_wind_sync;
+		try {
+			this.useTimeSync = world.getDynamicProperty(RailwayData.KEY_USE_TIME_SYNC) as boolean | undefined ?? false;
+		} catch (e) {
+			console.log(e)
+		}
 		this.runRealTimeSync();
 	}
 
-	public override toMessagePack() {
-		return {
-			[RailwayData.KEY_DATA_VERSION]: RailwayData.DATA_VERSION,
-			[RailwayData.NAME]: this.railwayDataFileSaveModule.toMessagePack(),
+	public fullSave() {
+		this.railwayDataFileSaveModule.fullSave();
+		this.saveMisc();
+	}
 
-			use_time_and_wind_sync: this.useTimeAndWindSync
-		} as const;
+	public autoSave() {
+		this.railwayDataFileSaveModule.autoSave();
+		this.saveMisc();
+	}
+
+	private saveMisc() {
+		try {
+			world.setDynamicProperty(RailwayData.KEY_DATA_VERSION, RailwayData.DATA_VERSION);
+			world.setDynamicProperty(RailwayData.KEY_USE_TIME_SYNC, this.useTimeSync);
+		} catch (e) {
+		}
 	}
 
 	public simulateTrains(): void {
@@ -107,6 +115,9 @@ export class RailwayData extends SerializedDataBase {
 		}
 		this.prevPlatformCount = this.platforms.size;
 		this.prevSidingCount = this.sidings.size;
+
+		this.railwayDataFileSaveModule.autoSaveTick();
+		this.runRealTimeSync();
 	}
 
 	// writing data
@@ -163,11 +174,11 @@ export class RailwayData extends SerializedDataBase {
 	}
 
 	public getUseTimeAndWindSync(): boolean {
-		return this.useTimeAndWindSync;
+		return this.useTimeSync;
 	}
 
 	public setUseTimeAndWindSync(useTimeAndWindSync: boolean): void {
-		this.useTimeAndWindSync = useTimeAndWindSync;
+		this.useTimeSync = useTimeAndWindSync;
 		this.runRealTimeSync();
 	}
 
@@ -188,13 +199,12 @@ export class RailwayData extends SerializedDataBase {
 	}
 
 	private runRealTimeSync(): void {
-		if (this.useTimeAndWindSync) {
+		if (this.useTimeSync) {
 			const date = new Date();
 			const ticks = Math.round((date.getHours() + Depot.HOURS_IN_DAY - 6) * 1000 + date.getMinutes() / 0.06 + date.getSeconds() / 3.6) % 24000;
 			try {
 				world.setTimeOfDay(ticks);
 			} catch (e) {
-				world.sendMessage(`§cFailed to set world time to real time: ${e}`);
 			}
 		}
 	}
@@ -235,7 +245,7 @@ export class RailwayData extends SerializedDataBase {
 			rails.forEach((railMap, startPos) => {
 				railMap.get(pos)?.destroyEntities();
 				railMap.delete(pos);
-				if (railMap.isEmpty() && world != null) {
+				if (railMap.isEmpty()) {
 					BlockNode.resetRailNode(startPos);
 				}
 			});
@@ -261,9 +271,7 @@ export class RailwayData extends SerializedDataBase {
 					BlockNode.resetRailNode(pos2);
 				}
 			}
-			if (world != null) {
-				RailwayData.validateRails(rails);
-			}
+			RailwayData.validateRails(rails);
 		} catch (e) {
 		}
 	}
@@ -314,7 +322,7 @@ export class RailwayData extends SerializedDataBase {
 		for (let i = 0; i < routeIds.length; i++) {
 			const thisRoute = dataCache.routeIdMap.get(routeIds[i]);
 			const nextRoute = i < routeIds.length - 1 && !dataCache.routeIdMap.get(routeIds[i + 1])!.isHidden ? dataCache.routeIdMap.get(routeIds[i + 1]) : undefined;
-			if (thisRoute != null) {
+			if (thisRoute != undefined) {
 				const difference = stopIndex - sum;
 				sum += thisRoute.platformIds.length;
 				if (thisRoute.platformIds.length != 0 && nextRoute != null && nextRoute.platformIds.length != 0 && thisRoute.getLastPlatformId() == nextRoute.getFirstPlatformId()) {
