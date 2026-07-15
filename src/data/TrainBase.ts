@@ -44,7 +44,7 @@ export abstract class TrainBase extends NameColorDataBase {
 	protected readonly distances: number[];
 	protected readonly repeatIndex1: number;
 	protected readonly repeatIndex2: number;
-	protected readonly ridingEntities: BetterMap<Player, {carrier: Entity, ridingCar: number, offsets: Vec3}> = new BetterMap();
+	protected readonly ridingEntities: Map<string, Entity> =  new Map()
 	// protected readonly SimpleContainer inventory;
 
 	private readonly railLength: number;
@@ -131,16 +131,23 @@ export abstract class TrainBase extends NameColorDataBase {
 			
 			this.isOnRoute = messagePackHelper.getBoolean("is_on_route");
 
-			// packet.riding_entities.forEach(([playerId, data]) => {
-			// 	world.getAllPlayers
-			// })
+			messagePackHelper.iterateArrayValue("riding_entities", (v, i) => {
+				const entry = v.asArrayValue() as [string, string];
+				const entity = world.getEntity(entry[1])
+				if (entity) {
+					this.ridingEntities.set(entry[0], entity);
+				}
+			})
 		}
 	}
 
 	public dispose() {
-		system.run(() => {
-			Array.from(this.ridingEntities.values()).forEach(v => v.carrier.remove())
-		})
+		this.disposeRidingEntities();
+	}
+
+	protected disposeRidingEntities() {
+		this.ridingEntities.forEach((entity, playerId) => entity.remove())
+		this.ridingEntities.clear();
 	}
 
 	public override toMessagePack() {
@@ -158,7 +165,7 @@ export abstract class TrainBase extends NameColorDataBase {
 			is_currently_manual: this.isCurrentlyManual,
 			is_on_route: this.isOnRoute,
 
-			// riding_entities: Array.from(this.ridingEntities, ([player, data]) => [player.id, { carrier: data.carrier.id, riding_car: data.ridingCar, offsets: data.offsets }]) as [string, {carrier: string, riding_car: number, offsets: Vec3}][]
+			riding_entities: Array.from(this.ridingEntities, ([playerId, entity]) => [playerId, entity.id])
 		} as const;
 	}
 
@@ -240,7 +247,7 @@ export abstract class TrainBase extends NameColorDataBase {
 	}
 
 	public isPlayerRiding(player: Player): boolean {
-		return this.ridingEntities.has(player);
+		return this.ridingEntities.has(player.id);
 	}
 
 	public getSpeed(): number {
@@ -295,7 +302,7 @@ export abstract class TrainBase extends NameColorDataBase {
 				if (this.railProgress >= this.distances[this.distances.length - 1] - (this.railLength - this.trainCars * this.spacing) / 2) {
 					this.isOnRoute = false;
 					this.manualNotch = -2;
-					this.ridingEntities.clear();
+					this.disposeRidingEntities();
 					tempDoorOpen = false;
 					tempDoorValue = 0;
 				} else {
@@ -473,7 +480,7 @@ export abstract class TrainBase extends NameColorDataBase {
 
 	protected abstract skipScanBlocks(trainX: number, trainY: number, trainZ: number): boolean;
 
-	protected abstract openDoors_(block: Block, checkPos: BlockPos, dwellTicks: number): boolean;
+	protected abstract openDoors_(block: Block, checkPos: Vector3, dwellTicks: number): boolean;
 
 	protected abstract asin(value: number): number;
 
@@ -505,8 +512,12 @@ export abstract class TrainBase extends NameColorDataBase {
 		for (let checkX = 1; checkX <= 3; checkX++) {
 			for (let checkY = -2; checkY <= 3; checkY++) {
 				for (let checkZ = -halfSpacing; checkZ <= halfSpacing; checkZ++) {
-					const checkPos = RailwayData.newBlockPos(trainX + offsetVec.x * checkX + traverseVec.x * checkZ, trainY + checkY, trainZ + offsetVec.z * checkX + traverseVec.z * checkZ);
-					const block = world.getDimension("overworld").getBlock(checkPos.asJson());
+					const checkPos = {
+						x: trainX + offsetVec.x * checkX + traverseVec.x * checkZ,
+						y: trainY + checkY,
+						z: trainZ + offsetVec.z * checkX + traverseVec.z * checkZ
+					};
+					const block = world.getDimension("overworld").getBlock(checkPos);
 
 					// if (block instanceof BlockPlatform || block instanceof BlockPSDAPGBase) {
 						if (this.openDoors_(block!, checkPos, dwellTicks)) {

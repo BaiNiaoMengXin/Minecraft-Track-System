@@ -14,7 +14,6 @@ import { Train } from "./Train";
 import { BlockPos } from "util/math/BlockPos";
 import { TrainType } from "./TrainType";
 import { Player, system } from "@minecraft/server";
-import { TrainDelay } from "./TrainDelay";
 import { ScheduleEntry } from "./ScheduleEntry";
 import { SignalBlocks } from "./SignalBlocks";
 import { ArrayList } from "jLib/ArrayList";
@@ -22,6 +21,7 @@ import { RailType } from "./RailType";
 import { IReducedSaveData } from "./IReducedSaveData";
 import { Integer } from "jLib/Math";
 import { MessagePackHelper } from "./MessagePackHelper";
+import { UUID } from "jLib/UUID";
 
 export class Siding extends SavedRailBase implements IReducedSaveData {
 	private depot: Depot | null = null;
@@ -217,7 +217,7 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
 		return successfulSegments;
     }
 
-	public simulateTrain(dataCache: DataCache, trainPositions: any, signalBlocks: SignalBlocks, schedulesForPlatform: Map<number, Array<ScheduleEntry>>, trainDelays: Map<number, BetterMap<BlockPos, TrainDelay>>): void {
+	public simulateTrain(dataCache: DataCache, trainPositions: Array<BetterMap<UUID, number>>, signalBlocks: SignalBlocks, schedulesForPlatform: Map<number, Array<ScheduleEntry>>): void {
 		if (this.depot == null) {
 			return;
 		}
@@ -232,7 +232,7 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
 			// 	trainsToSync.push(train);
 			// }
 
-			if (train.simulateTrain(1, this.depot, dataCache, trainPositions, schedulesForPlatform, trainDelays)) {
+			if (train.simulateTrain(1, this.depot, dataCache, trainPositions, schedulesForPlatform)) {
 				// trainsToSync.push(train);
 				console.log("[Siding.simulateTrain] DEBUG: simulateTrain sucesss")
 			}

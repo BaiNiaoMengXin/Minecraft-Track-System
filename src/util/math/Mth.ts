@@ -283,6 +283,10 @@ export namespace Mth {
     export function map(value: number, inMin: number, inMax: number, outMin: number, outMax: number): number {
         return outMin + (outMax - outMin) * inverseLerp(inMin, inMax, value);
     }
+
+    export function frac(f: number): number {
+        return f - Math.floor(f);
+    }
 }
 
 

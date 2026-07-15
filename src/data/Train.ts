@@ -1,4 +1,4 @@
-import { Block, Entity, EntityComponentTypes, EntityHealthComponent, EntityType, Player, SpawnEntityOptions, system, Vector2, Vector3, world } from "@minecraft/server";
+import { Block, Entity, EntityComponentTypes, EntityHealthComponent, EntityType, LocationInUnloadedChunkError, Player, RawMessage, SpawnEntityOptions, system, Vector2, Vector3, world } from "@minecraft/server";
 import { TrainBase } from "./TrainBase";
 import { Siding, TimeSegment } from "./Siding";
 import { CollisionDetector, currentTimeMillis, EntityModelStructure } from "./Base";
@@ -6,7 +6,6 @@ import { PathData } from "path/PathData";
 import { Depot } from "./Depot";
 import { DataCache } from "./DataCache";
 import { RailwayData } from "./RailwayData";
-import { TrainDelay } from "./TrainDelay";
 import { BlockPos } from "util/math/BlockPos";
 import { ScheduleEntry } from "./ScheduleEntry";
 import { UUID } from "jLib/UUID";
@@ -16,24 +15,38 @@ import { Vec3 } from "util/math/Vec3";
 import { BetterMap } from "./BetterMap";
 import { TrigCache } from "TrigCache";
 import { MessagePackHelper } from "./MessagePackHelper";
+import { TrainModels } from "extensions/TrainModels";
+import { TrainRegistry } from "extensions/TrainRegistry";
+import { TrainSoundBase } from "sound/TrainSoundBase";
+import { MTS } from "MTS";
+import { AABB } from "util/AABB";
+import { VehicleRiding } from "./VehicleRiding";
+import { Route } from "./Route";
+import { Station } from "./Station";
+import { IGui } from "./IGui";
+import { JonTrainSound } from "sound/JonTrainSound.";
+import { BveTrainSound } from "sound/bve/BveTrainSound";
 
 export class Train extends TrainBase {
 
     private canDeploy: boolean = false;
+    private trainPositions: Array<Map<UUID, number>> | undefined;
 	private oldSpeed: number = 0;
 	private oldDoorValue: number = 0;
 
-    private trainEntities: Array<Entity> = [];
+    private trainEntities: Array<Entity | undefined> = [];
 
     // private trainsInPlayerRange: BetterMap<Player, Set<Train>> = new EquitableMap();
-    // private Map<Long, Map<BlockPos, TrainDelay>> trainDelays = new HashMap<>();
     private routeId: number = 0;
     private updateRailProgressCounter: number = 0;
     private manualCoolDown: number = 0;
 
     private readonly timeSegments: TimeSegment[];
+    private readonly trainModels: TrainModels;
+    private readonly trainSound: TrainSoundBase;
+    private readonly vehicleRiding: VehicleRiding = new VehicleRiding(this.ridingEntities)
 
-    private static readonly TRAIN_UPDATE_DISTANCE: number = 128;
+    private static readonly TRAIN_UPDATE_DISTANCE: number = 96;
     private static readonly TICKS_TO_SEND_RAIL_PROGRESS: number = 40;
 
     public constructor(id: number, sidingId: number, railLength: number, trainId: string, baseTrainType: string, trainCars: number, path: PathData[], distances: number[], repeatIndex1: number, repeatIndex2: number, accelerationConstant: number, timeSegments: TimeSegment[], isManual: boolean, maxManualSpeed: number, manualToAutomaticTime: number);
@@ -54,12 +67,6 @@ export class Train extends TrainBase {
         if (manualToAutomaticTime != undefined) {
             super(arg1, arg2, arg3 as number, arg4 as string, arg5 as string, arg6, arg7 as PathData[], arg8 as number[], arg9 as number, arg10, arg11, isManual!, maxManualSpeed!, manualToAutomaticTime);
             this.timeSegments = arg12 as TimeSegment[];
-
-            for (let i = 0; i < this.trainCars; i++) {
-                const entity = world.getDimension("overworld").spawnEntity<string>("mts:train", this.path[0].startingPos.asJson());
-                entity.playAnimation("animation.train.rotation");
-                this.trainEntities.push(entity);
-            }
         } else {
             super(arg1, arg2, arg4 as PathData[], arg5 as number[], arg6, arg7 as number, arg8 as number, arg9 as boolean, arg10, arg11, arg12 as Record<string, unknown>)
             const messagePackHelper = new MessagePackHelper(arg12 as ReturnType<this['toMessagePack']>);
@@ -72,20 +79,56 @@ export class Train extends TrainBase {
                 }
             })
         }
+        const trainProperties = TrainRegistry.getTrainProperties(this.trainId);
+        this.trainModels = trainProperties.models;
+        this.trainSound = trainProperties.sound.createTrainInstance(this);
+
+        if (manualToAutomaticTime != undefined) {
+            this.createEntities();
+        }
+    }
+
+    private async createEntities() {
+        const siding = MTS.railwayData.dataCache.sidingIdMap.get(this.sidingId);
+
+        if (siding !== undefined) {
+            const dimension = world.getDimension("overworld");
+            let isUseTickingArea = false;
+            if (!RailwayData.chunkLoaded(siding.getMidPos(true))) {
+                if (this.path.length == 0) return;
+
+                await this.path[0].rail.createTickingArea(String(this.id), dimension.id);
+                isUseTickingArea = true;
+            }
+
+            for (let i = 0; i < this.trainCars; i++) {
+                try {
+                    const entity = dimension.spawnEntity<string>(this.trainModels.getModelFormIndex(this.trainCars, i)!, this.path[0].startingPos.asJson());
+                    this.trainEntities.push(entity)
+                } catch (error) {
+                    this.trainEntities.push(undefined);
+                    console.error(error)
+                }
+            }
+            if (isUseTickingArea) {
+                world.tickingAreaManager.removeTickingArea(String(this.id))
+            }
+        }
     }
 
     public override dispose() {
         super.dispose();
-        system.run(() => {
-            this.trainEntities.forEach(entity => entity.remove())
+        this.trainEntities.forEach(entity => {
+            if (entity !== undefined) entity.remove();
         })
+        this.trainEntities.length = 0;
     }
 
     public override toMessagePack() {
         return {
             ...super.toMessagePack(),
 
-            train_entities: Array.from(this.trainEntities, entity => entity.id)
+            train_entities: Array.from(this.trainEntities, entity => entity?.id)
         } as const;
     }
 
@@ -129,139 +172,117 @@ export class Train extends TrainBase {
         prevCarX: number, prevCarY: number, prevCarZ: number, prevCarYaw: number, prevCarPitch: number,
         doorLeftOpen: boolean, doorRightOpen: boolean, realSpacing: number
     ): void {
-        // VehicleRidingServer.mountRider(world, ridingEntities, id, routeId, carX, carY, carZ, realSpacing, width, carYaw, carPitch, doorLeftOpen || doorRightOpen, isManualAllowed || doorLeftOpen || doorRightOpen, ridingCar, PACKET_UPDATE_TRAIN_PASSENGERS, player -> !isManualAllowed || doorLeftOpen || doorRightOpen || Train.isHoldingKey(player), player -> {
-        // 	if (isHoldingKey(player)) {
-        // 		manualCoolDown = 0;
-        // 	}
-        // });
+        this.vehicleRiding.mountRider(this.routeId, carX, carY, carZ, realSpacing, this.width, carYaw, carPitch, doorLeftOpen || doorRightOpen, this.isManualAllowed || doorLeftOpen || doorRightOpen, ridingCar, player => !this.isManualAllowed || doorLeftOpen || doorRightOpen || Train.isHoldingKey(player), player => {
+        	if (Train.isHoldingKey(player)) {
+        		this.manualCoolDown = 0;
+        	}
+        });
 
-        //////////////////////////////////////
+        const soundPos = { x: carX, y: carY, z: carZ };
+        this.trainSound.playAllCars(soundPos, ridingCar);
+        // TODO...?
+        this.trainSound.playNearestCar(soundPos, ridingCar);
+        if (doorLeftOpen || doorRightOpen) {
+            this.trainSound.playAllCarsDoorOpening(soundPos, ridingCar);
+        }
+
         const entity = this.trainEntities[ridingCar];
-
-        entity?.teleport({ x: carX, y: carY, z: carZ });
-        entity?.setProperty("mts:x_rotation", -Mth.toDegrees(carPitch));
-        entity?.setProperty("mts:y_rotation", -Mth.toDegrees(carYaw));
-        entity?.setProperty("mts:z_rotation", 0.0);
-
-        // HandlePlayerRiding
-        for (const [player, data] of this.ridingEntities) {
-            if (!player) {
-                this.removeRidingPlayer(player);
-                continue;
-            }
-            if (data.ridingCar != ridingCar) {
-                continue;
-            }
-
-            // 获取玩家输入
-            const move: Vector2 = player.inputInfo.getMovementVector?.() || { x: 0, y: 0 };
-
-            // 只在玩家有输入时更新偏移量
-            if (move.x !== 0 || move.y !== 0) {
-                const SPEED = 0.2;
-                const playerRotation = player.getRotation();
-                let offset = new Vec3(Math.sign(-move.y) * SPEED, 0, Math.sign(move.x) * SPEED)
-                let offset2 = (offset.yRot_Degrees(-playerRotation.y + 90)).yRot(carYaw);
-                data.offsets.z += offset2.z;
-                data.offsets.x += offset2.x;
-            }
-
-            const newRidingPos: Vec3 = new Vec3(carX, carY, carZ).add(data.offsets.yRot(-carYaw));
-
-            data.carrier.teleport(newRidingPos)
-        }
-
-        for (const player of world.getAllPlayers()) {
-            const model: EntityModelStructure = {
-                position: { x: carX, y: carY + 3 / 2, z: carZ },
-                rotation: { x: carPitch, y: -carYaw },
-                size: { x: 3, y: 3, z: this.spacing + this.width }
-            };
-
-            const isColliding = CollisionDetector.isPlayerCollidingWithModel(player, model);
-            if (isColliding && !this.isPlayerRiding(player)) {
-                this.addRidingPlayer(
-                    ridingCar, player,
-                    carX, carY, carZ,
-                    carYaw, carPitch
-                );
-            } else if (!isColliding && this.isPlayerRiding(player) && this.ridingEntities.get(player)?.ridingCar == ridingCar) {
-
-
-                // const model2: EntityModelStructure = {
-                //     position: { x: pos.x, y: pos.y + 3 / 2, z: pos.z},
-                //     rotation: { x: rot.x, y: -rot.y },
-                //     size: { x: 3.1, y: 3, z: this.spacing + this.width }
-                // };
-                // const isColliding2 = CollisionDetector.isPlayerCollidingWithModel(player, model2);
-
-                // if (!isColliding2)
-                // {
-                this.removeRidingPlayer(player);
-                // }
-            }
-        }
-
-        for (const entity of this.trainEntities.values()) {
-            (entity.getComponent(EntityComponentTypes.Health) as EntityHealthComponent).setCurrentValue(9999)
-        }
-        for (const data of this.ridingEntities.values()) {
-            (data.carrier.getComponent(EntityComponentTypes.Health) as EntityHealthComponent).setCurrentValue(9999)
+        if (entity) {
+            entity?.teleport({ x: carX, y: carY, z: carZ });
+            entity?.setProperty("mts:x_rotation", -Mth.toDegrees(carPitch) * 10);
+            entity?.setProperty("mts:y_rotation", -Mth.toDegrees(carYaw) * 10);
+            entity?.setProperty("mts:z_rotation", 0.0);
+            const doorState = (this.doorValue < (this.trainSound instanceof JonTrainSound ? this.trainSound.config.doorCloseSoundTime : (this.trainSound as BveTrainSound).config.soundCfg.doorCloseSoundLength) && this.doorValue < this.oldDoorValue) ? 0 : ((doorLeftOpen ? 1 : 0) + (doorRightOpen ? 2 : 0));
+            entity?.setProperty("mts:door_state", doorState);
         }
     }
 
     protected override handlePositions(positions: Vec3[], ticksElapsed: number): boolean {
-        // final AABB trainAABB = new AABB(positions[0], positions[positions.length - 1]).inflate(TRAIN_UPDATE_DISTANCE);
-        let playerNearby: boolean[] = [false];
-        // world.players().forEach(player -> {
-        // 	if (isPlayerRiding(player) || trainAABB.contains(player.position())) {
-        // 		if (!trainsInPlayerRange.containsKey(player)) {
-        // 			trainsInPlayerRange.put(player, new HashSet<>());
-        // 		}
-        // 		trainsInPlayerRange.get(player).add(this);
-        // 		playerNearby[0] = true;
-        // 	}
-        // });
+        const trainAABB = new AABB(positions[0], positions[positions.length - 1]).inflate(Train.TRAIN_UPDATE_DISTANCE);
+        const playerNearby: boolean = world.getAllPlayers().some(player => this.isPlayerRiding(player) || trainAABB.contains(player.location));
 
-        // final BlockPos frontPos = RailwayData.newBlockPos(positions[reversed ? positions.length - 1 : 0]);
-        // if (RailwayData.chunkLoaded(world, frontPos)) {
-        // 	checkBlock(frontPos, checkPos -> {
-        // 		if (RailwayData.chunkLoaded(world, checkPos)) {
-        // 			final BlockState state = world.getBlockState(checkPos);
-        // 			final Block block = state.getBlock();
+        if (ticksElapsed > 0) {
+            const headIndex = this.getIndex(0, this.spacing, false);
+            const stopIndex = this.path[headIndex].stopIndex - 1;
 
-        // 			if (block instanceof BlockTrainRedstoneSensor && BlockTrainSensorBase.matchesFilter(world, checkPos, routeId, speed)) {
-        // 				((BlockTrainRedstoneSensor) block).power(world, state, checkPos);
-        // 			}
+            const speed = this.speed * 20;
+            const routeIds = MTS.railwayData.dataCache.sidingIdToDepot.get(this.sidingId)!.routeIds;
+            let thisRoute: Route | null = null;
+            let thisStation: Station | null = null;
+            let nextStation: Station | null = null;
+            let lastStation: Station | null = null;
+            RailwayData.useRoutesAndStationsFromIndex(stopIndex, routeIds, MTS.railwayData.dataCache, (currentStationIndex, thisRoute1, nextRoute1, thisStation1, nextStation1, lastStation1) => {
+				thisRoute = thisRoute1;
+				thisStation = thisStation1;
+				nextStation = nextStation1;
+				lastStation = lastStation1;
+			})
 
-        // 			if ((block instanceof BlockTrainCargoLoader || block instanceof BlockTrainCargoUnloader) && BlockTrainSensorBase.matchesFilter(world, checkPos, routeId, speed)) {
-        // 				for (final Direction direction : Direction.values()) {
-        // 					final Container nearbyInventory = HopperBlockEntity.getContainerAt(world, checkPos.relative(direction));
-        // 					if (nearbyInventory != null) {
-        // 						if (block instanceof BlockTrainCargoLoader) {
-        // 							transferItems(nearbyInventory, inventory);
-        // 						} else {
-        // 							transferItems(inventory, nearbyInventory);
-        // 						}
-        // 					}
-        // 				}
-        // 			}
-        // 		}
-        // 	});
-        // }
+            world.getAllPlayers().forEach(player => {
+                if (this.isPlayerRiding(player)) {
+                    if (!this.isCurrentlyManual || !Train.isHoldingKey(player)) {
+                        if (speed > 5 || thisRoute == null || thisStation == null || lastStation == null) {
+                            player.onScreenDisplay.setActionBar({
+                                translate: "gui.mts.vehicle_speed",
+                                with: [
+                                    String(RailwayData.round(speed, 1)),
+                                    String(RailwayData.round(speed * 3.6, 1))
+                                ]
+                            });
+                        } else {
+                            let text: RawMessage;
+                            switch (~~((system.currentTick / 20) % 3)) {
+                                default:
+                                    text = Train.getStationText(thisStation, "this");
+                                    break;
+                                case 1:
+                                    if (nextStation == null) {
+                                        text = Train.getStationText(thisStation, "this");
+                                    } else {
+                                        text = Train.getStationText(nextStation, "next");
+                                    }
+                                    break;
+                                case 2:
+                                    text = Train.getStationText(lastStation, "last_" + thisRoute.transportMode.toString().toLowerCase());
+                                    break;
+                            }
+                            player.onScreenDisplay.setActionBar(text);
+                        }
+                    }
 
-        // if (!ridingEntities.isEmpty() && RailwayData.chunkLoaded(world, frontPos)) {
-        // 	checkBlock(frontPos, checkPos -> {
-        // 		if (RailwayData.chunkLoaded(world, checkPos) && world.getBlockState(checkPos).getBlock() instanceof BlockTrainAnnouncer) {
-        // 			final BlockEntity entity = world.getBlockEntity(checkPos);
-        // 			if (entity instanceof BlockTrainAnnouncer.TileEntityTrainAnnouncer && ((BlockTrainAnnouncer.TileEntityTrainAnnouncer) entity).matchesFilter(routeId, speed)) {
-        // 				ridingEntities.forEach(uuid -> ((BlockTrainAnnouncer.TileEntityTrainAnnouncer) entity).announce(world.getPlayerByUUID(uuid)));
-        // 			}
-        // 		}
-        // 	});
-        // }
 
-        return true;
+                    /* if (announcementCallback != null) {
+                        final double targetProgress = distances.get(getPreviousStoppingIndex(headIndex)) + (trainCars + 1) * spacing;
+                        if (oldRailProgress < targetProgress && railProgress >= targetProgress) {
+                            announcementCallback.announcementCallback(stopIndex, routeIds);
+                        }
+                    }
+
+                    if (lightRailAnnouncementCallback != null && (justOpening() || justMounted)) {
+                        lightRailAnnouncementCallback.announcementCallback(stopIndex, routeIds);
+                    } */
+                }
+			})
+
+            const trainProperties = TrainRegistry.getTrainProperties(this.trainId);
+            this.vehicleRiding.movePlayer(playerId => {
+                const calculateCarCallback = (x: number, y: number, z: number, yaw: number, pitch: number, realSpacingRender: number, doorLeftOpenRender: boolean, doorRightOpenRender: boolean) => this.vehicleRiding.setOffsets(playerId, x, y, z, yaw, pitch, this.transportMode.maxLength == 1 ? this.spacing : realSpacingRender, this.width, doorLeftOpenRender, doorRightOpenRender, this.transportMode.hasPitchAscending, this.transportMode.hasPitchDescending, trainProperties.riderOffset, trainProperties.riderOffsetDismounting);
+
+                const currentRidingCar = ~~Mth.clamp(Math.floor(this.vehicleRiding.getPercentageZ(playerId)), 0, positions.length - 2);
+                this.calculateCar(positions, currentRidingCar, 0, (x, y, z, yaw, pitch, realSpacingRender, doorLeftOpenRender, doorRightOpenRender) => {
+                    this.vehicleRiding.moveSelf(playerId, realSpacingRender, this.width, yaw, currentRidingCar, this.trainCars, doorLeftOpenRender, doorRightOpenRender, false, ticksElapsed);
+
+                    const newRidingCar = ~~Mth.clamp(Math.floor(this.vehicleRiding.getPercentageZ(playerId)), 0, positions.length - 2);
+                    if (currentRidingCar == newRidingCar) {
+                        calculateCarCallback(x, y, z, yaw, pitch, realSpacingRender, doorLeftOpenRender, doorRightOpenRender);
+                    } else {
+                        this.calculateCar(positions, newRidingCar, 0, calculateCarCallback);
+                    }
+                });
+            });
+        }
+
+        return playerNearby;
     }
 
     protected override canDeploy_(depot: Depot): boolean {
@@ -272,33 +293,24 @@ export class Train extends TrainBase {
     }
 
     protected override isRailBlocked(checkIndex: number): boolean {
-        // if (!this.transportMode.continuousMovement && this.trainPositions != null && checkIndex < this.path.size()) {
-        // 	const pathData = this.path.get(checkIndex);
-        // 	const railProduct = pathData.getRailProduct();
-        // 	for (const trainPositionsMap of this.trainPositions) {
-        // 		if (trainPositionsMap.containsKey(railProduct) && trainPositionsMap.get(railProduct) != id) {
-        // 			if (routeId != 0) {
-        // 				if (!trainDelays.containsKey(routeId)) {
-        // 					trainDelays.put(routeId, new HashMap<>());
-        // 				}
-        // 				if (!trainDelays.get(routeId).containsKey(pathData.startingPos)) {
-        // 					trainDelays.get(routeId).put(pathData.startingPos, new TrainDelay());
-        // 				}
-        // 				trainDelays.get(routeId).get(pathData.startingPos).delaying();
-        // 			}
-        // 			return true;
-        // 		}
-        // 	}
-        // }
+        if (!this.transportMode.continuousMovement && this.trainPositions != undefined && checkIndex < this.path.length) {
+        	const pathData = this.path[checkIndex];
+        	const railProduct = pathData.getRailProduct();
+        	for (const trainPositionsMap of this.trainPositions) {
+        		if (trainPositionsMap.has(railProduct) && trainPositionsMap.get(railProduct) != this.id) {
+        			return true;
+        		}
+        	}
+        }
         return false;
     }
 
     protected override skipScanBlocks(trainX: number, trainY: number, trainZ: number): boolean {
         return false;
-        // return world.getNearestPlayer(trainX, trainY, trainZ, MAX_CHECK_DISTANCE, entity -> true) == null;
+        // return world.getNearestPlayer(trainX, trainY, trainZ, MAX_CHECK_DISTANCE, entity => true) == null;
     }
 
-    protected override openDoors_(block: Block, checkPos: BlockPos, dwellTicks: number): boolean {
+    protected override openDoors_(block: Block, checkPos: Vector3, dwellTicks: number): boolean {
         // if (block instanceof BlockPSDAPGDoorBase) {
         // 	for (int i = -1; i <= 1; i++) {
         // 		final BlockPos doorPos = checkPos.above(i);
@@ -318,17 +330,18 @@ export class Train extends TrainBase {
         // 	}
         // }
 
-        return false;
+        // TODO: Debuging
+        return true;
+
+        // return false;
     }
 
     protected override asin(value: number): number {
         return TrigCache.asin(value);
     }
 
-    public simulateTrain(ticksElapsed: number, depot: Depot, dataCache: DataCache, trainPositions: Map<UUID, bigint>[], schedulesForPlatform: Map<number, Array<ScheduleEntry>>, trainDelays: Map<number, BetterMap<BlockPos, TrainDelay>>): boolean {
-        // this.trainPositions = trainPositions;
-        // this.trainsInPlayerRange = trainsInPlayerRange;
-        // this.trainDelays = trainDelays;
+    public simulateTrain(ticksElapsed: number, depot: Depot, dataCache: DataCache, trainPositions: Array<BetterMap<UUID, number>>, schedulesForPlatform: Map<number, Array<ScheduleEntry>>): boolean {
+        this.trainPositions = trainPositions;
         const oldStoppingIndex = this.nextStoppingIndex;
         const oldPassengerCount = this.ridingEntities.size;
         const oldIsCurrentlyManual = this.isCurrentlyManual;
@@ -353,54 +366,54 @@ export class Train extends TrainBase {
         }
 
         if (currentTime >= 0) {
-            const offsetTime = 0;
-            const offsetTimeTemp = 0;
-            const secondRound = false;
-            // Runnable addSchedule = null;
-            // routeId = 0;
-            // for (int i = startingIndex; i < timeSegments.size() + (isRepeat() ? timeSegments.size() : 0); i++) {
-            // 	final Siding.TimeSegment timeSegment = timeSegments.get(i % timeSegments.size());
+            let offsetTime = 0;
+            let offsetTimeTemp = 0;
+            let secondRound = false;
+            let addSchedule: (() => void) | undefined = undefined;
+            this.routeId = 0;
+            for (let i = startingIndex; i < this.timeSegments.length + (this.isRepeat() ? this.timeSegments.length : 0); i++) {
+            	const timeSegment = this.timeSegments[i % this.timeSegments.length];
 
-            // 	if (timeSegment.savedRailBaseId != 0) {
-            // 		if (timeSegment.routeId == 0) {
-            // 			RailwayData.useRoutesAndStationsFromIndex(path.get(getIndex(timeSegment.endRailProgress, true)).stopIndex - 1, depot.routeIds, dataCache, (currentStationIndex, thisRoute, nextRoute, thisStation, nextStation, lastStation) -> {
-            // 				timeSegment.routeId = thisRoute == null ? 0 : thisRoute.id;
-            // 				timeSegment.currentStationIndex = currentStationIndex;
-            // 			});
-            // 		}
+            	if (timeSegment.savedRailBaseId != 0) {
+            		if (timeSegment.routeId == 0) {
+            			RailwayData.useRoutesAndStationsFromIndex(this.path[this.getIndex(timeSegment.endRailProgress, true)].stopIndex - 1, depot.routeIds, dataCache, (currentStationIndex, thisRoute, nextRoute, thisStation, nextStation, lastStation) => {
+            				timeSegment.routeId = thisRoute.id;
+            				timeSegment.currentStationIndex = currentStationIndex;
+            			});
+            		}
 
-            // 		final long platformId = timeSegment.savedRailBaseId;
-            // 		if (!schedulesForPlatform.containsKey(platformId)) {
-            // 			schedulesForPlatform.put(platformId, new ArrayList<>());
-            // 		}
+            		const platformId = timeSegment.savedRailBaseId;
+            		if (!schedulesForPlatform.has(platformId)) {
+            			schedulesForPlatform.set(platformId, []);
+            		}
 
-            // 		if (secondRound) {
-            // 			offsetTime = offsetTimeTemp - timeSegment.endTime;
-            // 			secondRound = false;
-            // 		} else if (addSchedule != null) {
-            // 			addSchedule.run();
-            // 		}
+            		if (secondRound) {
+            			offsetTime = offsetTimeTemp - timeSegment.endTime;
+            			secondRound = false;
+            		} else if (addSchedule != undefined) {
+            			addSchedule();
+            		}
 
-            // 		if (isOnRoute || nextDepartureTicks >= 0) {
-            // 			final long arrivalMillis = currentMillis + (long) ((timeSegment.endTime + offsetTime - currentTime) * Depot.MILLIS_PER_TICK);
-            // 			addSchedule = () -> schedulesForPlatform.get(platformId).add(new ScheduleEntry(arrivalMillis, trainCars, timeSegment.routeId, timeSegment.currentStationIndex));
-            // 			if (!isRepeat()) {
-            // 				addSchedule.run();
-            // 				addSchedule = null;
-            // 			}
-            // 		}
+            		if (this.isOnRoute || nextDepartureTicks >= 0) {
+            			const arrivalMillis = currentMillis + ((timeSegment.endTime + offsetTime - currentTime) * Depot.MILLIS_PER_TICK);
+            			addSchedule = () => schedulesForPlatform.get(platformId)?.push(new ScheduleEntry(arrivalMillis, this.trainCars, timeSegment.routeId, timeSegment.currentStationIndex));
+            			if (!this.isRepeat()) {
+            				addSchedule();
+            				addSchedule = undefined;
+            			}
+            		}
 
-            // 		offsetTimeTemp = timeSegment.endTime;
-            // 	}
+            		offsetTimeTemp = timeSegment.endTime;
+            	}
 
-            // 	if (routeId == 0) {
-            // 		routeId = timeSegment.routeId;
-            // 	}
+            	if (this.routeId == 0) {
+            		this.routeId = timeSegment.routeId;
+            	}
 
-            // 	if (i == timeSegments.size() - 1) {
-            // 		secondRound = true;
-            // 	}
-            // }
+            	if (i == this.timeSegments.length - 1) {
+            		secondRound = true;
+            	}
+            }
         }
 
         this.updateRailProgressCounter++;
@@ -485,38 +498,6 @@ export class Train extends TrainBase {
     // 	}
     // }
 
-    public removeRidingPlayer(player: Player): void {
-        const carrier = this.ridingEntities.get(player)?.carrier;
-        if (carrier) {
-            carrier.remove();
-        }
-        this.ridingEntities.delete(player);
-    }
-
-    public addRidingPlayer(ridingCar: number, player: Player,
-        carX: number, carY: number, carZ: number, carYaw: number, carPitch: number,
-    ): void {
-        if (this.isPlayerRiding(player)) return;
-
-
-        const playerPos = Vec3.fromVector3(player.location);
-
-        playerPos.y = carY + 0.3;
-
-        const carrier = world.getDimension("overworld").spawnEntity<string>("mts:transparent_carrier", playerPos);
-        carrier.getComponent("rideable")?.addRider(player);
-
-        // 计算玩家相对于车厢的局部坐标（考虑旋转）
-        const worldOffset = playerPos.subtract(new Vec3(carX, carY, carZ));
-
-        const localOffset = worldOffset.yRot(carYaw).xRot(carPitch);
-
-        this.ridingEntities.set(player, {
-            carrier: carrier,
-            ridingCar: ridingCar,
-            offsets: localOffset  // 使用局部坐标偏移
-        });
-    }
 
 	public speedChange() {
 		return this.speed - this.oldSpeed;
@@ -528,5 +509,23 @@ export class Train extends TrainBase {
 
 	public justClosing(doorCloseTime: number) {
 		return this.oldDoorValue >= doorCloseTime && this.doorValue < doorCloseTime;
-    }
+	}
+
+
+	private static getStationText(station: Station, textKey: string): RawMessage {
+		if (station != null) {
+			return {
+                translate: "gui.mts." + textKey + "_station_cjk",
+                with: {
+                    rawtext: [
+                        IGui.textOrUntitled(IGui.formatStationName(station.name))
+                    ]
+                }
+            };
+		} else {
+			return {
+                text: ""
+            };
+		}
+	}
 }

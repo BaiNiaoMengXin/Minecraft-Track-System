@@ -24,6 +24,7 @@ import { PathData } from "path/PathData";
 import { BlockNode } from "block/BlockNode";
 import { RailwayDataPathGenerationModle } from "./RailwayDataPathGenerationModle";
 import { RailwayDataRailActionsModule } from "./RailwayDataRailActionsModule";
+import { RailwayDataCoolDownModule } from "./RailwayDataCoolDownModule";
 
 export class RailwayData extends SerializedDataBase {
 
@@ -34,6 +35,7 @@ export class RailwayData extends SerializedDataBase {
 	public readonly depots: Set<Depot> = new Set();
 	public readonly dataCache: DataCache = new DataCache(this.stations, this.platforms, this.sidings, this.routes, this.depots);
 
+	public readonly railwayDataCoolDownModule: RailwayDataCoolDownModule;
 	public readonly railwayDataPathGenerationMoudle: RailwayDataPathGenerationModle;
 	public readonly railwayDataRailActionsModule: RailwayDataRailActionsModule;
 
@@ -46,7 +48,7 @@ export class RailwayData extends SerializedDataBase {
 
 	private readonly railwayDataFileSaveModule: RailwayDataFileSaveModule;
 
-	private readonly trainPositions: ArrayList<BetterMap<UUID, bigint>> = new ArrayList(2);
+	private readonly trainPositions: Array<BetterMap<UUID, number>> = new Array(2);
 	private readonly schedulesForPlatform: Map<number, Array<ScheduleEntry>> = new Map();
 	private readonly trainDelays: Map<number, BetterMap<BlockPos, TrainDelay>> = new Map()
 
@@ -63,6 +65,7 @@ export class RailwayData extends SerializedDataBase {
 		this.railwayDataFileSaveModule = new RailwayDataFileSaveModule(this, this.rails, this.signalBlocks);
 		this.railwayDataPathGenerationMoudle = new RailwayDataPathGenerationModle(this, this.rails);
 		this.railwayDataRailActionsModule = new RailwayDataRailActionsModule(this, this.rails);
+		this.railwayDataCoolDownModule = new RailwayDataCoolDownModule(this, this.rails);
 	}
 
 	public load(packet: ReturnType<this['toMessagePack']>) {
@@ -89,15 +92,17 @@ export class RailwayData extends SerializedDataBase {
 	}
 
 	public simulateTrains(): void {
-		this.trainPositions.remove(0);
+		this.trainPositions.splice(0, 1);
 		this.trainPositions.push(new BetterMap());
 		this.schedulesForPlatform.clear();
 		this.signalBlocks.resetOccupied();
 		this.sidings.forEach(siding => {
 			siding.setSidingData(this.dataCache.sidingIdToDepot.get(siding.id) ?? null, this.rails);
-			siding.simulateTrain(this.dataCache, this.trainPositions, this.signalBlocks, this.schedulesForPlatform, this.trainDelays);
+			siding.simulateTrain(this.dataCache, this.trainPositions, this.signalBlocks, this.schedulesForPlatform);
 		});
 		this.depots.forEach(depot => depot.deployTrain(this));
+
+		this.railwayDataCoolDownModule.tick();
 		this.railwayDataRailActionsModule.tick();
 
 		if (this.prevPlatformCount != this.platforms.size || this.prevSidingCount != this.sidings.size) {
