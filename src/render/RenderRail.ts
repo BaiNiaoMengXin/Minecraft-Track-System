@@ -53,7 +53,44 @@ export namespace RenderRail {
         const railLength = rail.getLength();
 
         if (rail.railType == RailType.NONE) {
-            // TODO Render "one_way_rail_arrow"
+            let lastPoint = rail.getPosition(MIN_RENDER_PRECISION / 2);
+            
+            let flag = false;
+            for (let i = MIN_RENDER_PRECISION * 1.5; ; i += MIN_RENDER_PRECISION) {
+                if (i > railLength) {
+                    if (!flag) {
+                        flag = true;
+                    } else {
+                        break;
+                    }
+                }
+
+                const newPoint = rail.getPosition(i);
+                const middlePos = lastPoint.lerp(newPoint, 0.5).add(0, yOffset, 0);
+
+                const dx = newPoint.x - lastPoint.x;
+                const dy = newPoint.y - lastPoint.y;
+                const dz = newPoint.z - lastPoint.z;
+                const yaw = Math.atan2(dz, dx);
+                const pitch = Math.atan2(dy, Math.sqrt(dx * dx + dz * dz));
+
+                if (player == null || middlePos.distanceTo(player.location) < maxRenderDistance) {
+                    const molang = new MolangVariableMap();
+                    
+                    molang.setVector3("variable.rot", {
+                        x: Math.cos(pitch) * Math.cos(yaw),
+                        y: Math.sin(pitch),
+                        z: Math.cos(pitch) * Math.sin(yaw)
+                    });
+                    molang.setFloat("variable.mts_particle_lifetime", duration / 2)
+                    try {
+                        (player ? player.dimension : world.getDimension("overworld")).spawnParticle("mts:one_way_rail_arrow", middlePos, molang);
+                    } catch (error) {
+                    }
+                }
+    
+                lastPoint = newPoint;
+            }
         } else {
             let lastPoints = getRailInLengthLeftRightPoints(rail, 0, railWidth + (2 / 16));// particle texture width is 2px
             
