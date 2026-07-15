@@ -26,10 +26,7 @@ world.afterEvents.worldLoad.subscribe(event => {
 
 // TODO load railwayData
 
-
-
-
-world.afterEvents.playerBreakBlock.subscribe((event) => {
+world.beforeEvents.playerBreakBlock.subscribe((event) => {
     const { block, player } = event;
     
     if (block.typeId === BlockNode.RAIL_NODE_BLOCK_KEY_NAME) {
