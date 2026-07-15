@@ -5,7 +5,7 @@ import { RailType } from 'data/RailType';
 import { RailAngle } from 'data/RailAngle';
 import { Rail } from 'data/Rail';
 import { DataCache } from 'data/DataCache';
-import { ExtensionRegistry } from 'ExtensionRegistry/ExtensionRegistry';
+import { CustomResources } from 'extensions/CustomResources';
 import { itemBrush } from 'item/itemBrush';
 import { ShardDataBase } from 'packet/ShardDataSave';
 import { BlockPos } from 'util/math/BlockPos';
@@ -25,7 +25,13 @@ export const DEBUG: boolean = true;
 export let gSharedDataBase: ShardDataBase<string>
 
 world.afterEvents.worldLoad.subscribe(event => {
-    gSharedDataBase = new ShardDataBase<string>("mts");
+    system.runTimeout(() => {
+        try {
+            CustomResources.reload()
+        } catch (e) {
+            console.error(e)
+        }
+    }, 20 * 2);
 })
 
 
@@ -67,26 +73,6 @@ export function ClearDebugData() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-export const gExtensionRegistry = new ExtensionRegistry();
-
-
-world.beforeEvents.playerLeave.subscribe((event) => {
-    // ClearExtRegistry
-    if (gExtensionRegistry.getAllRailExtension()) {
-        world.scoreboard.removeObjective("mtsExtensionRegistry")
-    }
-});
 
 world.afterEvents.playerBreakBlock.subscribe((event) => {
     const { block, player } = event;

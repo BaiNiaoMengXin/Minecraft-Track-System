@@ -20,7 +20,8 @@ import { MessagePackHelper } from "./MessagePackHelper";
 export class Train extends TrainBase {
 
     private canDeploy: boolean = false;
-    // private List<Map<UUID, Long>> trainPositions;
+	private oldSpeed: number = 0;
+	private oldDoorValue: number = 0;
 
     private trainEntities: Array<Entity> = [];
 
@@ -333,6 +334,8 @@ export class Train extends TrainBase {
         const oldIsCurrentlyManual = this.isCurrentlyManual;
         const oldStopped = this.speed == 0;
         const oldDoorOpen = this.doorTarget;
+        this.oldSpeed = this.speed;
+        this.oldDoorValue = this.doorValue;
 
         super.simulateTrain_(ticksElapsed, depot);
 
@@ -513,5 +516,17 @@ export class Train extends TrainBase {
             ridingCar: ridingCar,
             offsets: localOffset  // 使用局部坐标偏移
         });
+    }
+
+	public speedChange() {
+		return this.speed - this.oldSpeed;
+	}
+
+	public justOpening() {
+		return this.oldDoorValue == 0 && this.doorValue > 0;
+	}
+
+	public justClosing(doorCloseTime: number) {
+		return this.oldDoorValue >= doorCloseTime && this.doorValue < doorCloseTime;
     }
 }
