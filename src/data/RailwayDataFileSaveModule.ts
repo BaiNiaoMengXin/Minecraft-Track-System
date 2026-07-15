@@ -15,6 +15,11 @@ import { decode, encode } from "libs/MessagePack/index";
 import { NameColorDataBase } from "./NameColorDataBase";
 import { ArrayList } from "jLib/ArrayList";
 import { IReducedSaveData } from "./IReducedSaveData";
+import { LZString } from "libs/lz-string";
+
+(BigInt.prototype as any).toJSON = function() {
+	return this.toString();
+}
 
 export class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 
@@ -62,13 +67,13 @@ export class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 
 	public load(): void {
 		this.existingFiles.clear();
-		this.readMessagePackFromDP(this.stationsDPIdBase, map => new Station(map), v => this.railwayData.stations.add(v), false);
-		this.readMessagePackFromDP(this.platformsDPIdBase, map => new Platform(map), v => this.railwayData.platforms.add(v), true);
-		this.readMessagePackFromDP(this.sidingsDPIdBase, map => new Siding(map), v => this.railwayData.sidings.add(v), true);
-		this.readMessagePackFromDP(this.routesDPIdBase, map => new Route(map), v => this.railwayData.routes.add(v), false);
-		this.readMessagePackFromDP(this.depotsDPIdBase, map => new Depot(map), v => this.railwayData.depots.add(v), false);
-		this.readMessagePackFromDP(this.railsDPIdBase, map => new RailEntry(map), railEntry => this.rails.set(railEntry.pos, railEntry.connections), true);
-		this.readMessagePackFromDP(this.signalBlocksDPIdBase, map => new SignalBlock(map), v => this.signalBlocks.signalBlocks.push(v), true);
+		this.readSerizalizedDataFromDP(this.stationsDPIdBase, map => new Station(map), v => this.railwayData.stations.add(v), false);
+		this.readSerizalizedDataFromDP(this.platformsDPIdBase, map => new Platform(map), v => this.railwayData.platforms.add(v), true);
+		this.readSerizalizedDataFromDP(this.sidingsDPIdBase, map => new Siding(map), v => this.railwayData.sidings.add(v), true);
+		this.readSerizalizedDataFromDP(this.routesDPIdBase, map => new Route(map), v => this.railwayData.routes.add(v), false);
+		this.readSerizalizedDataFromDP(this.depotsDPIdBase, map => new Depot(map), v => this.railwayData.depots.add(v), false);
+		this.readSerizalizedDataFromDP(this.railsDPIdBase, map => new RailEntry(map), railEntry => this.rails.set(railEntry.pos, railEntry.connections), true);
+		this.readSerizalizedDataFromDP(this.signalBlocksDPIdBase, map => new SignalBlock(map), v => this.signalBlocks.signalBlocks.push(v), true);
 
 		const now = new Date();
 		const dateTime = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}`;
@@ -172,14 +177,12 @@ export class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 		}
 	}
 
-	private readMessagePackFromDP<T extends SerializedDataBase>(DPIdBase: string, getData: (map: Record<string, unknown>) => T, callback: (a: T) => void, skipVerify: boolean): void {
+	private readSerizalizedDataFromDP<T extends SerializedDataBase>(DPIdBase: string, getData: (map: Record<string, unknown>) => T, callback: (a: T) => void, skipVerify: boolean): void {
 		world.getDynamicPropertyIds().forEach(id => {
 			if (id.startsWith(DPIdBase) && !id.endsWith("/")) {
 				try {
 					const idFileContext = world.getDynamicProperty(id) as string;
-					const packed = new Uint8Array(Array.from(idFileContext, char => char.charCodeAt(0)))
-
-					const result = decode(packed, { useBigInt64: true });
+					const result = JSON.parse(LZString.decompressFromBase64(idFileContext)!);
 
 					const data = getData(result as any);
 					if (skipVerify || !(data instanceof NameColorDataBase) || (data as NameColorDataBase).name.length != 0) {
@@ -194,7 +197,7 @@ export class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 		})
 	}
 
-	private writeMessagePackToDP(data: SerializedDataBase, id: number | bigint, DPIdBase: string): string | null {
+	private writeSerizalizedDataToDP(data: SerializedDataBase, id: number | bigint, DPIdBase: string): string | null {
 		const parentPath = DPIdBase + (typeof id == "bigint" ? (id % 100n) : (id % 100)).toString() + "/";
 		try {
 			const dataPath = parentPath + id;
@@ -202,20 +205,7 @@ export class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 
 			if (!this.existingFiles.has(dataPath) || hash != this.existingFiles.get(dataPath)) {
 				
-				const bufferToStr = (arr: Uint8Array) => {
-					const chunkSize = 1000;
-					let result = '';
-					
-					for (let i = 0; i < arr.length; i += chunkSize) {
-						const chunk = arr.slice(i, i + chunkSize);
-						result += String.fromCharCode(...chunk);
-					}
-					
-					return result;
-				}
-
-				const packed = encode(data.toMessagePack(), { useBigInt64: true })
-				world.setDynamicProperty(dataPath, bufferToStr(packed));
+				world.setDynamicProperty(dataPath, LZString.compressToBase64(JSON.stringify(data.toMessagePack())));
 
 				this.existingFiles.set(dataPath, hash);
 				this.dynamicPropertiesWritten++;
@@ -234,7 +224,7 @@ export class RailwayDataFileSaveModule extends RailwayDataModuleBase {
 			const id: U = dirtyData.remove(0);
 			const data: T | undefined = getId(id);
 			if (data != undefined) {
-				const newPath = this.writeMessagePackToDP(data, idToLong(id), DPIdBase);
+				const newPath = this.writeSerizalizedDataToDP(data, idToLong(id), DPIdBase);
 				if (newPath != null) {
 					this.checkDynamicPropertiesToDelete.remove(newPath);
 				}
