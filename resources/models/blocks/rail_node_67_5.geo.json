@@ -14,7 +14,7 @@
 				{
 					"name": "rail_node",
 					"pivot": [0, 0, 0],
-					"rotation": [0, -22.5, 0],
+					"rotation": [0, 67.5, 0],
 					"cubes": [
 						{
 							"origin": [-7, 1, -1],
