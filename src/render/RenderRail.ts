@@ -1,5 +1,5 @@
 import { MolangVariableMap, Player, Vector3, world } from "@minecraft/server";
-import { getNearestPlayer, rgbHexToColor } from "data/Base";
+import { rgbHexToColor } from "data/Base";
 import { Rail } from "data/Rail";
 import { RailType } from "data/RailType";
 import { ParticleSystem, particleType } from "rail/ParticleSystem";

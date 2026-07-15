@@ -1,4 +1,4 @@
-import { Entity, Vector2, Player, Vector3, Dimension, MolangVariableMap, RGB, RGBA, world, VectorXZ, EntityType, SpawnEntityOptions, system, DimensionLocation, BlockPermutation, RawMessage, EntityTypes } from "@minecraft/server";
+import { Entity, Vector2, Player, Vector3, Dimension, MolangVariableMap, RGB, RGBA, world, VectorXZ, EntityType, SpawnEntityOptions, system, DimensionLocation, BlockPermutation, RawMessage, EntityTypes, InputButton, ButtonState } from "@minecraft/server";
 import { Vec3 } from "util/math/Vec3";
 import { Mth } from "util/math/Mth";
 
@@ -506,110 +506,6 @@ export function rgbHexToColor(hex: number): RGBA {
     return { red: r, green: g, blue: b, alpha: 1 };
 }
 
-export function GetPlayerById(id: string): Player | undefined {
-    for (const element of world.getAllPlayers()) {
-        if (element.id == id) {
-            return element;
-        }
-    }
-
-    return undefined;
-}
-
-// class EquitableMolang extends MolangVariableMap
-// {
-//     private molangVariableMap: MolangVariableMap;
-//     private floatsvariables: EquitableMap<string, number | Vector3 | RGB> = new EquitableMap();
-
-//     getMolang(): MolangVariableMap
-//     {
-//         return this.molangVariableMap;
-//     }
-// }
-// 尝试优化MolangVariableMap，但是失败了
-
-// Array.prototype.clearAndQuote = function<T>(this: T[]): T[] {
-//     this.length = 0;
-//     return this;
-// }
-
 export function currentTimeMillis(): number {
     return new Date().getTime()
-}
-
-const sleep = (time: number) => new Promise((r) => system.runTimeout((r as () => void), time));
-
-export function getNearestPlayer(location: Vector3): Player | null {
-    const players = world.getAllPlayers();
-    let nearestPlayer: Player | null = null;
-    let minDist: number = Infinity;
-
-    for (const player of players) {
-        const playerPos = player.location
-        const dx = location.x - playerPos.x;
-        const dy = location.y - playerPos.y;
-        const dz = location.z - playerPos.z;
-        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (dist < minDist) {
-            minDist = dist;
-            nearestPlayer = player;
-        }
-    }
-
-    return nearestPlayer;
-}
-
-
-
-
-class ThreadManager {
-    public readonly threads: Map<number, { sleepTick: number, currentTick: number }> = new Map(); // <SAPI Thread, sleepTick>
-    private static EMPTY_CALLBACK: () => void = () => { }
-
-    constructor() {
-    }
-
-    sleepTicks(tick: number): Promise<void> {
-        if (tick != Math.floor(tick) || tick < 1)
-            throw new Error()
-
-        return new Promise(async (resolve) => {
-            let currentTick = 1
-
-            const threadId = system.runInterval(() => {
-                if (currentTick == tick) {
-                    resolve()
-                    system.clearRun(threadId)
-                    return;
-                }
-
-                currentTick++;
-            }, 1)
-        })
-    }
-
-    update() {
-        for (const [threadId, struct] of this.threads) {
-            if (struct.currentTick == struct.sleepTick) {
-                system.clearRun(threadId)
-            }
-
-            struct.currentTick++;
-        }
-    }
-}
-
-const gThreadManager = new ThreadManager()
-
-
-export function getBlockDisplayName(blockPermutation: BlockPermutation): RawMessage {
-    let blockId = blockPermutation.type.id;
-    let translationKey = 'tile.' + blockId.replace(/^minecraft:/, '') + '.name';
-
-    // 显示本地化名称
-    return {
-        rawtext: [{
-            translate: translationKey
-        }]
-    };
 }
