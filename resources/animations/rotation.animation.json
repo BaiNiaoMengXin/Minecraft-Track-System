@@ -4,8 +4,8 @@
 		"animation.mts.rotation": {
 			"loop": true,
 			"bones": {
-				"main": {
-					"rotation": ["v.x_rot", "v.y_rot", "v.z_rot"]
+				"root": {
+					"rotation": ["math.mod(math.mod(math.lerp(v.prev_x_rot, v.x_rot, query.frame_alpha), 360) + 360, 360)", "math.mod(math.mod(math.lerp(v.prev_y_rot, v.y_rot, query.frame_alpha), 360) + 360, 360)", "math.mod(math.mod(math.lerp(v.prev_z_rot, v.z_rot, query.frame_alpha), 360) + 360, 360)"]
 				}
 			}
 		}

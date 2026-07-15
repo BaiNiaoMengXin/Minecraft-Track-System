@@ -1,21 +1,1401 @@
 {
-    "mts:train_door_open": {
+    "sp1900_door_open": {
         "category": "neutral",
-        "max_distance": 256.0,
+        "max_distance": 64,
         "sounds": [
             {
-                "name": "sounds/door_open",
-                "volume": 1.0
+                "name": "sounds/sp1900/door_open",
+                "volume": 1
             }
         ]
     },
-    "mts:train_door_close": {
+    "sp1900_door_close": {
         "category": "neutral",
-        "max_distance": 256.0,
+        "max_distance": 64,
         "sounds": [
             {
-                "name": "sounds/door_close",
-                "volume": 1.0
+                "name": "sounds/sp1900/door_close",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_0a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_0a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_0b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_0b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_0c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_0c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_1a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_1a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_1b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_1b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_1c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_1c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_2a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_2a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_2b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_2b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_2c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_2c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_3a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_3a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_3b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_3b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_3c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_3c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_4a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_4a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_4b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_4b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_4c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_4c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_5a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_5a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_5b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_5b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_5c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_5c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_6a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_6a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_6b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_6b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_6c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_6c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_7a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_7a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_7b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_7b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_7c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_7c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_8a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_8a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_8b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_8b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_8c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_8c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_9a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_9a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_9b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_9b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_9c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_9c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_10a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_10a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_10b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_10b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_10c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_10c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_11a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_11a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_11b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_11b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_11c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_11c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_12a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_12a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_12b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_12b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_12c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_12c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_13a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_13a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_13b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_13b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_13c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_13c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_14a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_14a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_14b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_14b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_14c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_14c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_15a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_15a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_15b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_15b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_15c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_15c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_16a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_16a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_16b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_16b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_16c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_16c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_17a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_17a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_17b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_17b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_17c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_17c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_18a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_18a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_18b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_18b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_18c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_18c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_19a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_19a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_19b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_19b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_19c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_19c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_20a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_20a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_20b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_20b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_20c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_20c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_21a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_21a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_21b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_21b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_21c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_21c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_22a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_22a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_22b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_22b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_acceleration_22c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/acceleration/speed_22c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_0a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_0a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_0b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_0b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_0c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_0c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_1a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_1a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_1b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_1b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_1c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_1c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_2a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_2a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_2b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_2b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_2c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_2c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_3a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_3a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_3b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_3b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_3c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_3c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_4a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_4a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_4b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_4b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_4c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_4c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_5a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_5a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_5b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_5b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_5c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_5c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_6a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_6a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_6b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_6b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_6c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_6c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_7a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_7a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_7b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_7b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_7c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_7c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_8a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_8a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_8b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_8b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_8c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_8c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_9a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_9a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_9b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_9b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_9c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_9c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_10a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_10a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_10b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_10b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_10c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_10c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_11a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_11a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_11b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_11b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_11c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_11c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_12a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_12a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_12b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_12b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_12c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_12c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_13a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_13a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_13b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_13b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_13c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_13c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_14a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_14a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_14b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_14b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_14c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_14c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_15a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_15a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_15b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_15b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_15c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_15c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_16a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_16a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_16b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_16b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_16c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_16c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_17a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_17a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_17b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_17b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_17c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_17c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_18a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_18a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_18b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_18b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_18c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_18c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_19a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_19a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_19b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_19b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_19c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_19c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_20a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_20a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_20b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_20b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_20c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_20c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_21a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_21a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_21b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_21b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_21c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_21c",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_22a": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_22a",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_22b": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_22b",
+                "volume": 1
+            }
+        ]
+    },
+    "c_train_deceleration_22c": {
+        "category": "neutral",
+        "max_distance": 64,
+        "sounds": [
+            {
+                "name": "sounds/c_train/deceleration/speed_22c",
+                "volume": 1
             }
         ]
     }

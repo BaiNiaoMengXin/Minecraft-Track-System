@@ -1,0 +1,52 @@
+{
+	"format_version": "1.19.0",
+	"animation_controllers": {
+		"controller.animation.mts.train.door": {
+			"states": {
+				"default": {
+					"transitions": [
+						{"open_left": "variable.door_state == 1"},
+						{"open_right": "variable.door_state == 2"},
+						{"open_both": "variable.door_state == 3"}
+					]
+				},
+				"open_left": {
+					"animations": ["door_left_open"],
+					"transitions": [
+						{"close_left": "variable.door_state == 0"}
+					]
+				},
+				"open_right": {
+					"animations": ["door_right_open"],
+					"transitions": [
+						{"close_right": "variable.door_state == 0"}
+					]
+				},
+				"open_both": {
+					"animations": ["door_left_open", "door_right_open"],
+					"transitions": [
+						{"close_both": "variable.door_state == 0"}
+					]
+				},
+				"close_left": {
+					"animations": ["door_left_close"],
+					"transitions": [
+						{"default": "query.any_animation_finished"}
+					]
+				},
+				"close_right": {
+					"animations": ["door_right_close"],
+					"transitions": [
+						{"default": "query.any_animation_finished"}
+					]
+				},
+				"close_both": {
+					"animations": ["door_left_close", "door_right_close"],
+					"transitions": [
+						{"default": "query.any_animation_finished"}
+					]
+				}
+			}
+		}
+	}
+}

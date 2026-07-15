@@ -1,0 +1,53 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mts:c_train_mini_1",
+      "min_engine_version": "1.8.0",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/c_train"
+      },
+      "geometry": {
+        "default": "geometry.c_train_mini_head"
+      },
+      "scripts": {
+        "animate": [
+          "rotation",
+          "door_controller"
+        ],
+        "initialize": [
+          "variable.prev_x_rot = 0.0;",
+          "variable.prev_y_rot = 0.0;",
+          "variable.prev_z_rot = 0.0;",
+          "variable.x_rot = 0.0;",
+          "variable.y_rot = 0.0;",
+          "variable.z_rot = 0.0;",
+          "variable.door_state = 0;"
+        ],
+        "pre_animation": [
+          "variable.prev_x_rot = variable.x_rot;",
+          "variable.prev_y_rot = variable.y_rot;",
+          "variable.prev_z_rot = variable.z_rot;",
+          "variable.x_rot = (-query.property('mts:x_rotation')) / 10.0;",
+          "variable.y_rot = (query.property('mts:y_rotation') / 10.0) + 180.0;",
+          "variable.z_rot = (query.property('mts:z_rotation')) / 10.0;",
+          "temp.door_state = query.property('mts:door_state');variable.door_state = temp.door_state == 1 ? 2 : (temp.door_state == 2 ? 1 : temp.door_state);"
+        ]
+      },
+      "animations": {
+        "rotation": "animation.mts.rotation",
+        "door_left_open": "animation.mts.c_train.door_left_open",
+        "door_left_close": "animation.mts.c_train.door_left_close",
+        "door_right_open": "animation.mts.c_train.door_right_open",
+        "door_right_close": "animation.mts.c_train.door_right_close",
+        "door_controller": "controller.animation.mts.train.door"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}
