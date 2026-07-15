@@ -1,7 +1,6 @@
 import { TransportMode } from "./TransportMode";
 import { SavedRailBase } from "./SavedRailBase";
 import { SerializedDataBase } from "./SerializedDataBase";
-import { FriendlyByteBuf } from "packet/FriendlyByteBuf";
 import { generateUniqueNumberID } from "./Base";
 import { Comparable } from "jLib/Comparable";
 import { MessagePackHelper } from "./MessagePackHelper";
