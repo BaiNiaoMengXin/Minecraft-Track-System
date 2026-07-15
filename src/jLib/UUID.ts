@@ -1,16 +1,16 @@
+import { Comparable } from "./Comparable";
 import { Long } from "./Math";
+import { JavaObject } from "./Object";
 
-export class UUID {
+export class UUID implements Comparable<UUID>, JavaObject {
 
     private readonly mostSigBits: bigint;
 
     private readonly leastSigBits: bigint;
 
-    private static readonly int64Array = new BigInt64Array(1)
-
     public constructor(mostSigBits: bigint, leastSigBits: bigint) {
-        this.mostSigBits = UUID.int64Array.fill(mostSigBits)[0];
-        this.leastSigBits = UUID.int64Array.fill(leastSigBits)[0];
+        this.mostSigBits = BigInt.asIntN(64, mostSigBits);
+        this.leastSigBits = BigInt.asIntN(64, leastSigBits);
     }
 
     public getLeastSignificantBits(): bigint {
