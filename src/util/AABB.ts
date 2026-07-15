@@ -1,9 +1,9 @@
 import { Double } from "jLib/Math";
-import { BlockPos } from "./math/BlockPos";
 import { Mth } from "./math/Mth";
 import { Vec3 } from "./math/Vec3";
 import { Direction } from "./math/Direction";
 import { JavaObject } from "jLib/Object";
+import { Vector3 } from "@minecraft/server";
 
 export class AABB implements JavaObject {
 
@@ -16,11 +16,11 @@ export class AABB implements JavaObject {
     
     public constructor(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number);
 
-    public constructor(pos1: BlockPos, pos2: BlockPos);
+    public constructor(pos1: Vec3, pos2: Vec3);
 
-    public constructor(pos: BlockPos);
+    public constructor(pos: Vec3);
 
-    public constructor(arg1: number | BlockPos, arg2?: number | BlockPos, z1?: number, x2?: number, y2?: number, z2?: number) {
+    public constructor(arg1: number | Vec3, arg2?: number | Vec3, z1?: number, x2?: number, y2?: number, z2?: number) {
         if (z1 != undefined) {
             this.minX = Math.min(arg1 as number, x2!);
             this.minY = Math.min(arg2 as number, y2!);
@@ -29,8 +29,8 @@ export class AABB implements JavaObject {
             this.maxY = Math.max(arg2 as number, y2!);
             this.maxZ = Math.max(z1, z2!);
         } else if (arg2 != undefined) {
-            let pos1 = arg1 as BlockPos;
-            let pos2 = arg2 as BlockPos;
+            let pos1 = arg1 as Vec3;
+            let pos2 = arg2 as Vec3;
             this.minX = Math.min(pos1.getX(), pos2.getX());
             this.minY = Math.min(pos1.getY(), pos2.getY());
             this.minZ = Math.min(pos1.getZ(), pos2.getZ());
@@ -38,7 +38,7 @@ export class AABB implements JavaObject {
             this.maxY = Math.max(pos1.getY(), pos2.getY());
             this.maxZ = Math.max(pos1.getZ(), pos2.getZ());
         } else {
-            let pos = arg1 as BlockPos;
+            let pos = arg1 as Vec3;
             this.minX = Math.min(pos.getX(), pos.getX() + 1);
             this.minY = Math.min(pos.getY(), pos.getY() + 1);
             this.minZ = Math.min(pos.getZ(), pos.getZ() + 1);
@@ -64,18 +64,23 @@ export class AABB implements JavaObject {
     }
     
     public contains(other: AABB): boolean;
+    public contains(pos: Vector3): boolean;
     public contains(x: number, y: number, z: number): boolean;
 
-    public contains(arg1: AABB | number, y?: number, z?: number): boolean {
-        if (y == undefined) {
-            const other = arg1 as AABB;
+    public contains(arg1: AABB | Vector3 | number, y?: number, z?: number): boolean {
+        if (arg1 instanceof AABB) {
+            const other = arg1;
             return this.minX <= other.minX && this.maxX >= other.maxX &&
                this.minY <= other.minY && this.maxY >= other.maxY &&
                this.minZ <= other.minZ && this.maxZ >= other.maxZ;
+        } else if (typeof arg1 != "number") {
+            return arg1.x >= this.minX && arg1.x <= this.maxX &&
+                arg1.y >= this.minY && arg1.y <= this.maxY &&
+                arg1.z >= this.minZ && arg1.z <= this.maxZ;
         } else {
             const x = arg1 as number;
             return x >= this.minX && x <= this.maxX &&
-                y >= this.minY && y <= this.maxY &&
+                y! >= this.minY && y! <= this.maxY &&
                 z! >= this.minZ && z! <= this.maxZ;
         }
     }
@@ -123,15 +128,15 @@ export class AABB implements JavaObject {
     }
     
     public move(x: number, y: number, z: number): AABB;
-    public move(pos: BlockPos): AABB;
+    public move(pos: Vec3): AABB;
 
-    public move(arg1: number | BlockPos, y?: number, z?: number): AABB {
+    public move(arg1: number | Vec3, y?: number, z?: number): AABB {
         if (y != undefined) {
             const x = arg1 as number;
             return new AABB(this.minX + x, this.minY + y, this.minZ + z!,
                     this.maxX + x, this.maxY + y, this.maxZ + z!);
         } else {
-            const pos = arg1 as BlockPos
+            const pos = arg1 as Vec3
             return new AABB(this.minX + pos.getX(), this.minY + pos.getY(), this.minZ + pos.getZ(),
                     this.maxX + pos.getX(), this.maxY + pos.getY(), this.maxZ + pos.getZ()); 
         }
