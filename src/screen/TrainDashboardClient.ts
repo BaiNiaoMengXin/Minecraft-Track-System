@@ -4,11 +4,16 @@ import { CollisionDetector } from "data/Base";
 import { BetterMap } from "data/BetterMap";
 import { DataCache } from "data/DataCache";
 import { Depot } from "data/Depot";
+import { IGui } from "data/IGui";
 import { NameColorDataBase } from "data/NameColorDataBase";
-import { Platform } from "data/Platform";
 import { Route, RoutePlatform } from "data/Route";
+import { SavedRailBase } from "data/SavedRailBase";
+import { Siding } from "data/Siding";
 import { Station } from "data/Station";
+import { TrainType } from "data/TrainType";
 import { TransportMode } from "data/TransportMode";
+import { TrainProperties } from "extensions/TrainProperties";
+import { TrainRegistry } from "extensions/TrainRegistry";
 import { ArrayList } from "jLib/ArrayList";
 import { MTS } from "MTS";
 import { ParticleSystem } from "rail/ParticleSystem";
@@ -37,7 +42,7 @@ export class TrainDashboardClient {
 
     private tempCorner1: Tuple<number, number> | null = null;
     private tempCorner2: Tuple<number, number> | null = null;
-    private tempSelectPlatfroms = new ArrayList<Platform>();
+    private tempSelectSavedRails = new ArrayList<SavedRailBase>();
     private tempSelectRoutes = new ArrayList<Route>();
     private isSelectingCorners = false;
 
@@ -56,14 +61,12 @@ export class TrainDashboardClient {
     private warningMessage = new ObservableString("");
     private dataCache: DataCache;
 
-    private static MAX_TRAIN_PER_HOUR = 5;
+    private static readonly MAX_TRAIN_PER_HOUR = 5;
     
-    private static WARNING_MESSAGE_UPDATE_TICKS = 10;
-
-    private static CREATE_LABEL = "新增";
-    private static STATION_LABEL = "车站";
-    private static ROUTE_LABEL = "路线";
-    private static DEPOT_LABEL = "车厂";
+    private static readonly CREATE_LABEL = "新增";
+    private static readonly STATION_LABEL = "车站";
+    private static readonly ROUTE_LABEL = "路线";
+    private static readonly DEPOT_LABEL = "车厂";
 
     public constructor(player: Player) {
         this.dataCache = MTS.railwayData.dataCache;
@@ -72,23 +75,23 @@ export class TrainDashboardClient {
         this.indexPage = new CustomForm(player, "铁路仪表板");
         this.indexPage.closeButton();
         this.indexPage.button(TrainDashboardClient.STATION_LABEL, () => {
+            this.selectedTab = SelectedTab.STATIONS;
             this.updateSitesPageTo(this.dataCache.stations, TrainDashboardClient.STATION_LABEL);
             this.indexPage.close();
             this.showSitesPage();
-            this.selectedTab = SelectedTab.STATIONS;
         })
 
         this.indexPage.button(TrainDashboardClient.ROUTE_LABEL, () => {
+            this.selectedTab = SelectedTab.ROUTES;
             this.updateSitesPageTo(this.dataCache.routes, TrainDashboardClient.ROUTE_LABEL);
             this.indexPage.close();
             this.showSitesPage();
-            this.selectedTab = SelectedTab.ROUTES;
         })
         this.indexPage.button(TrainDashboardClient.DEPOT_LABEL, () => {
+            this.selectedTab = SelectedTab.DEPOTS;
             this.updateSitesPageTo(this.dataCache.depots, TrainDashboardClient.DEPOT_LABEL);
             this.indexPage.close();
             this.showSitesPage();
-            this.selectedTab = SelectedTab.DEPOTS;
         });
 
         this.textFieldName.subscribe(newValue => this.updateWarningMessage());
@@ -155,7 +158,7 @@ export class TrainDashboardClient {
         this.playerSecondChoicesPos = null;
         this.tempCorner1 = null;
         this.tempCorner2 = null;
-        this.tempSelectPlatfroms.clear();
+        this.tempSelectSavedRails.clear();
         this.tempSelectRoutes.clear();
         this.isSelectingCorners = false;
     }
@@ -196,14 +199,22 @@ export class TrainDashboardClient {
             this.isOnAwait = true;
             this.selectStationsPage.close();
         }, { disabled: this.dataCache.platformIdToStation.size == 0 });
-        this.tempSelectPlatfroms.forEach((platfrom, i) => {
-            const index = i;
-            this.selectStationsPage.button(`${this.dataCache.platformIdToStation.get(platfrom.id)!.name}  ${platfrom.name}`, () => {
+        this.tempSelectSavedRails.forEach((platform, i) => {
+            const customDestinationPrefix = "";
+            const station = this.dataCache.platformIdToStation.get(platform.id);
+            let buttonLabel: string
+            if (station != undefined) {
+                buttonLabel = `${customDestinationPrefix}${station.name} (${platform.name})`;
+            } else {
+                buttonLabel = `${customDestinationPrefix}(${platform.name})`;
+            }
+
+            this.selectStationsPage.button(IGui.formatStationName(buttonLabel), () => {
                 this.selectStationsPage.close()
                 system.run(() => {
                     new MessageBox(this.player, "你要从路线里删除这个站台吗?").button1("确认").button2("取消").show().then(onfulfilled => {
                         if (onfulfilled.selection === 0) {
-                            this.tempSelectPlatfroms.remove(index);
+                            this.tempSelectSavedRails.remove(i);
                             this.updateSelectStationsPage();
                         }
                         this.showSelectStationsPage();
@@ -216,12 +227,12 @@ export class TrainDashboardClient {
     private showSelectStationsPage() {
         system.run(() => this.selectStationsPage.show().then(async (onfulfilled) => {
             if (onfulfilled == "ClientClosed") {
-                this.tempSelectPlatfroms.clear();
+                this.tempSelectSavedRails.clear();
             }
             else if (onfulfilled == "ServerClosed" && this.isOnAwait) {
-                const platform = await this.waitForPlatformSelectResult();
+                const platform = await this.waitForSavedRailSelectResult(false, true);
                 this.isOnAwait = false;
-                this.tempSelectPlatfroms.push(platform);
+                this.tempSelectSavedRails.push(platform);
                 this.updateSelectStationsPage();
                 this.showSelectStationsPage();
             }
@@ -239,6 +250,7 @@ export class TrainDashboardClient {
             routes.forEach(route => routeListPage.button(route.name, () => {
                 this.tempSelectRoutes.push(route);
                 this.updateEditInstructionsPage();
+                routeListPage.close();
                 this.showEditInstructionsPage();
             }));
             this.editInstructionsPage.close();
@@ -252,6 +264,7 @@ export class TrainDashboardClient {
                     new MessageBox(this.player, "你要从车厂里移除这个线路吗?").button1("确认").button2("取消").show().then(onfulfilled => {
                         if (onfulfilled.selection === 0) {
                             this.tempSelectRoutes.remove(index);
+                            console.log("tempSelectRoutes length: " + this.tempSelectRoutes.length);
                             this.updateEditInstructionsPage();
                         }
                         this.showEditInstructionsPage();
@@ -277,8 +290,8 @@ export class TrainDashboardClient {
             .textField(this.warningMessage, this.textFieldName)
             .spacer();
         if (this.editingSite instanceof Route) {
-            this.tempSelectPlatfroms = ArrayList.from(this.editingSite.platformIds, item => this.dataCache.platformIdMap.get(item.platformId)!);
-            this.editSitePage.button(`${this.isNew ? "选择" : "重选"}线路`, () => {
+            this.tempSelectSavedRails = ArrayList.from(this.editingSite.platformIds, item => this.dataCache.platformIdMap.get(item.platformId)!);
+            this.editSitePage.button(`${this.isNew ? "选择" : "重选"}站台`, () => {
                 this.updateSelectStationsPage();
                 this.editSitePage.close()
                 this.showSelectStationsPage();
@@ -332,9 +345,9 @@ export class TrainDashboardClient {
                 }
             }
             this.editingSite!.name = this.textFieldName.getData();
-            if (!this.tempSelectPlatfroms.isEmpty() && this.editingSite instanceof Route) {
+            if (!this.tempSelectSavedRails.isEmpty() && this.editingSite instanceof Route) {
                 this.editingSite.platformIds.clear();
-                this.tempSelectPlatfroms.forEach((platfrom) => (this.editingSite as Route).platformIds.push(new RoutePlatform(platfrom.id)));
+                this.tempSelectSavedRails.forEach((platfrom) => (this.editingSite as Route).platformIds.push(new RoutePlatform(platfrom.id)));
             }
             saveRouteData();
             if (this.isNew) {
@@ -386,27 +399,30 @@ export class TrainDashboardClient {
         }
     }
     
-    private waitForPlatformSelectResult(): Promise<Platform> {
+    private waitForSavedRailSelectResult(isSiding: boolean, showNotInMaps: boolean): Promise<SavedRailBase> {
+        // TODOOOOOOOOO!!!
+
         return new Promise((resolve) => {
-            let resultPlatform: Platform | null = null;
-            const posToPlatforms = new BetterMap<BlockPos, Array<Platform>>();
-            const playerPos = this.player.location;
-            const renderDistance = this.player.clientSystemInfo.maxRenderDistance * 16;
-            this.dataCache.platforms.forEach(savedRail => {
-                if (this.dataCache.platformIdToStation.has(savedRail.id)) {
+            let resultSavedRail: SavedRailBase | null = null;
+            const posToSavedRails = new BetterMap<BlockPos, Array<SavedRailBase>>();
+            const playerPos = new BlockPos(this.player.location);
+            const renderDistance = (this.player.clientSystemInfo.maxRenderDistance - 2) * 16;
+            (isSiding ? this.dataCache.sidings : this.dataCache.platforms).forEach(savedRail => {
+                if (showNotInMaps || (isSiding ? this.dataCache.sidingIdToDepot : this.dataCache.platformIdToStation).has(savedRail.id)) {
                     const pos = savedRail.getMidPos();
-                    if (pos.distanceTo(new BlockPos(playerPos)) < renderDistance) {
-                        if (!posToPlatforms.has(pos)) {
-                            posToPlatforms.set(pos, new Array())
+                    if (pos.distanceTo(playerPos) < renderDistance) {
+                        if (!posToSavedRails.has(pos)) {
+                            posToSavedRails.set(pos, new Array())
                         }
-                        posToPlatforms.get(pos)!.push(savedRail);
+                        posToSavedRails.get(pos)!.push(savedRail);
                     }
                 }
             })
-            const doSomethingWhileWaiting = () => {
-                resultPlatform = null;
 
-                posToPlatforms.forEach((savedRails, savedRailPos) => {
+            const doSomethingWhileWaiting = () => {
+                resultSavedRail = null;
+
+                posToSavedRails.forEach((savedRails, savedRailPos) => {
                     const savedRailCount = savedRails.length;
                     for (let i = 0; i < savedRailCount; i++) {
                         const x = savedRailPos.getX() + 0.5;
@@ -415,14 +431,14 @@ export class TrainDashboardClient {
                         const text = savedRails[i].name;
 
                         let aColor: RGBA;
-                        const isCollision = resultPlatform === null && CollisionDetector.isPlayerLookingAtOBB(this.player, {
+                        const isCollision = resultSavedRail === null && CollisionDetector.isPlayerLookingAtOBB(this.player, {
                             center: { x: x, y: y, z: z },
                             dimensions: { x: 2, y: 2, z: 2 },
                             rotation: { x: 0, y: 0 }
                         })
                         if (isCollision) {
                             aColor = { red: 0, green: 0.9, blue: 0, alpha: 0.8 };
-                            resultPlatform = savedRails[i];
+                            resultSavedRail = savedRails[i];
                         } else {
                             aColor = { red: 0.8, green: 1, blue: 0.8, alpha: 0.5 }
                         }
@@ -444,12 +460,16 @@ export class TrainDashboardClient {
             }, 4)
 
             const callback = world.afterEvents.itemUse.subscribe(event => {
-                if (event.source.id === this.player.id && event.itemStack && event.itemStack.typeId === TrainDashboardClient.ITEM_TYPE_ID && resultPlatform) {
+                if (event.source.id === this.player.id && event.itemStack && event.itemStack.typeId === TrainDashboardClient.ITEM_TYPE_ID && resultSavedRail) {
                     world.afterEvents.itemUse.unsubscribe(callback);
                     system.clearRun(intervalId);
-                    resolve(resultPlatform);
+                    resolve(resultSavedRail);
                 }
             });
         })
+    }
+
+    public getIsSelectingCorners(): boolean {
+        return this.isSelectingCorners;
     }
 }
