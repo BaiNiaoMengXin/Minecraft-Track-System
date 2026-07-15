@@ -79,7 +79,7 @@ export class ArrayList<T/* extends Comparable<T> | JavaObject*/> extends Array<T
     }
 
     public override sort(this: T extends Comparable<T> ? this : never): this {
-        return super.sort((a, b) => (a as Comparable<T>).compareTo(b));
+        return ArrayList.from(super.sort((a, b) => (a as Comparable<T>).compareTo(b))) as this;
     }
 
     public isEmpty(): boolean {
@@ -97,5 +97,24 @@ export class ArrayList<T/* extends Comparable<T> | JavaObject*/> extends Array<T
 
     public clear(): void {
         this.length = 0;
+    }
+
+    public pushAll(other: Array<T>): this;
+    public pushAll(other: Iterable<T>): this;
+
+    public pushAll(other: Array<T> | Iterable<T>): this {
+        if (Array.isArray(other)) {
+            const chunkSize = 5000;
+            
+            for (let i = 0; i < other.length; i += chunkSize) {
+                const chunk = other.slice(i, i + chunkSize);
+                this.push(...chunk);
+            }
+        } else {
+            for (const a of other) {
+                this.push(a)
+            }
+        }
+        return this
     }
 }
