@@ -8,9 +8,6 @@
         "rail_node_connected": {
             "textures": "textures/blocks/rail_node_connected"
         },
-        "rail": {
-            "textures": "textures/rails/rail"
-        },
         "escalator": {
             "textures": "textures/blocks/escalator"
         },

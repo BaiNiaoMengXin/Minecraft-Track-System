@@ -1,0 +1,37 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.rail_common.test": {
+      "arrays": {
+        "textures": {
+          "Array.variant": [
+            "Texture.wooden",
+            "Texture.stone",
+            "Texture.emerald",
+            "Texture.iron",
+            "Texture.obsidian",
+            "Texture.blaze",
+            "Texture.quartz",
+            "Texture.diamond",
+            "Texture.platform",
+            "Texture.siding",
+            "Texture.turn_back",
+            "Texture.cable_car",
+            "Texture.cable_car_station",
+            "Texture.runway",
+            "Texture.airplane_dummy",
+            "Texture.none",
+            "Texture.default"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": ["Array.variant[(query.property('mts:variant') >= 50 ? (query.property('mts:variant') - 34) : query.property('mts:variant'))]"]
+    }
+  }
+}

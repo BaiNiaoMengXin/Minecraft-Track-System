@@ -8,7 +8,23 @@
         "default": "entity_alphatest"
       },
       "textures": {
-        "default": "textures/rails/rail"
+        "wooden": "textures/rails/wooden",
+        "stone": "textures/rails/stone",
+        "emerald": "textures/rails/emerald",
+        "iron": "textures/rails/iron",
+        "obsidian": "textures/rails/obsidian",
+        "blaze": "textures/rails/blaze",
+        "quartz": "textures/rails/quartz",
+        "diamond": "textures/rails/diamond",
+        "platform": "textures/rails/platform",
+        "siding": "textures/rails/siding",
+        "turn_back": "textures/rails/turn_back",
+        "cable_car": "textures/rails/cable_car",
+        "cable_car_station": "textures/rails/cable_car_station",
+        "runway": "textures/rails/runway",
+        "airplane_dummy": "textures/rails/airplane_dummy",
+        "none": "textures/rails/none",
+        "default": "textures/blocks/rail_normal"
       },
       "geometry": {
         "default": "geometry.rail_base"
@@ -93,7 +109,7 @@
       "animations": {
         "rotation": "animation.rail.curve"
       },
-      "render_controllers": ["controller.render.default"]
+      "render_controllers": ["controller.render.rail_common.test"]
     }
   }
 }

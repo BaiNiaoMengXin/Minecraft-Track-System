@@ -1,4 +1,4 @@
-import { Player, Vector3 } from "@minecraft/server";
+import { MolangVariableMap, Player, Vector3, world } from "@minecraft/server";
 import { getNearestPlayer, rgbHexToColor } from "data/Base";
 import { Rail } from "data/Rail";
 import { RailType } from "data/RailType";
@@ -9,8 +9,6 @@ import { Vec3 } from "util/math/Vec3";
 export namespace RenderRail {
 
     export const SMALL_OFFSET: number = 0.003125;
-
-    export const MAX_RAIL_DISTANCE: number = 3 * 16;
     
     const MIN_RENDER_PRECISION = 1.25;
 
@@ -51,10 +49,12 @@ export namespace RenderRail {
     }
 
     export function particleRenderRailStandard(rail: Rail, yOffset: number, opacity: number, railWidth: number, player: Player | null, useLOD: boolean, duration: number): void {
+        const maxRenderDistance = player ? Math.max(player.clientSystemInfo.maxRenderDistance - 2, 1) * 16 : -1;
+        const railLength = rail.getLength();
+
         if (rail.railType == RailType.NONE) {
             // TODO Render "one_way_rail_arrow"
         } else {
-            const railLength = rail.getLength();
             let lastPoints = getRailInLengthLeftRightPoints(rail, 0, railWidth + (2 / 16));// particle texture width is 2px
             
             let flag = false;
@@ -85,7 +85,7 @@ export namespace RenderRail {
                     Math.atan2(dy[1], Math.sqrt(dx[1] * dx[1] + dz[1] * dz[1]))
                 ]
 
-                if (player == null || (middlePosLeft.distanceTo(player.location) < MAX_RAIL_DISTANCE))
+                if (player == null || (middlePosLeft.distanceTo(player.location) < maxRenderDistance))
                 {
                     ParticleSystem.layParticle(
                         particleType.rail_preview_left,

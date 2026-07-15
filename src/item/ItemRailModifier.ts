@@ -67,7 +67,7 @@ export class ItemRailModifier extends ItemNodeModifierBase {
 			if (goodRadius && isValid && isValidContinuousMovement) {
 				MTS.railwayData.addRail(player, transportMode, posStart, posEnd, rail1, false);
 				const newId = MTS.railwayData.addRail(player, transportMode, posEnd, posStart, rail2, true);
-				rail2.createEntities(player);
+				rail2.createEntities(dimiension.id);
 				blockStart?.setPermutation(permutationStart.withState(BlockNode.IS_CONNECTED as any, true));
 				blockEnd?.setPermutation(permutationEnd.withState(BlockNode.IS_CONNECTED as any, true));
 			} else {

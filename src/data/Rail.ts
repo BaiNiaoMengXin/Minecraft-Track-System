@@ -1,9 +1,8 @@
 import { Block, BlockPermutation, Dimension, Entity, Player, system, TickingArea, Vector2, Vector3, world } from "@minecraft/server";
-import { canSpawnEntity, mandatorySpawnEntity, PosHelper, generateUniqueNumberID } from "./Base";
+import { generateUniqueNumberID } from "./Base";
 import { RailAngle } from "./RailAngle";
 import { RAIL_SEG_COUNT, RailType } from "./RailType";
 import { TransportMode } from "./TransportMode";
-import { ExtensionRail } from "ExtensionRegistry/ExtensionRegistry";
 import { BlockPos } from "util/math/BlockPos";
 import { SerializedDataBase } from "./SerializedDataBase";
 import { Vec3 } from "util/math/Vec3";
@@ -338,193 +337,52 @@ export class Rail extends SerializedDataBase {
         } as const;
     }
 
-    async createEntitiesExt(theStyle: ExtensionRail, player: Player) {
+    public async createEntities(dimensionId: string) {
         const length = this.getLength();
 
-        const MobleWidth = theStyle.single_segment_model_length;
+        const modelLength = 0.5;
 
-        const Tolerance = 0;
-        const MobleSetWidth = MobleWidth * RAIL_SEG_COUNT;
-        const MobleSetCount = Math.ceil(length / (MobleSetWidth - Tolerance));
-        const MobleSetSpacing = MobleSetCount > 1 ? (length - MobleSetWidth) / (MobleSetCount - 1) : 0;
-        const MobleSetStartOffset = MobleWidth / 2;
-        // const MobleSetStartOffset = -length / 2 + MobleSetWidth / 2;
-        const MobleSpacingInSet = (MobleSetWidth - MobleWidth) / (MobleSetCount - 1);
+        const tolerance = 0;
+        const mobelSetWidth = modelLength * RAIL_SEG_COUNT;
+        const mobelSetCount = Math.ceil(length / (mobelSetWidth - tolerance));
+        const modelSetSpacing = mobelSetCount > 1 ? (length - mobelSetWidth) / (mobelSetCount - 1) : 0;
+        const modelSetStartOffset = modelLength / 2;
+        
+        const tickingAreaId = String(generateUniqueNumberID());
+        await this.createTickingArea(tickingAreaId, dimensionId);
 
-        for (let i = 0; i < MobleSetCount; i++) {
-            const MobleSetCenterDistance = MobleSetStartOffset + i * MobleSetSpacing;
-            const EntityPos = PosHelper.offset(this.getPosition(MobleSetCenterDistance), 0, 0.1, 0);
-            // const EntityRot = this.getAngleAtPosition(MobleSetCenterDistance);
-            const EntityRot = 0;
+        for (let i = 0; i < mobelSetCount; i++) {
+            const modelSetCenterDistance = modelSetStartOffset + i * modelSetSpacing;
+            const entityPos = this.getPosition(modelSetCenterDistance).add(0, 0.1, 0);
 
-            const RailEntity = await mandatorySpawnEntity("overworld", player.location, theStyle.entity_name, EntityPos);
+            const railEntity = world.getDimension(dimensionId).spawnEntity<string>("mts:rail", entityPos);
 
-            this.entities.add(RailEntity);
-            // RailSegEntity.setRotation({x: 0, y: EntityRot});
-            RailEntity.playAnimation("animation.rail.curve");
-
+            this.entities.add(railEntity);
 
             for (let j = 0; j < RAIL_SEG_COUNT; j++) {
-                const MobleOffsetInAtlas = j * MobleSpacingInSet;
-                const MobleOffsetFromCenter = MobleOffsetInAtlas - MobleSetWidth / 2 + MobleWidth / 2;
-                
-                // const CurrentMobleDistance = MobleSetCenterDistance + MobleOffsetFromCenter;
-                const CurrentMobleDistance = MobleSetCenterDistance + j * MobleWidth;
+                const currentMobleDistance = modelSetCenterDistance + j * modelLength;
 
-                let pos;
-                let rot;
-                // if (j = 0) {
-                    pos = this.getPosition(CurrentMobleDistance);
-                    rot = this.getAngleAtPosition(CurrentMobleDistance);
-                // } else {
-                //     const lastRot = this.getAngleAtPosition(MobleSetCenterDistance + ((j - 1) * MobleWidth));
-                //     const currentRot = this.getAngleAtPosition(CurrentMobleDistance);
-                //     const diff = Math.abs(currentRot - lastRot) / 15;
-                //     pos = this.getPosition(Math.max(0, CurrentMobleDistance - diff));
-                //     angle = this.getAngleAtPosition(Math.max(0, CurrentMobleDistance - diff));
-                // }
+                const pos = this.getPosition(currentMobleDistance);
+                const rot = this.getAngleAtPosition(currentMobleDistance);
 
-                const pos_offset = Vec3.fromVector3(pos).subtract(Vec3.fromVector3(EntityPos));
-                const rot_offset = rot;
-                RailEntity.setProperty(`mts:seg${j + 1}_x`, pos_offset.x * 16);
-                RailEntity.setProperty(`mts:seg${j + 1}_y`, pos_offset.y * 16);
-                RailEntity.setProperty(`mts:seg${j + 1}_z`, - pos_offset.z * 16);
+                const pos_offset = pos.subtract(entityPos);
+                railEntity.setProperty(`mts:seg${j + 1}_x`, pos_offset.x * 16);
+                railEntity.setProperty(`mts:seg${j + 1}_y`, pos_offset.y * 16);
+                railEntity.setProperty(`mts:seg${j + 1}_z`, - pos_offset.z * 16);
 
-                RailEntity.setProperty(`mts:seg${j + 1}_y_rot`, rot_offset.y);
-                RailEntity.setProperty(`mts:seg${j + 1}_x_rot`, rot_offset.x);
+                railEntity.setProperty(`mts:seg${j + 1}_y_rot`, rot.y);
+                railEntity.setProperty(`mts:seg${j + 1}_x_rot`, rot.x);
             }
+            railEntity.setProperty("mts:variant", this.railType.hasSavedRail ? this.railType.ordinal() : 50)
         }
+
+        world.tickingAreaManager.removeTickingArea(tickingAreaId);
     }
-
-    createEntities(player: Player) {
-        this.createEntitiesExt({
-            name: "",
-            entity_name: "mts:rail",
-            single_segment_model_length: 0.5,
-        }, player)
-    }
-
-    // createEntities() {
-    //     const length = this.getLength();
-
-    //     const effectiveLength = length - this.railType.entityOringinLength;  // 因为两端各占0.5
-    //     const n = Math.max(1, Math.ceil(effectiveLength / this.railType.entityOringinLength));
-    //     const actualInterval = effectiveLength / n;
-
-
-    //     const L0: number = actualInterval;      // 原始模型放置间隔（沿曲线弧长）
-    //     const M: number = L0;       // 模型实际长度（沿切线方向）
-    //     const maxComp: number = 1 / 16; // 最大补偿限制
-    //     // 计算并放置模型
-    //     let s: number = M / 2; // 当前弧长位置
-    //     let s_next: number = 0;
-    //     let angleCurrent: Vector2 = {x: 0, y: 0};
-    //     let angleNext: Vector2 = {x: 0, y: 0};
-    //     let delta_theta: Vector2 = {x: 0, y: 0};
-    //     let delta_s: Vector2 = {x: 0, y: 0};
-    //     let delta_s_clamped: number = 0;
-
-    //     const MAX = 5;
-
-    //     let i = 1;
-
-    //     let RailEntity;
-    //     let EntityPos;
-
-    //     let j = 0;
-    //     let POS = [];
-
-    //     while (s < length/* - M / 2*/) {
-    //         angleCurrent = this.getAngleAtPosition(s);
-    //         angleNext = this.getAngleAtPosition(s + L0);
-    //         delta_theta = {x: angleNext.x - angleCurrent.x, y: angleNext.y - angleCurrent.y};
-            
-    //         // 补偿公式
-    //         delta_s = {x: -M/2 * delta_theta.x, y: -M/2 * delta_theta.y};
-            
-    //         // 限制在[-0.5, 0.5]范围内
-    //         if (delta_s.y > maxComp) {
-    //             delta_s_clamped = -maxComp;
-    //         } else if (delta_s.y < -maxComp) {
-    //             delta_s_clamped = maxComp - 1 / 16;
-    //         } else {
-    //             delta_s_clamped = 0;
-    //         }
-
-    //         if (j == MAX) {
-    //             function a(nums: number[])
-    //             {
-    //                 const max = Math.max(...nums);
-    //                 const min = Math.min(...nums);
-
-    //                 return max - min < 1;
-    //             }
-
-    //             if (a(POS))
-    //             {
-    //                 console.error("暂停");
-    //                 console.error(L0);
-    //             }
-    //         }
-            
-    //         // 计算下一个放置点的弧长
-    //         // s_next = s + L0 + delta_s_clamped;
-    //         s_next = s + L0 + 0;
-            
-    //         if (i == 1)
-    //         {
-    //             EntityPos = this.getPosition(s);
-    //             POS.push(s);
-    //             RailEntity = world.getDimension('overworld').spawnEntity(this.railType.entityId, {
-    //                 x: EntityPos.x,
-    //                 y: EntityPos.y,
-    //                 z: EntityPos.z
-    //             });
-    //             RailEntity.playAnimation("animation.rail.curve");
-    //             this.entities.push(RailEntity);
-    //             j += 1;
-    //         }
-            
-    //         const pos = this.getPosition(s);
-    //         const angle = this.getAngleAtPosition(s);
-
-    //         const pos_offset = Vec3.fromVector3(pos).subtract(Vec3.fromVector3(EntityPos!));
-
-    //         RailEntity!.setProperty(`mts:seg${i}_x`, pos_offset.x * 16);
-    //         RailEntity!.setProperty(`mts:seg${i}_y`, pos_offset.y * 16);
-    //         RailEntity!.setProperty(`mts:seg${i}_z`, - pos_offset.z * 16);
-
-    //         RailEntity!.setProperty(`mts:seg${i}_y_rot`, angle.y);
-    //         RailEntity!.setProperty(`mts:seg${i}_x_rot`, angle.x);
-            
-    //         s = s_next; // 移动到下一个点
-
-    //         i += 1;
-
-    //         if (i == RAIL_SEG_COUNT + 1)
-    //         {
-    //             i = 1;
-    //         }
-    //     }
-
-    //     while (i <= RAIL_SEG_COUNT) {
-    //         RailEntity!.setProperty(`mts:seg${i}_x`, 360);  //HIDE
-    //         RailEntity!.setProperty(`mts:seg${i}_y`, 360);
-    //         RailEntity!.setProperty(`mts:seg${i}_z`, 360);
-
-    //         i += 1;
-    //     }
-    // }
 
     destroyEntities() {
-        system.run(() => {
-            for (const element of this.entities) {
-                try {
-                    element.remove();
-                } catch (e) { }
-            }
-            this.entities.clear();
-        });
+        console.log("[Rail.destroyEntities] entities size: " + this.entities.size)
+        this.entities.forEach(entity => entity.remove())
+        this.entities.clear();
     }
 
     getPosition(rawValue: number): Vec3 {
@@ -557,7 +415,6 @@ export class Rail extends SerializedDataBase {
                 this.tEnd1 !== 0 || this.tEnd2 !== 0) && 
                 this.facingStart === this.getRailAngle(false) && 
                 this.facingEnd === this.getRailAngle(true);
-        // return true;
     }
 
     getPositionY(value: number) {
@@ -617,67 +474,6 @@ export class Rail extends SerializedDataBase {
 
     static getTBounds(x: number, h: number, z: number, k: number, r: number): number {
         return Math.atan2(z - k, x - h) * r;
-    }
-
-    isEqual(other : Rail) {
-
-        function B(a: number) {
-            return Math.round(a * 100) / 100;
-        }
-
-        var a1 = B(other.yStart) == B(this.yStart) && B(other.yEnd) == B(this.yEnd) && B(other.h1) == B(this.h1) && B(other.h2) == B(this.h2) && 
-                B(other.k1) == B(this.k1) && B(other.k2) == B(this.k2) && B(other.r1) == B(this.r1) && B(other.r2) == B(this.r2);
-
-        var a2 = B(other.yStart) == B(this.yEnd) && B(other.yEnd) == B(this.yStart) && B(other.h1) == B(this.h2) && B(other.h2) == B(this.h1) && 
-                B(other.k1) == B(this.k2) && B(other.k2) == B(this.k1) && B(other.r1) == B(this.r2) && B(other.r2) == B(this.r1);
-
-        var c = a1 || a2;
-
-        console.warn(c);
-        console.warn("a1 ", a1);
-        console.warn("a2 ", a2);
-
-        if (c == false) {
-            console.warn("0");
-            if (!other.reverseT1 && !this.reverseT1 &&
-                !other.reverseT2 && !this.reverseT2  &&
-                other.isStraight1 && this.isStraight1 &&
-                other.isStraight2 && this.isStraight2
-            ) {
-                console.warn("1");
-                if ((B(other.yStart) == B(this.yStart) && B(other.yEnd) == B(this.yEnd)) || (B(other.yStart) == B(this.yEnd) && B(other.yEnd) == B(this.yStart))) {
-                    console.warn("2");
-                    if (B(other.k2) == B(this.k2) && B(other.h2) == B(this.h2)) {
-                        console.warn("3");
-                        if (Math.abs(B(other.k1)) == Math.abs(B(this.k1))) {
-                            console.warn("4");
-                            if (Math.abs(B(other.r1)) == Math.abs(B(this.r1))) {
-                                console.warn("5");
-                                c = true;
-                            }
-                        }
-                    }
-                } 
-            }
-        }
-
-        function LOG(obj : any, name : string) {
-            const jsonString = JSON.stringify(obj, (key, value) => {
-                if (typeof value === 'number') {
-                    return B(value);
-                }
-                return value;
-            }, 2);
-            console.warn(name);
-            console.warn(jsonString);
-        }
-
-        if (!c) {
-            LOG(this, "this: ");
-            LOG(other, "other: ");
-        }
-
-        return c;
     }
 
     static getTBoundsWithReverse(x: number, h: number, z: number, k: number, r: number, tStart: number, reverse : boolean) {
