@@ -122,8 +122,7 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
         this.depot = depot;
 
         if (depot == null) {
-			this.trains.forEach(train => train.dispose());
-            this.trains.clear();
+			this.clearTrains();
             this.path.length = 0;
             this.distances.length = 0;
         } else {
@@ -206,8 +205,7 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
             this.generateDistances();
 
             if (tempRepeatIndex1 != this.repeatIndex1 || tempRepeatIndex2 != this.repeatIndex2) {
-                this.trains.forEach(train => train.dispose());
-				this.trains.clear();
+                this.clearTrains();
             }
 
             this.repeatIndex1 = tempRepeatIndex1;
@@ -306,8 +304,7 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
     }
 
 	private generateDefaultPath(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
-		this.trains.forEach(train => train.dispose());
-		this.trains.clear();
+		this.clearTrains();
 
 		const orderedPositions = this.getOrderedPositions(RailwayData.newBlockPos(0, 0, 0), false);
 		const pos1 = orderedPositions[0];
