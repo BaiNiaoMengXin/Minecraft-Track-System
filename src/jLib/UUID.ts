@@ -163,6 +163,6 @@ export class UUID {
 
     public compareTo(val: UUID): number {
         const mostSigBits = Long.compare(this.mostSigBits, val.mostSigBits);
-        return mostSigBits != 0 ? mostSigBits : Long.compare(this.leastSigBits, this.leastSigBits);
+        return mostSigBits != 0 ? mostSigBits : Long.compare(this.leastSigBits, val.leastSigBits);
     }
 }
