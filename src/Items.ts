@@ -1,4 +1,5 @@
 import { RailType } from "data/RailType";
+import { ItemBridgeCreator } from "item/ItemBridgeCreator";
 import { ItemRailModifier } from "item/ItemRailModifier";
 
 export namespace Items {
@@ -16,4 +17,8 @@ export namespace Items {
     export const RAIL_CONNECTOR_PLATFORM = new ItemRailModifier(true, true, true, false, RailType.PLATFORM);
     export const RAIL_CONNECTOR_SIDING = new ItemRailModifier(true, true, true, false, RailType.SIDING);
     export const RAIL_CONNECTOR_TURN_BACK = new ItemRailModifier(true, false, true, false, RailType.TURN_BACK);
+	export const BRIDGE_CREATOR_3 = new ItemBridgeCreator(3);
+	export const BRIDGE_CREATOR_5 = new ItemBridgeCreator(5);
+	export const BRIDGE_CREATOR_7 = new ItemBridgeCreator(7);
+	export const BRIDGE_CREATOR_9 = new ItemBridgeCreator(9);
 }

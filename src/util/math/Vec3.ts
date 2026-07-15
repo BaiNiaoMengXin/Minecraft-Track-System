@@ -117,8 +117,16 @@ export class Vec3 implements JavaObject {
         );
     }
 
-    subtract(other: Vec3): Vec3 {
-        return new Vec3(this.x - other.x, this.y - other.y, this.z - other.z);
+    subtract(x: number, y: number, z: number): Vec3;
+    subtract(other: Vec3): Vec3;
+
+    subtract(arg1: number | Vec3, y?: number, z?: number): Vec3 {
+        if (typeof arg1 == "number") {
+            return new Vec3(this.x - arg1, this.y - y!, this.z - z!);
+        } else {
+            const other = arg1 as Vector3;
+            return new Vec3(this.x - other.x, this.y - other.y, this.z - other.z);
+        }
     }
 
     add(vec: Vec3): Vec3;
@@ -133,12 +141,19 @@ export class Vec3 implements JavaObject {
         }
     }
 
-    multiply(num: number): Vec3 {
-        return this.multiply_(num, num, num);
-    }
+    multiply(num: number): Vec3;
+	multiply(x: number, y: number, z: number): Vec3;
 
+	multiply(arg1: number, arg2?: number, arg3?: number): Vec3 {
+        let x = arg1;
+        let y = arg2;
+        let z = arg3;
 
-	multiply_(x: number, y: number, z: number): Vec3 {
+        if (y === undefined || z === undefined) {
+            y = x;
+            z = x;
+        }
+
 		return new Vec3(this.x * x, this.y * y, this.z * z);
 	}
 

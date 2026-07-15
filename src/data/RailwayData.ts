@@ -23,7 +23,7 @@ import { DyeColor } from "util/DyeColor";
 import { PathData } from "path/PathData";
 import { BlockNode } from "block/BlockNode";
 import { RailwayDataPathGenerationModle } from "./RailwayDataPathGenerationModle";
-import { RailAngle } from "./RailAngle";
+import { RailwayDataRailActionsModule } from "./RailwayDataRailActionsModule";
 
 export class RailwayData extends SerializedDataBase {
 
@@ -35,6 +35,7 @@ export class RailwayData extends SerializedDataBase {
 	public readonly dataCache: DataCache = new DataCache(this.stations, this.platforms, this.sidings, this.routes, this.depots);
 
 	public readonly railwayDataPathGenerationMoudle: RailwayDataPathGenerationModle;
+	public readonly railwayDataRailActionsModule: RailwayDataRailActionsModule;
 
 	private prevPlatformCount: number = 0;
 	private prevSidingCount: number = 0;
@@ -61,6 +62,7 @@ export class RailwayData extends SerializedDataBase {
 
 		this.railwayDataFileSaveModule = new RailwayDataFileSaveModule(this, this.rails, this.signalBlocks);
 		this.railwayDataPathGenerationMoudle = new RailwayDataPathGenerationModle(this, this.rails);
+		this.railwayDataRailActionsModule = new RailwayDataRailActionsModule(this, this.rails);
 	}
 
 	public load(packet: ReturnType<this['toMessagePack']>) {
@@ -96,6 +98,7 @@ export class RailwayData extends SerializedDataBase {
 			siding.simulateTrain(this.dataCache, this.trainPositions, this.signalBlocks, this.schedulesForPlatform, this.trainDelays);
 		});
 		this.depots.forEach(depot => depot.deployTrain(this));
+		this.railwayDataRailActionsModule.tick();
 
 		if (this.prevPlatformCount != this.platforms.size || this.prevSidingCount != this.sidings.size) {
 			this.dataCache.sync();

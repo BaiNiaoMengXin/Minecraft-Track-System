@@ -1,5 +1,5 @@
-import { Entity, Player, system, Vector2, world } from "@minecraft/server";
-import { canSpawnEntity, mandatorySpawnEntity, PosHelper } from "./Base";
+import { Block, BlockPermutation, Dimension, Entity, Player, system, TickingArea, Vector2, Vector3, world } from "@minecraft/server";
+import { canSpawnEntity, mandatorySpawnEntity, PosHelper, generateUniqueNumberID } from "./Base";
 import { RailAngle } from "./RailAngle";
 import { RAIL_SEG_COUNT, RailType } from "./RailType";
 import { TransportMode } from "./TransportMode";
@@ -8,6 +8,8 @@ import { BlockPos } from "util/math/BlockPos";
 import { SerializedDataBase } from "./SerializedDataBase";
 import { Vec3 } from "util/math/Vec3";
 import { MessagePackHelper } from "./MessagePackHelper";
+import { RailwayData } from "./RailwayData";
+import { BlockNode } from "block/BlockNode";
 
 export class Rail extends SerializedDataBase {
     
@@ -736,5 +738,188 @@ export class Rail extends SerializedDataBase {
 
     public getEntities(): ReadonlySet<Entity> {
         return this.entities;
+    }
+
+    public createTickingArea(id: string, dimensionId: string): Promise<void> {
+        return world.tickingAreaManager.createTickingArea(id, {
+            dimension: world.getDimension(dimensionId),
+            from: this.getPosition(0),
+            to: this.getPosition(this.getLength())
+        });
+    }
+}
+
+export class RailActionType {
+
+    public static readonly BRIDGE = new RailActionType("percentage_complete_bridge", "rail_action_bridge");
+    public static readonly TUNNEL = new RailActionType("percentage_complete_tunnel", "rail_action_tunnel");
+    public static readonly TUNNEL_WALL = new RailActionType("percentage_complete_tunnel_wall", "rail_action_tunnel_wall");
+
+    public readonly progressTranslation: string;
+    public readonly nameTranslation: string;
+
+    private constructor(progressTranslation: string, nameTranslation: string) {
+        this.progressTranslation = progressTranslation;
+        this.nameTranslation = nameTranslation;
+    }
+}
+
+export class RailActions {
+
+    private distance: number;
+    private tickingAreaFlag: number = 0;// 0 -> not loaded, 1 -> loading, 2 -> loaded
+
+    public readonly id: number;
+    private readonly dimension = world.getDimension("overworld");
+    private readonly playerId: string;
+    private readonly railActionType: RailActionType;
+    private readonly rail: Rail;
+    private readonly radius: number;
+    private readonly height: number;
+    private readonly length: number;
+    private readonly permutation: BlockPermutation;
+    private readonly blacklistedPos: Set<Vector3> = new Set();
+
+    private static readonly INCREMENT = 0.2;
+
+    public constructor(player: Player, railActionType: RailActionType, rail: Rail, radius: number, height: number, permutation: BlockPermutation) {
+        this.id = generateUniqueNumberID();
+        this.playerId = player.id;
+        this.railActionType = railActionType;
+        this.rail = rail;
+        this.radius = radius;
+        this.height = height;
+        this.permutation = permutation;
+        this.length = rail.getLength();
+        this.distance = 0;
+        
+    }
+
+    public build() {
+        if (this.tickingAreaFlag == 0) {
+            this.tickingAreaFlag = 1;
+            this.rail.createTickingArea(String(this.id), this.dimension.id).then(() => {
+                this.tickingAreaFlag = 2;
+            });
+            return false;
+        } else if (this.tickingAreaFlag == 1) {
+            return false;
+        }
+
+        let result: boolean;
+
+        switch (this.railActionType) {
+            case RailActionType.BRIDGE:
+                result = this.createBridge();
+                break;
+            case RailActionType.TUNNEL:
+                result = this.createTunnel();
+                break;
+            case RailActionType.TUNNEL_WALL:
+                result = this.createTunnelWall();
+                break;
+            default:
+                result = true;
+                break;
+        }
+
+        if (result) {
+            this.tickingAreaFlag = 0;
+            world.tickingAreaManager.removeTickingArea(String(this.id));
+        }
+
+        return result;
+    }
+
+    private createTunnel(): boolean {
+        return this.create(true, editPos => {
+            const pos = { x: ~~editPos.x, y: ~~editPos.y, z: ~~editPos.z };
+            if (!this.blacklistedPos.has(pos) && RailActions.canPlace(this.dimension, pos)) {
+                this.dimension.setBlockType(pos, "minecraft:air");
+                this.blacklistedPos.add(pos);
+            }
+        });
+    }
+
+    private createTunnelWall(): boolean {
+        return this.create(false, editPos => {
+            const pos = { x: ~~editPos.x, y: ~~editPos.y, z: ~~editPos.z };
+            if (!this.blacklistedPos.has(pos) && RailActions.canPlace(this.dimension, pos)) {
+                this.dimension.setBlockPermutation(pos, this.permutation);
+                this.blacklistedPos.add(pos);
+            }
+        });
+    }
+
+    private createBridge(): boolean {
+        return this.create(false, editPos => {
+            const pos = { x: ~~editPos.x, y: ~~editPos.y, z: ~~editPos.z };
+            const isTopHalf = editPos.y - Math.floor(editPos.y) >= 0.5;
+            this.blacklistedPos.add(RailActions.getHalfPos(pos, isTopHalf));
+
+            const placePos = { x: pos.x, y: pos.y - 1, z: pos.z };
+            const placePermutation = this.permutation;
+            const placeHalf = true;
+
+            if (placePos != pos && RailActions.canPlace(this.dimension, pos)) {
+                this.dimension.setBlockType(pos, "minecraft:air");
+            }
+            if (!this.blacklistedPos.has(RailActions.getHalfPos(placePos, placeHalf)) && RailActions.canPlace(this.dimension, placePos)) {
+                this.dimension.setBlockPermutation(placePos, placePermutation);
+            }
+        });
+    }
+
+    private create(includeMiddle: boolean, consumer: (pos: Vec3) => void): boolean {
+        for (let i = 0; i < 2; i++) {
+            const pos1 = this.rail.getPosition(this.distance);
+            this.distance += RailActions.INCREMENT;
+            const pos2 = this.rail.getPosition(this.distance);
+            const vec3 = new Vec3(pos2.x - pos1.x, 0, pos2.z - pos1.z).normalize().yRot(Math.PI / 2);
+
+            for (let x = -this.radius; x <= this.radius; x += RailActions.INCREMENT) {
+                const editPos = pos1.add(vec3.multiply(x, 0, x));
+                const wholeNumber = Math.floor(editPos.y) == Math.ceil(editPos.y);
+                if (includeMiddle || Math.abs(x) > this.radius - RailActions.INCREMENT) {
+                    for (let y = 0; y <= this.height; y++) {
+                        if (y < this.height || !wholeNumber) {
+                            consumer(editPos.add(0, y, 0));
+                        }
+                    }
+                } else {
+                    consumer(editPos.add(0, Math.max(0, wholeNumber ? this.height - 1 : this.height), 0));
+                }
+            }
+
+            if (this.length - this.distance < RailActions.INCREMENT) {
+                this.showProgressMessage(100);
+                return true;
+            }
+        }
+
+        this.showProgressMessage(RailwayData.round(100 * this.distance / this.length, 1));
+        return false;
+    }
+
+    private showProgressMessage(percentage: number): void {
+        const player = world.getAllPlayers().find(p => p.id === this.playerId);
+        if (player != undefined) {
+            player.onScreenDisplay.setActionBar({
+                translate: "gui.mts." + this.railActionType.progressTranslation,
+                with: [ String(percentage) ]
+            });
+        }
+    }
+
+    private static canPlace(dimension: Dimension, pos: Vector3): boolean {
+        return dimension.getBlock(pos)?.typeId != BlockNode.RAIL_NODE_BLOCK_KEY_NAME;
+    }
+
+    private static getHalfPos(pos: Vector3, isTopHalf: boolean) {
+        return {
+            x: ~~pos.x,
+            y: ~~(pos.y * 2 + (isTopHalf ? 1 : 0)),
+            z: ~~pos.z
+        };
     }
 }

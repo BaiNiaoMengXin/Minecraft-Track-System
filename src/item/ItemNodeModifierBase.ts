@@ -57,6 +57,19 @@ export abstract class ItemNodeModifierBase extends ItemBlockClickingBase {
 		}
 	}
 
+	protected override clickCondition(event: ItemComponentUseOnEvent): boolean {
+		if (event.block.typeId == BlockNode.RAIL_NODE_BLOCK_KEY_NAME) {
+			// TODO
+			/* if (blockNode.transportMode == TransportMode.AIRPLANE) {
+				return forAirplaneNode;
+			} else { */
+			return TransportMode.TRAIN.continuousMovement ? this.forContinuousMovementNode : this.forNonContinuousMovementNode;
+			//}
+		} else {
+			return false;
+		}
+	}
+
 	protected abstract onConnect(transportMode: TransportMode, permutationStart: BlockPermutation, permutationEnd: BlockPermutation, posStart: BlockPos, posEnd: BlockPos, facingStart: RailAngle, facingEnd: RailAngle, player: Player): void;
 
 	protected abstract onRemove(posStart: BlockPos, posEnd: BlockPos, player: Player): void;

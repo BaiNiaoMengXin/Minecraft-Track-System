@@ -22,7 +22,7 @@ export class ItemRailModifier extends ItemNodeModifierBase {
 	protected override onConnect(transportMode: TransportMode, permutationStart: BlockPermutation, permutationEnd: BlockPermutation, posStart: BlockPos, posEnd: BlockPos, facingStart: RailAngle, facingEnd: RailAngle, player: Player): void {
 		if (this.railType.hasSavedRail && (MTS.railwayData.hasSavedRail(posStart) || MTS.railwayData.hasSavedRail(posEnd))) {
 			if (player != null) {
-				player.onScreenDisplay.setActionBar({ translate: "gui.mtr.platform_or_siding_exists" });
+				player.onScreenDisplay.setActionBar({ translate: "gui.mts.platform_or_siding_exists" });
 			}
 		} else {
 			let isValidContinuousMovement = false;
@@ -71,7 +71,7 @@ export class ItemRailModifier extends ItemNodeModifierBase {
 				blockStart?.setPermutation(permutationStart.withState(BlockNode.IS_CONNECTED as any, true));
 				blockEnd?.setPermutation(permutationEnd.withState(BlockNode.IS_CONNECTED as any, true));
 			} else {
-				player.onScreenDisplay.setActionBar({ translate: isValidContinuousMovement ? goodRadius ? "gui.mtr.invalid_orientation" : "gui.mtr.radius_too_small" : "gui.mtr.cable_car_invalid_orientation" });
+				player.onScreenDisplay.setActionBar({ translate: isValidContinuousMovement ? goodRadius ? "gui.mts.invalid_orientation" : "gui.mts.radius_too_small" : "gui.mts.cable_car_invalid_orientation" });
 			}
 		}
 	}

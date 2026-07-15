@@ -85,6 +85,10 @@ export namespace MTS {
         registeredItem.set("mts:rail_connector_platform", Items.RAIL_CONNECTOR_PLATFORM);
         registeredItem.set("mts:rail_connector_siding", Items.RAIL_CONNECTOR_SIDING);
         registeredItem.set("mts:rail_connector_turn_back", Items.RAIL_CONNECTOR_TURN_BACK);
+        registeredItem.set("mts:bridge_creator_3", Items.BRIDGE_CREATOR_3);
+        registeredItem.set("mts:bridge_creator_5", Items.BRIDGE_CREATOR_5);
+        registeredItem.set("mts:bridge_creator_7", Items.BRIDGE_CREATOR_7);
+        registeredItem.set("mts:bridge_creator_9", Items.BRIDGE_CREATOR_9);
 
         system.beforeEvents.startup.subscribe((event) => {
             event.itemComponentRegistry.registerCustomComponent("mts:on_use_on", {
