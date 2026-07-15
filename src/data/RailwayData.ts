@@ -14,9 +14,7 @@ import { Siding } from "./Siding";
 import { BlockPos } from "util/math/BlockPos";
 import { SerializedDataBase } from "./SerializedDataBase";
 import { SignalBlocks } from "./SignalBlocks";
-import { TrainDelay } from "./TrainDelay";
 import { RailwayDataFileSaveModule } from "./RailwayDataFileSaveModule";
-import { ArrayList } from "jLib/ArrayList";
 import { ScheduleEntry } from "./ScheduleEntry";
 import { UUID } from "jLib/UUID";
 import { DyeColor } from "util/DyeColor";
@@ -50,7 +48,6 @@ export class RailwayData extends SerializedDataBase {
 
 	private readonly trainPositions: Array<BetterMap<UUID, number>> = new Array(2);
 	private readonly schedulesForPlatform: Map<number, Array<ScheduleEntry>> = new Map();
-	private readonly trainDelays: Map<number, BetterMap<BlockPos, TrainDelay>> = new Map()
 
 	private static readonly DATA_VERSION = 1;
 
@@ -163,14 +160,6 @@ export class RailwayData extends SerializedDataBase {
 
 	public getSchedulesAtPlatform(platformId: number): Array<ScheduleEntry> | null {
 		return this.schedulesForPlatform.get(platformId) ?? null;
-	}
-
-	public getTrainDelays(): Map<number, BetterMap<BlockPos, TrainDelay>> {
-		return this.trainDelays;
-	}
-
-	public resetTrainDelays(depot: Depot): void {
-		depot.routeIds.forEach(v => this.trainDelays.delete(v));
 	}
 
 	public getUseTimeAndWindSync(): boolean {

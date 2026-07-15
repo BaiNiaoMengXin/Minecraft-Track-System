@@ -311,7 +311,6 @@ export class TrainDashboardClient {
             this.editSitePage.button("清除车辆", () => {
                 const sidingsInDepot = DataCache.areaIdToSavedRails(depot, this.dataCache.sidings);
                 Array.from(sidingsInDepot.values()).forEach(siding => siding.clearTrains());
-                MTS.railwayData.resetTrainDelays(depot);
             });
             this.editSitePage.spacer();
             this.editSitePage.button("重置时刻表", () => {
