@@ -14,7 +14,7 @@ export class SignalBlocks {
 	public add(id: number, color: DyeColor, rail: UUID): number {
 		const connectedSignalBlocks = new ArrayList<SignalBlock>();
 		this.signalBlocks.forEach(signalBlock => {
-			if (signalBlock.color == color && signalBlock.isConnected(rail)) {
+			if (signalBlock.dyeColor == color && signalBlock.isConnected(rail)) {
 				connectedSignalBlocks.push(signalBlock);
 			}
 		});
@@ -38,7 +38,7 @@ export class SignalBlocks {
 	public remove(id: number, color: DyeColor, rail: UUID): number {
 		let connectedSignalBlock = null;
 		for (const signalBlock of this.signalBlocks) {
-			if (signalBlock.color == color && signalBlock.isConnected(rail)) {
+			if (signalBlock.dyeColor == color && signalBlock.isConnected(rail)) {
 				connectedSignalBlock = signalBlock;
 				break;
 			}
@@ -148,7 +148,7 @@ export class SignalBlocks {
 
 export class SignalBlock extends NameColorDataBase {
 
-    public readonly color: DyeColor;
+    public readonly dyeColor: DyeColor;
     public readonly rails: ArrayList<UUID> = new ArrayList();
     public occupied: number = 0;
 
@@ -159,13 +159,13 @@ export class SignalBlock extends NameColorDataBase {
     public constructor(arg1: number | Record<string, unknown>, color?: DyeColor, rail?: UUID) {
         if (color != undefined) {
 			super(arg1 as number);
-            this.color = color;
+            this.dyeColor = color;
             this.rails.push(rail!);
         } else {
 			super(arg1 as Record<string, unknown>);
 			const messagePackHelper = new MessagePackHelper(arg1 as ReturnType<this['toMessagePack']>);
 
-			this.color = messagePackHelper.getInt("color");
+			this.dyeColor = DyeColor.values()[messagePackHelper.getInt("color")];
             messagePackHelper.iterateArrayValue("rails", value => this.rails.push(UUID.fromString(value.asString())));
         }
     }
@@ -174,7 +174,7 @@ export class SignalBlock extends NameColorDataBase {
         return {
             ...super.toMessagePack(),
 
-            color: this.color,
+            color: this.dyeColor.ordinal(),
             rails: Array.from(this.rails, rail => rail.toString())
         } as const;
     }
