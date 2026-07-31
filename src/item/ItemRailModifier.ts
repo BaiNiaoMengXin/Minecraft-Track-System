@@ -11,16 +11,25 @@ import { BlockNode } from "block/BlockNode";
 export class ItemRailModifier extends ItemNodeModifierBase {
 
 	private readonly isOneWay: boolean;
-	private readonly railType: RailType;
+	private readonly railType: RailType | null;
 
-	public constructor(forNonContinuousMovementNode: boolean, forContinuousMovementNode: boolean, forAirplaneNode: boolean, isOneWay: boolean, railType: RailType) {
-		super(forNonContinuousMovementNode, forContinuousMovementNode, forAirplaneNode, true);
-		this.isOneWay = isOneWay;
-		this.railType = railType;
+	public constructor();
+	public constructor(forNonContinuousMovementNode: boolean, forContinuousMovementNode: boolean, forAirplaneNode: boolean, isOneWay: boolean, railType: RailType);
+
+	public constructor(forNonContinuousMovementNode?: boolean, forContinuousMovementNode?: boolean, forAirplaneNode?: boolean, isOneWay?: boolean, railType?: RailType) {
+		if (forNonContinuousMovementNode == undefined) {
+			super(true, true, true, false);
+			this.isOneWay = false;
+			this.railType = null;
+		} else {
+			super(forNonContinuousMovementNode, forContinuousMovementNode!, forAirplaneNode!, true);
+			this.isOneWay = isOneWay!;
+			this.railType = railType!;
+		}
 	}
 
 	protected override onConnect(transportMode: TransportMode, permutationStart: BlockPermutation, permutationEnd: BlockPermutation, posStart: BlockPos, posEnd: BlockPos, facingStart: RailAngle, facingEnd: RailAngle, player: Player): void {
-		if (this.railType.hasSavedRail && (MTS.railwayData.hasSavedRail(posStart) || MTS.railwayData.hasSavedRail(posEnd))) {
+		if (this.railType!.hasSavedRail && (MTS.railwayData.hasSavedRail(posStart) || MTS.railwayData.hasSavedRail(posEnd))) {
 			if (player != null) {
 				player.onScreenDisplay.setActionBar({ translate: "gui.mts.platform_or_siding_exists" });
 			}
@@ -55,7 +64,7 @@ export class ItemRailModifier extends ItemNodeModifierBase {
 				}
 			} else */{
 				isValidContinuousMovement = true;
-				newRailType = this.railType;
+				newRailType = this.railType!;
 			}
 
 			const rail1 = new Rail(posStart, facingStart, posEnd, facingEnd, this.isOneWay ? RailType.NONE : newRailType, transportMode);
