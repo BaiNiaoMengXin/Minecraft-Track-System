@@ -208,6 +208,12 @@ export namespace MTS {
             }
         }, 4)
 
+        world.beforeEvents.entityHurt.subscribe(event => {
+            if (event.damageSource.cause != "none" && event.damageSource.cause != "selfDestruct") {
+                event.cancel = true;
+            }
+        }, { entityFilter: { families: ["mts"] } });
+
         system.runInterval(() => {
             world.sendMessage("auto saving Minecraft Track System game data...");// debug
             railwayData.autoSave();
