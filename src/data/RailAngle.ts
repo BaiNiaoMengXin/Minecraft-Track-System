@@ -1,40 +1,45 @@
 export class RailAngle {
-    static E = new RailAngle(0);
-    static SEE = new RailAngle(22.5);
-    static SE = new RailAngle(45);
-    static SSE = new RailAngle(67.5);
-    static S = new RailAngle(90);
-    static SSW = new RailAngle(112.5);
-    static SW = new RailAngle(135);
-    static SWW = new RailAngle(157.5);
-    static W = new RailAngle(180);
-    static NWW = new RailAngle(202.5);
-    static NW = new RailAngle(225);
-    static NNW = new RailAngle(247.5);
-    static N = new RailAngle(270);
-    static NNE = new RailAngle(292.5);
-    static NE = new RailAngle(315);
-    static NEE = new RailAngle(337.5);
+
+    private static readonly $VALUES: Array<RailAngle> = [];
+
+    public static readonly E = new RailAngle(0);
+    public static readonly SEE = new RailAngle(22.5);
+    public static readonly SE = new RailAngle(45);
+    public static readonly SSE = new RailAngle(67.5);
+    public static readonly S = new RailAngle(90);
+    public static readonly SSW = new RailAngle(112.5);
+    public static readonly SW = new RailAngle(135);
+    public static readonly SWW = new RailAngle(157.5);
+    public static readonly W = new RailAngle(180);
+    public static readonly NWW = new RailAngle(202.5);
+    public static readonly NW = new RailAngle(225);
+    public static readonly NNW = new RailAngle(247.5);
+    public static readonly N = new RailAngle(270);
+    public static readonly NNE = new RailAngle(292.5);
+    public static readonly NE = new RailAngle(315);
+    public static readonly NEE = new RailAngle(337.5);
 
     
-    public angleDegrees : number;
-    public angleRadians : number;
-    public sin : number;
-    public cos : number;
-    public tan : number;
-    public halfTan : number;
+    public readonly angleDegrees: number;
+    public readonly angleRadians: number;
+    public readonly sin: number;
+    public readonly cos: number;
+    public readonly tan: number;
+    public readonly halfTan: number;
 
-    static DEGREES_IN_CIRCLE = 360;
-    static QUADRANTS = 16;
-    static ANGLE_INCREMENT = RailAngle.DEGREES_IN_CIRCLE / RailAngle.QUADRANTS;
+    private static readonly DEGREES_IN_CIRCLE = 360;
+    private static readonly QUADRANTS = this.$VALUES.length;
+    private static readonly ANGLE_INCREMENT = RailAngle.DEGREES_IN_CIRCLE / RailAngle.QUADRANTS;
 
-    constructor(angleDegrees : number) {
+    constructor(angleDegrees: number) {
         this.angleDegrees = RailAngle.normalizeAngle(angleDegrees);
         this.angleRadians = this.angleDegrees * Math.PI / 180;
         this.sin = Math.sin(this.angleRadians);
         this.cos = Math.cos(this.angleRadians);
         this.tan = Math.tan(this.angleRadians);
         this.halfTan = Math.tan(this.angleRadians / 2);
+
+        RailAngle.$VALUES.push(this);
     }
 
     getOpposite() {
@@ -100,13 +105,7 @@ export class RailAngle {
     }
 
     static fromAngle(angleDegrees: number) {
-        const values = [
-            RailAngle.E, RailAngle.SEE, RailAngle.SE, RailAngle.SSE,
-            RailAngle.S, RailAngle.SSW, RailAngle.SW, RailAngle.SWW,
-            RailAngle.W, RailAngle.NWW, RailAngle.NW, RailAngle.NNW,
-            RailAngle.N, RailAngle.NNE, RailAngle.NE, RailAngle.NEE
-        ];
-        return values[RailAngle.getQuadrant(angleDegrees, true)];
+        return this.$VALUES[RailAngle.getQuadrant(angleDegrees, true)];
     }
 
     static normalizeAngle(angleDegrees: number) {
@@ -119,82 +118,8 @@ export class RailAngle {
         }
         return angleDegrees + additional;
     }
-    
-    toString() {
-        switch (this) {
-            case RailAngle.E:
-                return "E";
-            case RailAngle.SEE:
-                return "SEE";
-            case RailAngle.SE:
-                return "SE";
-            case RailAngle.SSE:
-                return "SSE";
-            case RailAngle.S:
-                return "S";
-            case RailAngle.SSW:
-                return "SSW";
-            case RailAngle.SW:
-                return "SW";
-            case RailAngle.SWW:
-                return "SWW";
-            case RailAngle.W:
-                return "W";
-            case RailAngle.NWW:
-                return "NWW";
-            case RailAngle.NW:
-                return "NW";
-            case RailAngle.NNW:
-                return "NNW";
-            case RailAngle.N:
-                return "N";
-            case RailAngle.NNE:
-                return "NNE";
-            case RailAngle.NE:
-                return "NE";
-            case RailAngle.NEE:
-                return "NEE";
-            default:
-                return "undefined";
-        }
-    }
 
-    static fromString(angleStr: string) {
-        switch (angleStr) {
-            case "E":
-                return RailAngle.E;
-            case "SEE":
-                return RailAngle.SEE;
-            case "SE":
-                return RailAngle.SE;
-            case "SSE":
-                return RailAngle.SSE;
-            case "S":
-                return RailAngle.S;
-            case "SSW":
-                return RailAngle.SSW;
-            case "SW":
-                return RailAngle.SW;
-            case "SWW":
-                return RailAngle.SWW;
-            case "W":
-                return RailAngle.W;
-            case "NWW":
-                return RailAngle.NWW;
-            case "NW":
-                return RailAngle.NW;
-            case "NNW":
-                return RailAngle.NNW;
-            case "N":
-                return RailAngle.N;
-            case "NNE":
-                return RailAngle.NNE;
-            case "NE":
-                return RailAngle.NE;
-            case "NEE":
-                return RailAngle.NEE;
-            default:
-                return RailAngle.E;
-        }
+    static values(): ReadonlyArray<RailAngle> {
+        return this.$VALUES;
     }
 }
