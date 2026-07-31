@@ -348,15 +348,17 @@ export class Rail extends SerializedDataBase {
         const modelSetSpacing = mobelSetCount > 1 ? (length - mobelSetWidth) / (mobelSetCount - 1) : 0;
         const modelSetStartOffset = modelLength / 2;
         
-        const tickingAreaId = String(generateUniqueNumberID());
+        let tickingAreaId = "";
+        if (!RailwayData.chunkLoaded(this.getPosition(0)) || !RailwayData.chunkLoaded(this.getPosition(length))) {
+            tickingAreaId = String(generateUniqueNumberID());
         await this.createTickingArea(tickingAreaId, dimensionId);
+        }
 
         for (let i = 0; i < mobelSetCount; i++) {
             const modelSetCenterDistance = modelSetStartOffset + i * modelSetSpacing;
             const entityPos = this.getPosition(modelSetCenterDistance).add(0, 0.1, 0);
 
             const railEntity = world.getDimension(dimensionId).spawnEntity<string>("mts:rail", entityPos);
-
             this.entities.add(railEntity);
 
             for (let j = 0; j < RAIL_SEG_COUNT; j++) {
@@ -376,12 +378,18 @@ export class Rail extends SerializedDataBase {
             railEntity.setProperty("mts:variant", this.railType.hasSavedRail ? this.railType.ordinal() : 50)
         }
 
+        if (tickingAreaId != "") {
         world.tickingAreaManager.removeTickingArea(tickingAreaId);
+        }
     }
 
     destroyEntities() {
-        console.log("[Rail.destroyEntities] entities size: " + this.entities.size)
-        this.entities.forEach(entity => entity.remove())
+        this.entities.forEach(entity => {
+            try {
+                entity.remove()
+            } catch (e) {
+            }
+        })
         this.entities.clear();
     }
 
