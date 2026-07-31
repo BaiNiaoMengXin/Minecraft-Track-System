@@ -187,8 +187,8 @@ export class RailwayData {
 	}
 
 	private validateData(): void {
-		RailwayData.removeSavedRailS2C(this.platforms, this.rails);
-		RailwayData.removeSavedRailS2C(this.sidings, this.rails);
+		RailwayData.removeSavedRail(this.platforms, this.rails);
+		RailwayData.removeSavedRail(this.sidings, this.rails);
 
 		const railsToRemove = new Array<BlockPos>();
 		this.rails.forEach((railMap, startPos) => railMap.forEach((rail, endPos) => {
@@ -402,7 +402,7 @@ export class RailwayData {
 		railsNodesToRemove.forEach(pos => RailwayData.removeNode(rails, pos));
 	}
 
-	private static removeSavedRailS2C<T extends SavedRailBase>(savedRailBases: Set<T>, rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
+	private static removeSavedRail<T extends SavedRailBase>(savedRailBases: Set<T>, rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
 		for (const savedRailBase of savedRailBases) {
 			if (savedRailBase.isInvalidSavedRail(rails)) {
 				savedRailBases.delete(savedRailBase);
