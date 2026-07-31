@@ -226,6 +226,9 @@ export class RailwayData {
 	// other
 
 	public static addRail(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>, platforms: Set<Platform>, sidings: Set<Siding>, transportMode: TransportMode, posStart: BlockPos, posEnd: BlockPos, rail: Rail, savedRailId: number): void {
+		rails.get(posStart)?.get(posEnd)?.destroyEntities();
+		rails.get(posEnd)?.get(posStart)?.destroyEntities();
+
 		if (!rails.has(posStart)) {
 			rails.set(posStart, new BetterMap());
 		}
