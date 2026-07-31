@@ -405,6 +405,9 @@ export class RailwayData {
 	private static removeSavedRail<T extends SavedRailBase>(savedRailBases: Set<T>, rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
 		for (const savedRailBase of savedRailBases) {
 			if (savedRailBase.isInvalidSavedRail(rails)) {
+				if (savedRailBase instanceof Siding) {
+					savedRailBase.clearTrains();
+				}
 				savedRailBases.delete(savedRailBase);
 			}
 		};
