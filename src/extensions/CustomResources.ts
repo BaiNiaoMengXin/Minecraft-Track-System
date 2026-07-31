@@ -14,9 +14,11 @@ export class CustomResources {
 
     static {
         system.beforeEvents.shutdown.subscribe(() => {
-            this.EXISTING_CUSTOM_RES_SCOREBOARD.forEach(objectiveId => {
-                world.scoreboard.removeObjective(objectiveId);
-            })
+            system.run(() => {
+                this.EXISTING_CUSTOM_RES_SCOREBOARD.forEach(objectiveId => {
+                    world.scoreboard.removeObjective(objectiveId);
+                });
+            });
         })
     }
 
