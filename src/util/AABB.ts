@@ -3,7 +3,7 @@ import { Mth } from "./math/Mth";
 import { Vec3 } from "./math/Vec3";
 import { Direction } from "./math/Direction";
 import { JavaObject } from "jLib/Object";
-import { Vector3 } from "@minecraft/server";
+import * as server from "@minecraft/server";
 
 export class AABB implements JavaObject {
 
@@ -16,11 +16,11 @@ export class AABB implements JavaObject {
     
     public constructor(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number);
 
-    public constructor(pos1: Vec3, pos2: Vec3);
+    public constructor(pos1: server.Vector3, pos2: server.Vector3);
 
-    public constructor(pos: Vec3);
+    public constructor(pos: server.Vector3);
 
-    public constructor(arg1: number | Vec3, arg2?: number | Vec3, z1?: number, x2?: number, y2?: number, z2?: number) {
+    public constructor(arg1: number | server.Vector3, arg2?: number | server.Vector3, z1?: number, x2?: number, y2?: number, z2?: number) {
         if (z1 != undefined) {
             this.minX = Math.min(arg1 as number, x2!);
             this.minY = Math.min(arg2 as number, y2!);
@@ -29,26 +29,30 @@ export class AABB implements JavaObject {
             this.maxY = Math.max(arg2 as number, y2!);
             this.maxZ = Math.max(z1, z2!);
         } else if (arg2 != undefined) {
-            let pos1 = arg1 as Vec3;
-            let pos2 = arg2 as Vec3;
-            this.minX = Math.min(pos1.getX(), pos2.getX());
-            this.minY = Math.min(pos1.getY(), pos2.getY());
-            this.minZ = Math.min(pos1.getZ(), pos2.getZ());
-            this.maxX = Math.max(pos1.getX(), pos2.getX());
-            this.maxY = Math.max(pos1.getY(), pos2.getY());
-            this.maxZ = Math.max(pos1.getZ(), pos2.getZ());
+            let pos1 = arg1 as server.Vector3;
+            let pos2 = arg2 as server.Vector3;
+            this.minX = Math.min(pos1.x, pos2.x);
+            this.minY = Math.min(pos1.y, pos2.y);
+            this.minZ = Math.min(pos1.z, pos2.z);
+            this.maxX = Math.max(pos1.x, pos2.x);
+            this.maxY = Math.max(pos1.y, pos2.y);
+            this.maxZ = Math.max(pos1.z, pos2.z);
         } else {
-            let pos = arg1 as Vec3;
-            this.minX = Math.min(pos.getX(), pos.getX() + 1);
-            this.minY = Math.min(pos.getY(), pos.getY() + 1);
-            this.minZ = Math.min(pos.getZ(), pos.getZ() + 1);
-            this.maxX = Math.max(pos.getX(), pos.getX() + 1);
-            this.maxY = Math.max(pos.getY(), pos.getY() + 1);
-            this.maxZ = Math.max(pos.getZ(), pos.getZ() + 1);
+            let pos = arg1 as server.Vector3;
+            this.minX = Math.min(pos.x, pos.x + 1);
+            this.minY = Math.min(pos.y, pos.y + 1);
+            this.minZ = Math.min(pos.z, pos.z + 1);
+            this.maxX = Math.max(pos.x, pos.x + 1);
+            this.maxY = Math.max(pos.y, pos.y + 1);
+            this.maxZ = Math.max(pos.z, pos.z + 1);
         }
     }
+
+    public static fromServerAABB(aabb: server.AABB) {
+        return this.ofSize(aabb.center.x, aabb.center.y, aabb.center.z, aabb.extent.x, aabb.extent.y, aabb.extent.z);
+    }
     
-    public staticofSize(centerX: number, centerY: number, centerZ: number, 
+    public static ofSize(centerX: number, centerY: number, centerZ: number, 
                               xSize: number, ySize: number, zSize: number): AABB {
         let halfX = xSize / 2.0;
         let halfY = ySize / 2.0;
@@ -64,10 +68,10 @@ export class AABB implements JavaObject {
     }
     
     public contains(other: AABB): boolean;
-    public contains(pos: Vector3): boolean;
+    public contains(pos: server.Vector3): boolean;
     public contains(x: number, y: number, z: number): boolean;
 
-    public contains(arg1: AABB | Vector3 | number, y?: number, z?: number): boolean {
+    public contains(arg1: AABB | server.Vector3 | number, y?: number, z?: number): boolean {
         if (arg1 instanceof AABB) {
             const other = arg1;
             return this.minX <= other.minX && this.maxX >= other.maxX &&
