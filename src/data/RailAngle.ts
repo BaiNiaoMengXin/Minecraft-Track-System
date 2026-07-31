@@ -19,7 +19,7 @@ export class RailAngle {
     public static readonly NE = new RailAngle(315);
     public static readonly NEE = new RailAngle(337.5);
 
-    
+
     public readonly angleDegrees: number;
     public readonly angleRadians: number;
     public readonly sin: number;
@@ -44,39 +44,39 @@ export class RailAngle {
 
     getOpposite() {
         switch (this) {
-			default:
-				return RailAngle.W;
-			case RailAngle.SEE:
-				return RailAngle.NWW;
-			case RailAngle.SE:
-				return RailAngle.NW;
-			case RailAngle.SSE:
-				return RailAngle.NNW;
-			case RailAngle.S:
-				return RailAngle.N;
-			case RailAngle.SSW:
-				return RailAngle.NNE;
-			case RailAngle.SW:
-				return RailAngle.NE;
-			case RailAngle.SWW:
-				return RailAngle.NEE;
-			case RailAngle.W:
-				return RailAngle.E;
-			case RailAngle.NWW:
-				return RailAngle.SEE;
-			case RailAngle.NW:
-				return RailAngle.SE;
-			case RailAngle.NNW:
-				return RailAngle.SSE;
-			case RailAngle.N:
-				return RailAngle.S;
-			case RailAngle.NNE:
-				return RailAngle.SSW;
-			case RailAngle.NE:
-				return RailAngle.SW;
-			case RailAngle.NEE:
-				return RailAngle.SWW;
-		}
+            default:
+                return RailAngle.W;
+            case RailAngle.SEE:
+                return RailAngle.NWW;
+            case RailAngle.SE:
+                return RailAngle.NW;
+            case RailAngle.SSE:
+                return RailAngle.NNW;
+            case RailAngle.S:
+                return RailAngle.N;
+            case RailAngle.SSW:
+                return RailAngle.NNE;
+            case RailAngle.SW:
+                return RailAngle.NE;
+            case RailAngle.SWW:
+                return RailAngle.NEE;
+            case RailAngle.W:
+                return RailAngle.E;
+            case RailAngle.NWW:
+                return RailAngle.SEE;
+            case RailAngle.NW:
+                return RailAngle.SE;
+            case RailAngle.NNW:
+                return RailAngle.SSE;
+            case RailAngle.N:
+                return RailAngle.S;
+            case RailAngle.NNE:
+                return RailAngle.SSW;
+            case RailAngle.NE:
+                return RailAngle.SW;
+            case RailAngle.NEE:
+                return RailAngle.SWW;
+        }
     }
 
     add(railAngle: RailAngle) {
