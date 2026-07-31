@@ -4,7 +4,7 @@ type TrainTypeCallback = (transportMode: TransportMode, length: number, width: n
 
 export class TrainType {
 
-	private static readonly $VALUES: Map<string, TrainType> = new Map();
+	private static readonly $VALUES: Array<TrainType> = [];
 
 	public static readonly C_TRAIN_MINI: TrainType = new TrainType("train_9_2", "C_TRAIN_MINI");
 
@@ -13,18 +13,18 @@ export class TrainType {
 	private readonly $NAME: string
 
 	private constructor(baseTrainType: string, $NAME: string) {
-		this.baseTrainType = baseTrainType,
+		this.baseTrainType = baseTrainType;
+
 		this.$NAME = $NAME;
-		TrainType.$VALUES.set($NAME, this);
+		TrainType.$VALUES.push(this);
 	}
 
-	public static values(): TrainType[] {
-		return Array.from(this.$VALUES.values());
+	public static values(): ReadonlyArray<TrainType> {
+		return this.$VALUES;
 	}
 
 	public static valueOf(str: string): TrainType {
-		const result = this.$VALUES.get(str);
-		return result ?? this.C_TRAIN_MINI;
+		return this.$VALUES.find(trainType => trainType.$NAME == str) ?? this.$VALUES[0];
 	}
 
 	public toString(): string {
