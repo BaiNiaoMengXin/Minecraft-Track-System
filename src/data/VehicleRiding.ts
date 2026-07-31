@@ -3,6 +3,7 @@ import { MTS } from "MTS";
 import { AABB } from "util/AABB";
 import { Mth } from "util/math/Mth";
 import { Vec3 } from "util/math/Vec3";
+import { TrainBase } from "./TrainBase";
 
 export class VehicleRiding {
 
@@ -47,12 +48,16 @@ export class VehicleRiding {
         const moveZ = z + playerOffset.z;
 
 		const entity = this.ridingEntities.get(playerId);
-        entity!.teleport({ x: moveX, y: moveY, z: moveZ });
-		// const rideable = entity!.getComponent(EntityComponentTypes.Rideable)!;
-		// if (rideable.getRiders().length == 0) {
-		// 	rideable.addRider(world.getAllPlayers().find(p => p.id == playerId)!)
-		// 	MTS.railwayData.railwayDataCoolDownModule.updatePlayerRiding
-		// }
+		entity!.teleport({ x: moveX, y: moveY, z: moveZ });
+		
+		const rideable = entity!.getComponent(EntityComponentTypes.Rideable)!;
+		if (rideable.getRiders().length == 0) {
+			const player = world.getEntity(playerId) as Player | undefined;
+			if (player) {
+				MTS.railwayData.railwayDataCoolDownModule.onPlayerLeaveRideable(player);
+				rideable.addRider(player)
+			}
+		}
 
         // clientPlayerCallback();
 	}
@@ -66,15 +71,8 @@ export class VehicleRiding {
         const player = this.getPlayer(playerId);
 		const speedMultiplier = ticksElapsed * VehicleRiding.VEHICLE_WALKING_SPEED_MULTIPLIER;
 
-        if (player == undefined) {
-            if (this.ridingEntities.has(playerId)) {
-                this.removeRiding(playerId);
-            }
+        if (player == undefined || TrainBase.isHoldingKey(player)) {
             return;
-        } else {
-            if (!this.ridingEntities.has(playerId)) {
-                return;
-            }
         }
 		
         const movementTemp = player.inputInfo.getMovementVector()
@@ -107,7 +105,7 @@ export class VehicleRiding {
 	}
 
 
-	public mountRider(routeId: number, carX: number, carY: number, carZ: number, length: number, width: number, carYaw: number, carPitch: number, doorOpen: boolean, canMount: boolean, percentageOffset: number, canRide: (player: Player) => boolean, ridingCallback: (player: Player) => void) {
+	public mountRider(routeId: number, carX: number, carY: number, carZ: number, length: number, width: number, carYaw: number, carPitch: number, doorOpen: boolean, canMount: boolean, percentageOffset: number, canRide: (player: Player) => boolean, ridingCallback: (player: Player) => void, startRidingCallback?: (player: Player) => void) {
 		const halfLength = length / 2;
 		const halfWidth = width / 2;
 
@@ -121,6 +119,9 @@ export class VehicleRiding {
 						const percentageX = positionRotated.x / width + 0.5;
 						const percentageZ = (length == 0 ? 0 : positionRotated.z / length + 0.5) + percentageOffset;
 						this.startRiding(player, percentageX, percentageZ);
+						if (startRidingCallback !== undefined) {
+							startRidingCallback(player);
+						}
 					}
 				}
 			});

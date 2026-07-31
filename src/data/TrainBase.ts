@@ -1,6 +1,6 @@
 import { PathData } from "path/PathData";
 import { NameColorDataBase } from "./NameColorDataBase";
-import { Block, Entity, Player, system, Vector3, world } from "@minecraft/server";
+import { Block, BlockVolume, Entity, EntityComponentTypes, Player, system, Vector3, world } from "@minecraft/server";
 import { TransportMode } from "./TransportMode";
 import { RailwayData } from "./RailwayData";
 import { TrainType } from "./TrainType";
@@ -40,11 +40,12 @@ export abstract class TrainBase extends NameColorDataBase {
 	public readonly maxManualSpeed: number;
 	public readonly manualToAutomaticTime: number;
 	public readonly path: PathData[];
+	public readonly ridingEntities: Map<string, Entity> =  new Map();
 
 	protected readonly distances: number[];
 	protected readonly repeatIndex1: number;
 	protected readonly repeatIndex2: number;
-	protected readonly ridingEntities: Map<string, Entity> =  new Map()
+	
 	// protected readonly SimpleContainer inventory;
 
 	private readonly railLength: number;
@@ -146,7 +147,12 @@ export abstract class TrainBase extends NameColorDataBase {
 	}
 
 	protected disposeRidingEntities() {
-		this.ridingEntities.forEach((entity, playerId) => entity.remove())
+		this.ridingEntities.forEach((entity, playerId) => {
+			try {
+				entity.remove()
+			} catch (e) {
+			}
+		});
 		this.ridingEntities.clear();
 	}
 
@@ -277,7 +283,6 @@ export abstract class TrainBase extends NameColorDataBase {
 	protected simulateTrain_(ticksElapsed: number, depot: Depot): void {
 		try {
 			if (this.nextStoppingIndex >= this.path.length) {
-				console.log(`调试: 列车 ${this.trainId} 的下一个停车索引 ${this.nextStoppingIndex} 超出路径长度 ${this.path.length}，跳过模拟。`);    
 				return;
 			}
 
@@ -440,8 +445,8 @@ export abstract class TrainBase extends NameColorDataBase {
 			const realSpacing = pos2.distanceTo(pos1);
 			const yaw = Math.atan2(pos2.x - pos1.x, pos2.z - pos1.z);
 			const pitch = realSpacing == 0 ? 0 : this.asin((pos2.y - pos1.y) / realSpacing);
-			const doorLeftOpen: boolean = this.scanDoors(x, y, z, Math.PI + yaw, pitch, realSpacing / 2, dwellTicks) && this.doorValue > 0;
-			const doorRightOpen: boolean = this.scanDoors(x, y, z, yaw, pitch, realSpacing / 2, dwellTicks) && this.doorValue > 0;
+			const doorLeftOpen: boolean = this.doorValue > 0 && this.scanDoors(x, y, z, Math.PI + yaw, pitch, realSpacing / 2, dwellTicks);
+			const doorRightOpen: boolean = this.doorValue > 0 && this.scanDoors(x, y, z, yaw, pitch, realSpacing / 2, dwellTicks);
 
 			calculateCarCallback(x, y, z, yaw, pitch, realSpacing, doorLeftOpen, doorRightOpen);
 		}
@@ -533,8 +538,7 @@ export abstract class TrainBase extends NameColorDataBase {
 	}
 
 	public static isHoldingKey(player: Player): boolean {
-		// return player != null && !Keys.LIFTS_ONLY && player.isHolding(Items.DRIVER_KEY.get());
-        return false;
+		return player.getComponent(EntityComponentTypes.Inventory)?.container.getItem(player.selectedSlotIndex)?.typeId == "mts:driver_key";
 	}
 
 	public static getAverage(a: number, b: number): number {

@@ -23,6 +23,7 @@ import { BlockNode } from "block/BlockNode";
 import { RailwayDataPathGenerationModle } from "./RailwayDataPathGenerationModle";
 import { RailwayDataRailActionsModule } from "./RailwayDataRailActionsModule";
 import { RailwayDataCoolDownModule } from "./RailwayDataCoolDownModule";
+import { RailwayDataDriveTrainModule } from "./RailwayDataDriveTrainModule";
 
 export class RailwayData {
 
@@ -35,6 +36,7 @@ export class RailwayData {
 
 	public readonly railwayDataCoolDownModule: RailwayDataCoolDownModule;
 	public readonly railwayDataPathGenerationMoudle: RailwayDataPathGenerationModle;
+	public readonly railwayDataDriveTrainModule: RailwayDataDriveTrainModule;
 	public readonly railwayDataRailActionsModule: RailwayDataRailActionsModule;
 
 	private prevPlatformCount: number = 0;
@@ -60,6 +62,7 @@ export class RailwayData {
 
 		this.railwayDataFileSaveModule = new RailwayDataFileSaveModule(this, this.rails, this.signalBlocks);
 		this.railwayDataPathGenerationMoudle = new RailwayDataPathGenerationModle(this, this.rails);
+		this.railwayDataDriveTrainModule = new RailwayDataDriveTrainModule(this, this.rails);
 		this.railwayDataRailActionsModule = new RailwayDataRailActionsModule(this, this.rails);
 		this.railwayDataCoolDownModule = new RailwayDataCoolDownModule(this, this.rails);
 	}
@@ -108,6 +111,7 @@ export class RailwayData {
 		this.depots.forEach(depot => depot.deployTrain(this));
 
 		this.railwayDataCoolDownModule.tick();
+		this.railwayDataDriveTrainModule.tick();
 		this.railwayDataRailActionsModule.tick();
 
 		if (this.prevPlatformCount != this.platforms.size || this.prevSidingCount != this.sidings.size) {
