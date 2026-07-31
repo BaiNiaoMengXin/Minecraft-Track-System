@@ -212,7 +212,7 @@ export namespace MTS {
             world.sendMessage("auto saving Minecraft Track System game data...");// debug
             railwayData.autoSave();
         }, 20 * 60 * 5);
-        world.beforeEvents.playerLeave.subscribe(event => {
+        system.beforeEvents.shutdown.subscribe(() => {
             system.run(() => {
                 railwayData.fullSave();
             });
