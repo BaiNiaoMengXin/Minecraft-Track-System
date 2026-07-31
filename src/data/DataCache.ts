@@ -4,18 +4,13 @@ import { Platform } from "./Platform";
 import { Route } from "./Route";
 import { Siding } from "./Siding";
 import { Station } from "./Station";
-import { currentTimeMillis } from "./Base";
-import { ArrayList } from "jLib/ArrayList";
 import { NameColorDataBase } from "./NameColorDataBase";
 import { SavedRailBase } from "./SavedRailBase";
 import { AreaBase } from "./AreaBase";
 import { RailwayDataRouteFinderModule } from "./RailwayDataRouteFinderModule";
-import { Rail } from "./Rail";
 import { BetterMap } from "./BetterMap";
 
 export class DataCache {
-
-	private lastRefreshedTime: number = 0;
 
 	public readonly stationIdMap: Map<number, Station> = new Map();
 	public readonly platformIdMap: Map<number, Platform> = new Map();
@@ -26,16 +21,19 @@ export class DataCache {
     public readonly platformIdToStation: Map<number, Station>  = new Map();
 	public readonly sidingIdToDepot: Map<number, Depot> = new Map();
 	public readonly routeIdToOneDepot: Map<number, Depot> = new Map();
+	public readonly stationIdToRoutes: Map<number, Map<number, string>> = new Map();
 	public readonly stationIdToConnectingStations: Map<Station, Set<Station>>  = new Map();
 	public readonly blockPosToStation: BetterMap<BlockPos, Station> = new BetterMap();
 	public readonly blockPosToPlatformId: Map<bigint, number> = new Map();
 	public readonly platformConnections: Map<bigint, Map<bigint, RailwayDataRouteFinderModule.ConnectionDetails>> = new Map();
 
-    public readonly stations : Set<Station>;
-    public readonly platforms : Set<Platform>;
+    public readonly stations: Set<Station>;
+    public readonly platforms: Set<Platform>;
     public readonly sidings: Set<Siding>;
-    public readonly routes : Set<Route>;
-    public readonly depots : Set<Depot>;
+    public readonly routes: Set<Route>;
+    public readonly depots: Set<Depot>;
+
+	private readonly depotIdToSidings: Map<number, Map<number, Siding>> = new Map();
 
 	constructor(stations: Set<Station>, platforms: Set<Platform>, sidings: Set<Siding>, routes: Set<Route>, depots: Set<Depot>) {
 		this.stations = stations;
@@ -103,24 +101,31 @@ export class DataCache {
 				});
 			});
 
+			this.stationIdToRoutes.clear();
+			this.routes.forEach(route => {
+				if (!route.isHidden) {
+					route.platformIds.forEach(platformId => {
+						const station = this.platformIdToStation.get(platformId.platformId);
+						if (station != undefined) {
+							if (!this.stationIdToRoutes.has(station.id)) {
+								this.stationIdToRoutes.set(station.id, new Map());
+							}
+							this.stationIdToRoutes.get(station.id)!.set(route.color, route.name);
+						}
+					});
+				}
+			});
+
 			DataCache.mapSavedRailIdToStation(this.platformIdToStation, this.platforms, this.stations);
 			DataCache.mapSavedRailIdToStation(this.sidingIdToDepot, this.sidings, this.depots);
 
 			this.blockPosToPlatformId.clear();
 			this.blockPosToStation.clear();
-			this.syncAdditional();
+
+			this.depotIdToSidings.clear();
 		} catch (e) {
 		    console.error(e)
 		}
-
-		this.lastRefreshedTime = currentTimeMillis();
-	}
-
-	public needsRefresh(cachedRefreshTime: number): boolean {
-		return this.lastRefreshedTime > cachedRefreshTime;
-	}
-
-	protected syncAdditional(): void {
 	}
 
 	public static tryGet<T, U>(map: Map<T, Map<T, U>>, key1: T, key2: T, defaultValue: U): U;
@@ -174,7 +179,7 @@ export class DataCache {
 
 	// TODO Implement ClientData, and change the following function
 
-	public static areaIdToSavedRails<U extends AreaBase, V extends SavedRailBase>(area: U, savedRails: Set<V>): Map<number, V> {
+	private static areaIdToSavedRails<U extends AreaBase, V extends SavedRailBase>(area: U, savedRails: Set<V>): Map<number, V> {
 		const savedRailMap = new Map<number, V>();
 		savedRails.forEach(savedRail => {
 			const pos = savedRail.getMidPos();
@@ -183,5 +188,17 @@ export class DataCache {
 			}
 		});
 		return savedRailMap;
+	}
+
+	public requestDepotIdToSidings(depotId: number) {
+		if (!this.depotIdToSidings.has(depotId)) {
+			const depot = this.depotIdMap.get(depotId);
+			if (depot) {
+				this.depotIdToSidings.set(depotId, DataCache.areaIdToSavedRails(depot, this.sidings));
+			} else {
+				this.depotIdToSidings.set(depotId, new Map());
+			}
+		}
+		return this.depotIdToSidings.get(depotId)!;
 	}
 }

@@ -8,7 +8,7 @@ import { BlockPermutation, Player } from "@minecraft/server";
 
 export class RailwayDataRailActionsModule extends RailwayDataModuleBase {
 
-	private readonly railActions: ArrayList<RailActions> = new ArrayList();
+	public readonly railActions: ArrayList<RailActions> = new ArrayList();
 
 	public constructor(railwayData: RailwayData, rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>) {
 		super(railwayData, rails);

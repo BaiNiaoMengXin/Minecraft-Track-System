@@ -30,9 +30,11 @@ export class Depot extends AreaBase implements IReducedSaveData {
 	private static readonly TICKS_PER_DAY : number = this.HOURS_IN_DAY * this.TICKS_PER_HOUR;
 	private static readonly CONTINUOUS_MOVEMENT_FREQUENCY : number = 8000;
 	private static readonly THRESHOLD_ABOVE_MAX_BUILD_HEIGHT : number = 64;
-
-
+    
 	public lastDeployedMillis: number = 0;
+	public useRealTime: boolean = false;
+	public repeatInfinitely: boolean = false;
+	public cruisingAltitude: number = Depot.DEFAULT_CRUISING_ALTITUDE;
 	private deployIndex: number = 0;
 	private departureOffset: number = 0;
 	private isDirty: boolean = true;
@@ -44,7 +46,7 @@ export class Depot extends AreaBase implements IReducedSaveData {
 
 	private readonly frequencies: number[] = new Array<number>(Depot.HOURS_IN_DAY).fill(0);
 	private readonly deployableSidings: Map<number, Train> = new Map();
-    
+
 	public constructor(transportMode: TransportMode);
 
 	public constructor(id: number, transportMode: TransportMode);
@@ -60,12 +62,15 @@ export class Depot extends AreaBase implements IReducedSaveData {
 			super(arg1 as Record<string, unknown>);
 			const messagePackHelper = new MessagePackHelper(arg1 as ReturnType<this['toMessagePack']>);
 			messagePackHelper.iterateArrayValue("route_ids", routeId => this.routeIds.push(routeId.asDouble()));
+			this.useRealTime = messagePackHelper.getBoolean("use_real_time");
 
 			messagePackHelper.iterateArrayValue("frequencies", (frequency, i) => this.frequencies[i] = frequency.asInt());
 			
 			messagePackHelper.iterateArrayValue("departures", departure => this.departures.push(departure.asInt()));
 			
 			this.deployIndex = messagePackHelper.getInt("deploy_index");
+			this.repeatInfinitely = messagePackHelper.getBoolean("repeat_infinitely");
+			this.cruisingAltitude = messagePackHelper.getInt("cruising_altitude");
 			this.lastDeployedMillis = currentTimeMillis() - messagePackHelper.getDouble("last_deployed");
 		}
     }
@@ -84,6 +89,10 @@ export class Depot extends AreaBase implements IReducedSaveData {
 			...super.toMessagePack(),
 
 			route_ids: this.routeIds.toArray(),
+
+			use_real_time: this.useRealTime,
+			repeat_infinitely: this.repeatInfinitely,
+			cruising_altitude: this.cruisingAltitude,
 			
 			frequencies: this.frequencies,
 
@@ -95,7 +104,7 @@ export class Depot extends AreaBase implements IReducedSaveData {
 		return true;
 	}
 
-	public generateMainRoute(dataCache: DataCache, rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>, sidings: Set<Siding>): void {
+	public generateMainRoute(dataCache: DataCache, rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>, sidings: Set<Siding>, callback: (successfulSegments: number) => void): void {
 		const platformsInRoute = new ArrayList<SavedRailBase>();
 
 		this.routeIds.forEach(routeId => {
@@ -110,10 +119,12 @@ export class Depot extends AreaBase implements IReducedSaveData {
 			}
 		});
 
+		const useFastSpeed = this.cruisingAltitude >= world.getDimension("overworld").heightRange.max + Depot.THRESHOLD_ABOVE_MAX_BUILD_HEIGHT;
+
 		(async() => {
 			try {
 				const tempPath = new Array<PathData>();
-				const successfulSegmentsMain = PathFinder.findPath(tempPath, rails, platformsInRoute, 1, 0, false);
+				const successfulSegmentsMain = PathFinder.findPath(tempPath, rails, platformsInRoute, 1, this.cruisingAltitude, useFastSpeed);
 				let successfulSegments = Number.MAX_SAFE_INTEGER;
 
 				sidings.forEach(siding => {
@@ -121,12 +132,13 @@ export class Depot extends AreaBase implements IReducedSaveData {
 					if (siding.isTransportMode(this.transportMode) && this.inArea(sidingMidPos.getX(), sidingMidPos.getZ())) {
 						const firstPlatform = platformsInRoute.isEmpty() ? null : platformsInRoute[0];
 						const lastPlatform = platformsInRoute.isEmpty() ? null : platformsInRoute[platformsInRoute.length - 1];
-						const result = siding.generateRoute(tempPath, successfulSegmentsMain, rails, firstPlatform, lastPlatform, false, 0, false);
+						const result = siding.generateRoute(tempPath, successfulSegmentsMain, rails, firstPlatform, lastPlatform, this.repeatInfinitely, this.cruisingAltitude, useFastSpeed);
 						if (result < successfulSegments) {
 							successfulSegments = result;
 						}
 					}
 				});
+				callback(successfulSegments);
 				console.log("Finished path generation" + (this.name == "" ? "" : " for " + this.name));
 			} catch (e) {
 				console.log("Failed to generate path" + (this.name == "" ? "" : " for " + this.name));
@@ -152,9 +164,9 @@ export class Depot extends AreaBase implements IReducedSaveData {
 
     public generateTempDepartures() {
 		this.tempDepartures.length = 0;
-		/*if (this.useRealTime && !this.transportMode!.continuousMovement) {
-			this.tempDepartures.addAll(departures);
-		} else if (world != null) {*/
+		if (this.useRealTime && !this.transportMode!.continuousMovement) {
+			this.tempDepartures.push(...this.departures);
+		} else if (world != null) {
 			let millisOffset: number = 0;
 			while (millisOffset < Depot.MILLISECONDS_PER_DAY) {
 				let tempFrequency: number = this.getFrequency(Depot.getHour(millisOffset));
@@ -166,7 +178,7 @@ export class Depot extends AreaBase implements IReducedSaveData {
 				}
 			}
 			this.tempDepartures.sort(Integer.compare);
-		// }
+		}
 		this.isDirty = false;
 	}
 

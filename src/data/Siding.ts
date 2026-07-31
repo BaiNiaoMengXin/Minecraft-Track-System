@@ -22,6 +22,7 @@ import { IReducedSaveData } from "./IReducedSaveData";
 import { Integer } from "jLib/Math";
 import { MessagePackHelper } from "./MessagePackHelper";
 import { UUID } from "jLib/UUID";
+import { MTS } from "MTS";
 
 export class Siding extends SavedRailBase implements IReducedSaveData {
 	private depot: Depot | null = null;
@@ -34,7 +35,7 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
 	private maxManualSpeed: number = 0;
 	private repeatIndex1: number = 0;
 	private repeatIndex2: number = 0;
-	private readonly accelerationConstant: number;
+	private accelerationConstant: number;
 
 	public readonly railLength: number = 0;
     private readonly path: PathData[] = [];
@@ -108,6 +109,18 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
             acceleration_constant: this.accelerationConstant,
 			path: Array.from(this.path, data => data.toMessagePack())
 		} as const;
+	}
+
+	public setUnlimitedTrains(unlimitedTrains: boolean, maxTrains: number, isManual: boolean, maxManualSpeed: number, accelerationConstant: number, newDwellTime: number, clearTrains: boolean): void {
+		const tempAccelerationConstant = RailwayData.round(accelerationConstant, 3);
+		this.unlimitedTrains = this.transportMode.continuousMovement || unlimitedTrains;
+		this.maxTrains = maxTrains;
+		this.isManual = isManual;
+		this.maxManualSpeed = maxManualSpeed;
+		this.accelerationConstant = this.transportMode.continuousMovement ? Train.MAX_ACCELERATION : tempAccelerationConstant;
+		if (clearTrains) {
+			this.clearTrains();
+		}
 	}
 
     public getTrainId(): string {
@@ -269,6 +282,22 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
 
     public isValidVehicle(spacing: number): boolean {
         return Math.max(2, this.railLength) >= spacing;
+    }
+
+	public getMaxTrains(): number {
+		return this.maxTrains;
+	}
+
+	public getIsManual(): boolean {
+		return this.isManual;
+	}
+
+	public getMaxManualSpeed(): number {
+		return this.maxManualSpeed;
+	}
+
+	public getUnlimitedTrains(): boolean {
+		return this.unlimitedTrains;
     }
 
 	public clearTrains(): void {

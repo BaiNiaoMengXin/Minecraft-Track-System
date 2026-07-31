@@ -563,32 +563,32 @@ export class RailActionType {
 export class RailActions {
 
     private distance: number;
-    private tickingAreaFlag: number = 0;// 0 -> not loaded, 1 -> loading, 2 -> loaded
+    private tickingAreaFlag: number = 0;// 0 -> Unloaded, 1 -> loading, 2 -> loaded
 
     public readonly id: number;
-    private readonly dimension = world.getDimension("overworld");
-    private readonly playerId: string;
-    private readonly railActionType: RailActionType;
+    public readonly railActionType: RailActionType;
+    public readonly playerName: string;
+    public readonly length: number;
+    public readonly permutation: BlockPermutation;
+    private readonly dimension;
     private readonly rail: Rail;
     private readonly radius: number;
     private readonly height: number;
-    private readonly length: number;
-    private readonly permutation: BlockPermutation;
     private readonly blacklistedPos: Set<Vector3> = new Set();
 
-    private static readonly INCREMENT = 0.2;
+    private static readonly INCREMENT = 0.1;
 
     public constructor(player: Player, railActionType: RailActionType, rail: Rail, radius: number, height: number, permutation: BlockPermutation) {
         this.id = generateUniqueNumberID();
-        this.playerId = player.id;
         this.railActionType = railActionType;
+        this.playerName = player.name;
+        this.length = rail.getLength();
+        this.permutation = permutation;
+        this.dimension = player.dimension;
         this.rail = rail;
         this.radius = radius;
         this.height = height;
-        this.permutation = permutation;
-        this.length = rail.getLength();
         this.distance = 0;
-        
     }
 
     public build() {
@@ -667,7 +667,7 @@ export class RailActions {
     }
 
     private create(includeMiddle: boolean, consumer: (pos: Vec3) => void): boolean {
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 1; i++) {
             const pos1 = this.rail.getPosition(this.distance);
             this.distance += RailActions.INCREMENT;
             const pos2 = this.rail.getPosition(this.distance);
@@ -698,7 +698,7 @@ export class RailActions {
     }
 
     private showProgressMessage(percentage: number): void {
-        const player = world.getAllPlayers().find(p => p.id === this.playerId);
+        const player = world.getAllPlayers().find(p => p.name === this.playerName);
         if (player != undefined) {
             player.onScreenDisplay.setActionBar({
                 translate: "gui.mts." + this.railActionType.progressTranslation,

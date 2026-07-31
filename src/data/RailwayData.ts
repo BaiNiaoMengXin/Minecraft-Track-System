@@ -173,11 +173,11 @@ export class RailwayData {
 		return this.schedulesForPlatform.get(platformId) ?? null;
 	}
 
-	public getUseTimeAndWindSync(): boolean {
+	public getUseTimeSync(): boolean {
 		return this.useTimeSync;
 	}
 
-	public setUseTimeAndWindSync(useTimeAndWindSync: boolean): void {
+	public setUseTimeSync(useTimeAndWindSync: boolean): void {
 		this.useTimeSync = useTimeAndWindSync;
 		this.runRealTimeSync();
 	}

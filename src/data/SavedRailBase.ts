@@ -102,7 +102,7 @@ export class SavedRailBase extends NameColorDataBase {
     }
 
 	public static isInvalidSavedRail(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>, pos1: BlockPos, pos2: BlockPos): boolean {
-		return !RailwayData.containsRail(rails, pos1, pos2) || !rails.get(pos1)!.get(pos2)!.railType.hasSavedRail;
+		return !RailwayData.containsRail(rails, pos1, pos2) || !rails.get(pos1)?.get(pos2)?.railType.hasSavedRail;
 	}
 
 
@@ -130,12 +130,21 @@ export class SavedRailBase extends NameColorDataBase {
 	}
 
     getDwellTime(): number {
-        if (this.dwellTime! <= 0 || this.dwellTime! > SavedRailBase.MAX_DWELL_TIME) {
+        if (this.dwellTime <= 0 || this.dwellTime > SavedRailBase.MAX_DWELL_TIME) {
             this.dwellTime = SavedRailBase.DEFAULT_DWELL_TIME;
         }
-        return this.transportMode!.continuousMovement ? 1 : this.dwellTime!;
+        return this.transportMode.continuousMovement ? 1 : this.dwellTime;
     }
 
+	public setDwellTime(newDwellTime: number) {
+		if (this.transportMode.continuousMovement) {
+			this.dwellTime = 1;
+		} else if (newDwellTime <= 0 || newDwellTime > SavedRailBase.MAX_DWELL_TIME) {
+			this.dwellTime = SavedRailBase.DEFAULT_DWELL_TIME;
+		} else {
+			this.dwellTime = newDwellTime;
+		}
+	}
 	
     public override compareTo(compare: NameColorDataBase): number {
         const thisIsNumber = !isNaN(parseFloat(this.name));
