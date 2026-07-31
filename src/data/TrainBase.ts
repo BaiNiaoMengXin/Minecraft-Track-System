@@ -40,12 +40,12 @@ export abstract class TrainBase extends NameColorDataBase {
 	public readonly maxManualSpeed: number;
 	public readonly manualToAutomaticTime: number;
 	public readonly path: PathData[];
-	public readonly ridingEntities: Map<string, Entity> =  new Map();
+	public readonly ridingEntities: Map<string, Entity> = new Map();
 
 	protected readonly distances: number[];
 	protected readonly repeatIndex1: number;
 	protected readonly repeatIndex2: number;
-	
+
 	// protected readonly SimpleContainer inventory;
 
 	private readonly railLength: number;
@@ -60,17 +60,17 @@ export abstract class TrainBase extends NameColorDataBase {
 	public constructor(id: number, sidingId: number, railLength: number, trainId: string, baseTrainType: string, trainCars: number, path: PathData[], distances: number[], repeatIndex1: number, repeatIndex2: number, accelerationConstant: number, isManualAllowed: boolean, maxManualSpeed: number, manualToAutomaticTime: number);
 
 	public constructor(
-			sidingId: number, railLength: number,
-			path: PathData[], distances: number[], repeatIndex1: number, repeatIndex2: number,
-			accelerationConstant: number, isManualAllowed: boolean, maxManualSpeed: number, manualToAutomaticTime: number,
-			map: Record<string, unknown>
+		sidingId: number, railLength: number,
+		path: PathData[], distances: number[], repeatIndex1: number, repeatIndex2: number,
+		accelerationConstant: number, isManualAllowed: boolean, maxManualSpeed: number, manualToAutomaticTime: number,
+		map: Record<string, unknown>
 	)
-	
+
 	public constructor(
-			arg1: number, arg2: number,
-			arg3: number | PathData[], arg4: string | number[], arg5: string | number, arg6: number,
-			arg7: PathData[] | number, arg8: number[] | boolean, arg9: number, arg10: number,
-			arg11: number | Record<string, unknown>, arg12?: boolean, arg13?: number, arg14?: number
+		arg1: number, arg2: number,
+		arg3: number | PathData[], arg4: string | number[], arg5: string | number, arg6: number,
+		arg7: PathData[] | number, arg8: number[] | boolean, arg9: number, arg10: number,
+		arg11: number | Record<string, unknown>, arg12?: boolean, arg13?: number, arg14?: number
 	) {
 		if (arg14 != undefined) {
 			super(arg1);
@@ -129,7 +129,7 @@ export abstract class TrainBase extends NameColorDataBase {
 			this.width = TrainType.getWidth(this.baseTrainType);
 			this.trainCars = Math.min(this.transportMode.maxLength, Math.floor(this.railLength / this.spacing));
 			this.isCurrentlyManual = messagePackHelper.getBoolean("is_currently_manual");
-			
+
 			this.isOnRoute = messagePackHelper.getBoolean("is_on_route");
 
 			messagePackHelper.iterateArrayValue("riding_entities", (v, i) => {
@@ -340,15 +340,15 @@ export abstract class TrainBase extends NameColorDataBase {
 							this.startUp(this.trainCars, this.spacing, isOppositeRail);
 						}
 					} else {
-                        const checkIndex = this.getIndex(0, this.spacing, true) + 1;
-                        if (this.isRailBlocked(checkIndex)) {
-                            this.nextStoppingIndex = checkIndex - 1;
-                        } else if (this.nextPlatformIndex > 0 && this.nextPlatformIndex < this.path.length) {
-                            this.nextStoppingIndex = this.nextPlatformIndex;
-                            if (this.manualNotch < -2) {
-                                this.manualNotch = 0;
-                            }
-                        }
+						const checkIndex = this.getIndex(0, this.spacing, true) + 1;
+						if (this.isRailBlocked(checkIndex)) {
+							this.nextStoppingIndex = checkIndex - 1;
+						} else if (this.nextPlatformIndex > 0 && this.nextPlatformIndex < this.path.length) {
+							this.nextStoppingIndex = this.nextPlatformIndex;
+							if (this.manualNotch < -2) {
+								this.manualNotch = 0;
+							}
+						}
 
 						const stoppingDistance = this.distances[this.nextStoppingIndex] - this.railProgress;
 						if (!this.transportMode.continuousMovement && stoppingDistance < 0.5 * this.speed * this.speed / this.accelerationConstant) {
@@ -399,9 +399,9 @@ export abstract class TrainBase extends NameColorDataBase {
 				for (let i = 0; i <= this.trainCars; i++) {
 					positions[i] = this.getRoutePosition(this.reversed ? this.trainCars - i : i, this.spacing);
 				}
-                
+
 				if (this.handlePositions(positions, ticksElapsed)) {
-                    
+
 					const prevX: number[] = [0];
 					const prevY: number[] = [0];
 					const prevZ: number[] = [0];
@@ -412,12 +412,12 @@ export abstract class TrainBase extends NameColorDataBase {
 						const ridingCar = i;
 						this.calculateCar(positions, i, totalDwellTicks, (x, y, z, yaw, pitch, realSpacing, doorLeftOpen, doorRightOpen) => {
 							this.simulateCar(
-									ridingCar, ticksElapsed,
-									x, y, z,
-									yaw, pitch,
-									prevX[0], prevY[0], prevZ[0],
-									prevYaw[0], prevPitch[0],
-									doorLeftOpen, doorRightOpen, realSpacing
+								ridingCar, ticksElapsed,
+								x, y, z,
+								yaw, pitch,
+								prevX[0], prevY[0], prevZ[0],
+								prevYaw[0], prevPitch[0],
+								doorLeftOpen, doorRightOpen, realSpacing
 							);
 							prevX[0] = x;
 							prevY[0] = y;
@@ -471,10 +471,10 @@ export abstract class TrainBase extends NameColorDataBase {
 	}
 
 	protected abstract simulateCar(
-			ridingCar: number, ticksElapsed: number,
-			carX: number, carY: number, carZ: number, carYaw: number, carPitch: number,
-			prevCarX: number, prevCarY: number, prevCarZ: number, prevCarYaw: number, prevCarPitch: number,
-			doorLeftOpen: boolean, doorRightOpen: boolean, realSpacing: number
+		ridingCar: number, ticksElapsed: number,
+		carX: number, carY: number, carZ: number, carYaw: number, carPitch: number,
+		prevCarX: number, prevCarY: number, prevCarZ: number, prevCarYaw: number, prevCarPitch: number,
+		doorLeftOpen: boolean, doorRightOpen: boolean, realSpacing: number
 	): void;
 
 	protected abstract handlePositions(positions: Vec3[], ticksElapsed: number): boolean;
@@ -490,9 +490,9 @@ export abstract class TrainBase extends NameColorDataBase {
 	protected abstract asin(value: number): number;
 
 	private isOppositeRail(): boolean {
-		return this.path.length > this.nextStoppingIndex + 1 && 
-            this.railProgress == this.distances[this.nextStoppingIndex] && 
-            this.path[this.nextStoppingIndex].isOppositeRail(this.path[this.nextStoppingIndex + 1]);
+		return this.path.length > this.nextStoppingIndex + 1 &&
+			this.railProgress == this.distances[this.nextStoppingIndex] &&
+			this.path[this.nextStoppingIndex].isOppositeRail(this.path[this.nextStoppingIndex + 1]);
 	}
 
 	private getRailProgress_(car: number, trainSpacing: number): number {
