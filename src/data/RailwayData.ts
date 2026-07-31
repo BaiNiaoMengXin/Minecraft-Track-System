@@ -368,15 +368,11 @@ export class RailwayData {
 		return Math.round(value * factor) / factor;
 	}
 
-	public static chunkLoaded(pos: BlockPos): boolean {
-		const chunX = Math.floor(pos.getX() / 16);
-		const chunZ = Math.floor(pos.getZ() / 16);
-		try {
-			const chunk = world.getDimension("overworld").getBlock({ x: chunX * 16, y: 0, z: chunZ * 16 });
-			return chunk != undefined;
-		} catch (e) {
-			return false;
-		}
+	public static chunkLoaded(pos: BlockPos): boolean;
+	public static chunkLoaded(pos: Vector3): boolean;
+
+	public static chunkLoaded(pos: BlockPos | Vector3): boolean {
+		return world.getDimension("overworld").isChunkLoaded(pos instanceof BlockPos ? pos.asJson() : pos);
 	}
 
 	public static isBetween(value: number, value1: number, value2: number, padding: number = 0): boolean {
