@@ -71,7 +71,7 @@ export class ConfigFile {
 		let doorCloseSoundLength = 1;
 
 		for (const line of lines) {
-			const trimLine = line.trim().replaceAll("\\s*(;|#|//).+", "");
+			const trimLine = line.trim().replaceAll(/\s*(;|#|\/\/).+/g, "");
 			if (trimLine == "") {
 				continue;
 			}
@@ -82,8 +82,8 @@ export class ConfigFile {
 					continue;
 				}
 
-				const key = tokens[0].trim().toLowerCase().replaceAll("\\s", "");
-				const value = tokens[1].trim().toLowerCase().replace("\\", "/").replaceAll("\\.wav|\\s|.+/", "");
+				const key = tokens[0].trim().toLowerCase().replaceAll(/\s/g, "");
+				const value = tokens[1].trim().toLowerCase().replace(/\\/g, "/").replaceAll(/\.wav|\\s|.+\//g, "");
 				if (value == "") {
 					continue;
 				}
