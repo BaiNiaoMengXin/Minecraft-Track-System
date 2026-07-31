@@ -514,25 +514,18 @@ export abstract class TrainBase extends NameColorDataBase {
 		const offsetVec = new Vec3(1, 0, 0).yRot(checkYaw).xRot(pitch);
 		const traverseVec = new Vec3(0, 0, 1).yRot(checkYaw).xRot(pitch);
 
-		for (let checkX = 1; checkX <= 3; checkX++) {
-			for (let checkY = -2; checkY <= 3; checkY++) {
-				for (let checkZ = -halfSpacing; checkZ <= halfSpacing; checkZ++) {
-					const checkPos = {
-						x: trainX + offsetVec.x * checkX + traverseVec.x * checkZ,
-						y: trainY + checkY,
-						z: trainZ + offsetVec.z * checkX + traverseVec.z * checkZ
-					};
-					const block = world.getDimension("overworld").getBlock(checkPos);
-
-					// if (block instanceof BlockPlatform || block instanceof BlockPSDAPGBase) {
-						if (this.openDoors_(block!, checkPos, dwellTicks)) {
-							return true;
-						}
-						hasPlatform = true;
-					// }
-				}
-			}
-		}
+		hasPlatform = world.getDimension("overworld").containsBlock(
+			new BlockVolume({
+				x: trainX + offsetVec.x + traverseVec.x * -halfSpacing,
+				y: trainY - 2,
+				z: trainZ + offsetVec.z + traverseVec.z * -halfSpacing
+			}, {
+				x: trainX + offsetVec.x * 3 + traverseVec.x * halfSpacing,
+				y: trainY + 3,
+				z: trainZ + offsetVec.z * 3 + traverseVec.z * halfSpacing
+			}),
+			{ includeTypes: ["mts:platform"] }
+		);
 
 		return hasPlatform;
 	}
