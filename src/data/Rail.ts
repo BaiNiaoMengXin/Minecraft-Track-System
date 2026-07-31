@@ -351,7 +351,7 @@ export class Rail extends SerializedDataBase {
         let tickingAreaId = "";
         if (!RailwayData.chunkLoaded(this.getPosition(0)) || !RailwayData.chunkLoaded(this.getPosition(length))) {
             tickingAreaId = String(generateUniqueNumberID());
-        await this.createTickingArea(tickingAreaId, dimensionId);
+            await this.createTickingArea(tickingAreaId, dimensionId);
         }
 
         for (let i = 0; i < mobelSetCount; i++) {
@@ -379,7 +379,7 @@ export class Rail extends SerializedDataBase {
         }
 
         if (tickingAreaId != "") {
-        world.tickingAreaManager.removeTickingArea(tickingAreaId);
+            world.tickingAreaManager.removeTickingArea(tickingAreaId);
         }
     }
 
