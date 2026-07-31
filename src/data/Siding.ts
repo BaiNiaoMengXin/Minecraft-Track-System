@@ -239,9 +239,9 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
 		const railProgressSet: number[] = [];
 		const trainsToRemove: Train[] = [];
 		for (const train of this.trains) {
-			// if (train.isCurrentlyManual_() && railwayDataDriveTrainModule.drive(train)) {
-			// 	trainsToSync.push(train);
-			// }
+			if (train.isCurrentlyManual_() && MTS.railwayData.railwayDataDriveTrainModule.drive(train)) {
+				// trainsToSync.push(train);
+			}
 
 			if (train.simulateTrain(1, this.depot, dataCache, trainPositions, schedulesForPlatform)) {
 				// trainsToSync.push(train);
@@ -298,7 +298,7 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
 
 	public getUnlimitedTrains(): boolean {
 		return this.unlimitedTrains;
-    }
+	}
 
 	public clearTrains(): void {
 		this.trains.forEach(train => train.dispose());
