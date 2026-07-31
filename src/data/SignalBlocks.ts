@@ -8,8 +8,8 @@ import { MessagePackHelper } from "./MessagePackHelper";
 
 export class SignalBlocks {
 
-	private readonly railToSignalBlocks: Map<UUID, Array<SignalBlock>> = new Map();
-	public readonly signalBlocks: ArrayList<SignalBlock> = new ArrayList();
+	private readonly railToSignalBlocks = new BetterMap<UUID, Array<SignalBlock>>;
+	public readonly signalBlocks = new ArrayList<SignalBlock>();
 
 	public add(id: number, color: DyeColor, rail: UUID): number {
 		const connectedSignalBlocks = new ArrayList<SignalBlock>();
