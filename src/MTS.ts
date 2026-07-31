@@ -1,4 +1,7 @@
-import { EntityComponentTypes, Player, system, world } from "@minecraft/server";
+import { BlockVolume, Entity, EntityComponentTypes, Player, system, world } from "@minecraft/server";
+import { BlockBase } from "block/BlockBase";
+import { EntityInsideableBlock } from "block/EntityInsideableBlock";
+import { Blocks } from "Blocks";
 import { Rail } from "data/Rail";
 import { RailType } from "data/RailType";
 import { RailwayData } from "data/RailwayData";
@@ -7,6 +10,7 @@ import { ItemBlockClickingBase } from "item/ItemBlockClickingBase";
 import { Items } from "Items";
 import { RenderRail } from "render/RenderRail";
 import { BlockPos } from "util/math/BlockPos";
+import { Vec3 } from "util/math/Vec3";
 
 export namespace MTS {
 
@@ -63,9 +67,17 @@ export namespace MTS {
     }, RAIL_RENDER_DURATION);
 
 
-    const registeredItem: Map<string, ItemBase> = new Map();
+    export const registeredItem: Map<string, ItemBase> = new Map();
+    export const registeredBlock: Map<string, BlockBase> = new Map();
 
     (function init() {
+
+        registeredBlock.set("mts:ticket_machine", Blocks.TICKET_MACHINE);
+        registeredBlock.set("mts:ticket_processor", Blocks.TICKET_PROCESSOR);
+        registeredBlock.set("mts:ticket_processor_entrance", Blocks.TICKET_PROCESSOR_ENTRANCE);
+        registeredBlock.set("mts:ticket_processor_exit", Blocks.TICKET_PROCESSOR_EXIT);
+        registeredBlock.set("mts:ticket_processor_enquiry", Blocks.TICKET_PROCESSOR_ENQUIRY);
+
         registeredItem.set("mts:rail_connector_20", Items.RAIL_CONNECTOR_20);
         registeredItem.set("mts:rail_connector_20_one_way", Items.RAIL_CONNECTOR_20_ONE_WAY);
         registeredItem.set("mts:rail_connector_40", Items.RAIL_CONNECTOR_40);
@@ -97,6 +109,41 @@ export namespace MTS {
                 }
             })
         });
+
+        world.beforeEvents.playerBreakBlock.subscribe(event => {
+            system.run(() => {
+                registeredBlock.get(event.block.typeId)?.playerWillDestroy(event);
+            })
+        });
+
+        world.beforeEvents.playerInteractWithBlock.subscribe(event => {
+            system.run(() => {
+                registeredBlock.get(event.block.typeId)?.use(event);
+            });
+        });
+
+        const entityInsideableBlockTypes: Array<string> = []
+        registeredBlock.forEach((instance, typeId) => {
+            if ((instance as EntityInsideableBlock).isEntityInsideableBlock) {
+                entityInsideableBlockTypes.push(typeId);
+            }
+        });
+        system.runInterval(() => {
+            const dimension = world.getDimension("overworld");
+
+            if (entityInsideableBlockTypes)
+            for (const player of world.getAllPlayers()) {
+                const boxCenter = Vec3.fromVector3(player.location);
+                const blocks = dimension.getBlocks(
+                    new BlockVolume({ x: boxCenter.x - 1, y: boxCenter.y - 1, z: boxCenter.y - 1 }, { x: boxCenter.x + 1, y: boxCenter.y + 1, z: boxCenter.y + 1 }),
+                    { includeTypes: entityInsideableBlockTypes }
+                );
+                for (const pos of blocks.getBlockLocationIterator()) {
+                    const block = dimension.getBlock(pos)!;
+                    (registeredBlock.get(block.typeId) as EntityInsideableBlock).entityInside(player, block);
+                }
+            }
+        }, 4)
 
         system.runInterval(() => {
             world.sendMessage("auto saving Minecraft Track System game data...");// debug
