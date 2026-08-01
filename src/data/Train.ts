@@ -603,7 +603,7 @@ export class Train extends TrainBase {
 		}
 	}
 
-    private static showShiftProgressBar(player: Player) {
+    public static showShiftProgressBar(player: Player) {
         if (!MTS.railwayData.railwayDataCoolDownModule.playerShiftCoolDowns.has(player)) {
             MTS.railwayData.railwayDataCoolDownModule.playerShiftCoolDowns.set(player, [0, 0]);
         }
