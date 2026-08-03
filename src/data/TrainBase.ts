@@ -524,7 +524,7 @@ export abstract class TrainBase extends NameColorDataBase {
 				y: trainY + 3,
 				z: trainZ + offsetVec.z * 3 + traverseVec.z * halfSpacing
 			}),
-			{ includeTypes: ["mts:platform"] }
+			{ includeTags: ["mts:platform"] }
 		);
 
 		return hasPlatform;
