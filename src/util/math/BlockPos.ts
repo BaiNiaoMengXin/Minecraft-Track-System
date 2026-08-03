@@ -1,4 +1,5 @@
 import { JavaObject } from "jLib/Object";
+import { Direction } from "./Direction";
 
 /**
  * Please do not "JSON.strify" it; use its "asJson" method instead.
@@ -138,6 +139,18 @@ export class BlockPos implements JavaObject {
     normalize(): BlockPos {
         const d = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         return d < 1.0E-5 ? new BlockPos(0, 0, 0) : new BlockPos(this.x / d, this.y / d, this.z / d);
+    }
+
+    relative(direction: Direction, steps: number = 1): BlockPos {
+        return steps == 0 ? this : new BlockPos(this.x + direction.getStepX() * steps, this.y + direction.getStepY() * steps, this.z + direction.getStepZ() * steps);
+    }
+
+    above(steps: number = 1): BlockPos {
+        return steps == 0 ? this : new BlockPos(this.x, this.y + Direction.UP.getStepY() * steps, this.z);
+    }
+
+    below(steps: number = 1): BlockPos {
+        return steps == 0 ? this : new BlockPos(this.x, this.y + Direction.DOWN.getStepY() * steps, this.z);
     }
 
     getX() { return this.x; }
