@@ -44,7 +44,7 @@ export class RailwayData {
 	private useTimeSync: boolean = false;
 
 	private readonly rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>> = new BetterMap();
-	private readonly signalBlocks: SignalBlocks = new SignalBlocks()
+	public readonly signalBlocks: SignalBlocks = new SignalBlocks()
 
 	private readonly railwayDataFileSaveModule: RailwayDataFileSaveModule;
 

@@ -1,8 +1,13 @@
-import { MolangVariableMap, Player, Vector3, world } from "@minecraft/server";
+import { MolangVariableMap, Player, system, Vector3, world } from "@minecraft/server";
 import { rgbHexToColor } from "data/Base";
 import { Rail } from "data/Rail";
 import { RailType } from "data/RailType";
+import { MTS } from "MTS";
+import { MTSClient } from "MTSClient";
+import { PathData } from "path/PathData";
 import { ParticleSystem, particleType } from "rail/ParticleSystem";
+import { DyeColor } from "util/DyeColor";
+import { BlockPos } from "util/math/BlockPos";
 import { Mth } from "util/math/Mth";
 import { Vec3 } from "util/math/Vec3";
 
@@ -49,14 +54,15 @@ export namespace RenderRail {
     }
 
     export function particleRenderRailStandard(rail: Rail, yOffset: number, opacity: number, railWidth: number, player: Player | null, useLOD: boolean, duration: number): void {
-        const maxRenderDistance = player ? Math.max(player.clientSystemInfo.maxRenderDistance - 2, 1) * 16 : -1;
+        const maxRenderDistance = 4 * 16;
         const railLength = rail.getLength();
+        const dimension = world.getDimension("overworld");
 
         if (rail.railType == RailType.NONE) {
-            let lastPoint = rail.getPosition(MIN_RENDER_PRECISION / 2);
+            let lastPoint = rail.getPosition(0);
             
             let flag = false;
-            for (let i = MIN_RENDER_PRECISION * 1.5; ; i += MIN_RENDER_PRECISION) {
+            for (let i = 1.5; ; i += 1.5) {
                 if (i > railLength) {
                     if (!flag) {
                         flag = true;
@@ -152,6 +158,73 @@ export namespace RenderRail {
                 }
     
                 lastPoints = newPoints;
+            }
+        }
+    }
+
+
+    export function particleRenderSignalsStandard(rail: Rail, startPos: BlockPos, endPos: BlockPos, player: Player, duration: number): void {
+        const maxRenderDistance = 4 * 16;
+        const railLength = rail.getLength();
+
+        const signalBlocks = MTS.railwayData.signalBlocks.getSignalBlocksAtTrack(PathData.getRailProduct(startPos, endPos));
+
+        const referenceWidth = 1 / 16;
+
+		for (let i = 0; i < signalBlocks.length; i++) {
+			const signalBlock = signalBlocks[i];
+			const shouldGlow = signalBlock.isOccupied() && system.currentTick % 20 < 10;
+			// const particleId = shouldGlow ? particleType.show2 : "mts:white_wool";
+			const particleId = particleType.show2;
+			const width = referenceWidth * i + 1 - referenceWidth * signalBlocks.length / 2;
+
+			const color = rgbHexToColor(0xFF000000 | signalBlock.dyeColor.materialColor);
+
+            color.red = Math.min(color.red + (shouldGlow ? 0.3 : 0), 1);
+            color.green = Math.min(color.green + (shouldGlow ? 0.3 : 0), 1);
+            color.blue = Math.min(color.blue + (shouldGlow ? 0.3 : 0), 1);
+
+            let lastPoint = rail.getPosition(0);
+            
+            let flag = false;
+            for (let i = getLODResolution(player, lastPoint); ; i += getLODResolution(player, lastPoint)) {
+                if (i > railLength) {
+                    if (!flag) {
+                        flag = true;
+                    } else {
+                        break;
+                    }
+                }
+
+                const newPoint = rail.getPosition(i);
+                const middlePos = lastPoint.lerp(newPoint, 0.5);
+                
+                const l = lastPoint.distanceTo(newPoint) / 2;
+
+                const dx = newPoint.getX() - lastPoint.getX()
+                const dy = newPoint.getY() - lastPoint.getY()
+                const dz = newPoint.getZ() - lastPoint.getZ()
+                const yaw = Math.atan2(dz, dx)
+                const pitch = Math.atan2(dy, Math.sqrt(dx * dx + dz * dz))
+
+                if (player.dimension.isChunkLoaded(middlePos))
+                {
+
+                    ParticleSystem.layParticle(
+                        particleId,
+                        middlePos.add(0, 0.03125, 0),
+                        {
+                            x: Math.cos(pitch) * Math.cos(yaw),
+                            y: Math.sin(pitch),
+                            z: Math.cos(pitch) * Math.sin(yaw)
+                        },
+                        {x: width, y: l},
+                        color,
+                        duration / 2
+                    )
+                }
+    
+                lastPoint = newPoint;
             }
         }
     }

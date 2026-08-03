@@ -26,27 +26,25 @@ export namespace MTS {
 
     system.runInterval(() => {
         const tempRailsToStandardRender = new Set<Rail>()
-        world.getAllPlayers().forEach(player => {
-            const inventory = player.getComponent(EntityComponentTypes.Inventory);
-            if (inventory) {
-                const itemStack = inventory.container.getItem(player.selectedSlotIndex);
-                const rails = railwayData.getRails();
+        const rails = railwayData.getRails();
 
-                if (itemStack && Array.from(registeredItem.keys()).some(id => itemStack.typeId.startsWith(id))) {
+
+        world.getAllPlayers().forEach(player => {
+            const itemStack = player.getComponent(EntityComponentTypes.Inventory)?.container.getItem(player.selectedSlotIndex);
+            if (itemStack) {
+                const typeId = itemStack.typeId;
+
+                const isBlockClicking = registeredItem.has(typeId) ? (registeredItem.get(typeId) instanceof ItemBlockClickingBase) : (typeId.endsWith(ItemBlockClickingBase.SELECTED_END_FLAG) && registeredItem.has(typeId.substring(0, typeId.length - ItemBlockClickingBase.SELECTED_END_FLAG.length)) && (registeredItem.get(typeId.substring(0, typeId.length - ItemBlockClickingBase.SELECTED_END_FLAG.length)) instanceof ItemBlockClickingBase));
+                if (isBlockClicking) {
                     rails.forEach((innerMap, posStart) => {
-                        if (posInPlayerRenderRange(posStart, player)) {
                             innerMap.forEach((rail, posEnd) => {
+                            if (posInPlayerRenderRange(posStart, player) || posInPlayerRenderRange(posEnd, player)) {
                                 if (!rail.railType.hasSavedRail) {
                                 	tempRailsToStandardRender.add(rail);
                                 }
-                            });
-                        } else {
-                            innerMap.forEach((rail, posEnd) => {
-                                if (posInPlayerRenderRange(posEnd, player) && !rail.railType.hasSavedRail) {
-                                    tempRailsToStandardRender.add(rail);
+                                RenderRail.particleRenderSignalsStandard(rail, posStart, posEnd, player, RAIL_RENDER_DURATION);
                                 }
                             });
-                        }
                     });
                 }
             }
@@ -62,7 +60,16 @@ export namespace MTS {
         		}
         	}
         })
-        railsToStandardRender.forEach(rail => rail.getEntities().forEach(entity => entity.setProperty("mts:variant", 50)));
+        railsToStandardRender.forEach(rail => {
+            const entities = rail.getEntities() as Set<Entity>;
+            entities.forEach(entity => {
+                if (entity.isValid) {
+                    entity.setProperty("mts:variant", 50)
+                } else {
+                    entities.delete(entity);
+                }
+            });
+        });
         railsToStandardRender = tempRailsToStandardRender;
     }, RAIL_RENDER_DURATION);
 
