@@ -14,8 +14,8 @@ export class RouteType {
 		RouteType.$VALUES.push(this);
 	}
 
-	public static values(): RouteType[] {
-		return Array.from(this.$VALUES);
+	public static values(): ReadonlyArray<RouteType> {
+		return this.$VALUES;
 	}
 
 	public static valueOf(str: string): RouteType {
