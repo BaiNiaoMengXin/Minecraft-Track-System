@@ -7,7 +7,6 @@ import { Station } from "./Station";
 import { NameColorDataBase } from "./NameColorDataBase";
 import { SavedRailBase } from "./SavedRailBase";
 import { AreaBase } from "./AreaBase";
-import { RailwayDataRouteFinderModule } from "./RailwayDataRouteFinderModule";
 import { BetterMap } from "./BetterMap";
 
 export class DataCache {
@@ -25,7 +24,6 @@ export class DataCache {
 	public readonly stationIdToConnectingStations: Map<Station, Set<Station>>  = new Map();
 	public readonly blockPosToStation: BetterMap<BlockPos, Station> = new BetterMap();
 	public readonly blockPosToPlatformId: Map<bigint, number> = new Map();
-	public readonly platformConnections: Map<bigint, Map<bigint, RailwayDataRouteFinderModule.ConnectionDetails>> = new Map();
 
     public readonly stations: Set<Station>;
     public readonly platforms: Set<Platform>;
@@ -56,39 +54,6 @@ export class DataCache {
 			this.depots.forEach(depot => {
 				depot.routeIds.removeIf(routeId => this.routeIdMap.get(routeId) == null);
 				depot.routeIds.forEach(routeId => this.routeIdToOneDepot.set(routeId, depot));
-			});
-
-			this.platformConnections.clear();
-			this.routes.forEach(route => {
-				const depot = this.routeIdToOneDepot.get(route.id);
-				if (depot != null) {
-					for (let i = 1; i < route.platformIds.length; i++) {
-						const prevPlatformId = route.platformIds[i - 1].platformId;
-						const thisPlatformId = route.platformIds[i].platformId;
-						const prevPlatform = this.platformIdMap.get(prevPlatformId);
-						const thisPlatform = this.platformIdMap.get(thisPlatformId + 1);
-						if (prevPlatform != null && thisPlatform != null) {
-							const duration = DataCache.tryGet(depot.platformTimes, prevPlatformId, thisPlatformId, 0);
-							if (duration > 0) {
-								const thisPlatformPosLong = thisPlatform.getMidPos().asLong();
-								DataCache.put(this.platformConnections, prevPlatform.getMidPos().asLong(), thisPlatformPosLong, oldValue => {
-									const newValue = Math.round(duration);
-									if (oldValue == null) {
-										const connectionDetails = new RailwayDataRouteFinderModule.ConnectionDetails(prevPlatform);
-										connectionDetails.addDurationInfo(route.id, newValue);
-										return connectionDetails;
-									} else {
-										oldValue.addDurationInfo(route.id, newValue);
-										return oldValue;
-									}
-								});
-								if (i == route.platformIds.length - 1 && !this.platformConnections.has(thisPlatformPosLong)) {
-									this.platformConnections.set(thisPlatformPosLong, new Map());
-								}
-							}
-						}
-					}
-				}
 			});
 
 			this.stationIdToConnectingStations.clear();
