@@ -19,7 +19,6 @@ export class DataCache {
 
     public readonly platformIdToStation: Map<number, Station>  = new Map();
 	public readonly sidingIdToDepot: Map<number, Depot> = new Map();
-	public readonly routeIdToOneDepot: Map<number, Depot> = new Map();
 	public readonly stationIdToRoutes: Map<number, Map<number, string>> = new Map();
 	public readonly stationIdToConnectingStations: Map<Station, Set<Station>>  = new Map();
 	public readonly blockPosToStation: BetterMap<BlockPos, Station> = new BetterMap();
@@ -49,12 +48,11 @@ export class DataCache {
 			DataCache.mapIds(this.routeIdMap, this.routes);
 			DataCache.mapIds(this.depotIdMap, this.depots);
 
-			this.routeIdToOneDepot.clear();
 			this.routes.forEach(route => route.platformIds.removeIf(platformId => !this.platformIdMap.has(platformId.platformId)));
 			this.depots.forEach(depot => {
 				depot.routeIds.removeIf(routeId => this.routeIdMap.get(routeId) == null);
-				depot.routeIds.forEach(routeId => this.routeIdToOneDepot.set(routeId, depot));
 			});
+
 
 			this.stationIdToConnectingStations.clear();
 			this.stations.forEach(station1 => {
