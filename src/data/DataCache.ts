@@ -21,7 +21,6 @@ export class DataCache {
 	public readonly sidingIdToDepot: Map<number, Depot> = new Map();
 	public readonly stationIdToRoutes: Map<number, Map<number, string>> = new Map();
 	public readonly stationIdToConnectingStations: Map<Station, Set<Station>>  = new Map();
-	public readonly blockPosToStation: BetterMap<BlockPos, Station> = new BetterMap();
 	public readonly blockPosToPlatformId: Map<bigint, number> = new Map();
 
     public readonly stations: Set<Station>;
@@ -83,7 +82,6 @@ export class DataCache {
 			DataCache.mapSavedRailIdToStation(this.sidingIdToDepot, this.sidings, this.depots);
 
 			this.blockPosToPlatformId.clear();
-			this.blockPosToStation.clear();
 
 			this.depotIdToSidings.clear();
 		} catch (e) {

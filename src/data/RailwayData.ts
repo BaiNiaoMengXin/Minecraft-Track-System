@@ -287,12 +287,13 @@ export class RailwayData {
 		return rails.has(pos1) && rails.get(pos1)!.has(pos2);
 	}
 
-	public static getStation(stations: Set<Station>, dataCache: DataCache, pos: BlockPos) {
-		if (dataCache.blockPosToStation.has(pos)) {
-			return dataCache.blockPosToStation.get(pos)!;
-		} else {
-			return Array.from(stations).find(station => station.inArea(pos.getX(), pos.getZ())) ?? null;
+	public static getStation(stations: Set<Station>, pos: BlockPos): Station | null {
+		for (const station of stations) {
+			if (station.inArea(pos.getX(), pos.getZ())) {
+				return station;
+			}
 		}
+		return null;
 	}
 
 	public static getClosePlatformId(platforms: Set<Platform>, dataCache: DataCache, pos: BlockPos): number;

@@ -21,7 +21,7 @@ export class TicketSystem {
 	public static passThrough(pos: Vector3, player: Player, isEntrance: boolean, isExit: boolean, entrySound: string, entrySoundConcessionary: string, exitSound: string, exitSoundConcessionary: string, failSound: string, remindIfNoRecord: boolean) {
 		const railwayData = MTS.railwayData;
 
-		const station = RailwayData.getStation(railwayData.stations, railwayData.dataCache, new BlockPos(pos));
+		const station = RailwayData.getStation(railwayData.stations, new BlockPos(pos));
 		if (station == null) {
 			return TicketSystem.EnumTicketBarrierOpen.CLOSED;
 		}
