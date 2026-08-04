@@ -201,11 +201,10 @@ export namespace MTS {
         system.runInterval(() => {
             const dimension = world.getDimension("overworld");
 
-            if (entityInsideableBlockTypes)
             for (const player of world.getAllPlayers()) {
-                const boxCenter = Vec3.fromVector3(player.location);
+                const boxCenter = player.location;
                 const blocks = dimension.getBlocks(
-                    new BlockVolume({ x: boxCenter.x - 1, y: boxCenter.y - 1, z: boxCenter.y - 1 }, { x: boxCenter.x + 1, y: boxCenter.y + 1, z: boxCenter.y + 1 }),
+                    new BlockVolume({ x: boxCenter.x - 0.5, y: boxCenter.y - 0.5, z: boxCenter.z - 0.5 }, { x: boxCenter.x + 0.5, y: boxCenter.y + 0.5, z: boxCenter.z + 0.5 }),
                     { includeTypes: entityInsideableBlockTypes }
                 );
                 for (const pos of blocks.getBlockLocationIterator()) {
@@ -213,7 +212,7 @@ export namespace MTS {
                     (registeredBlock.get(block.typeId) as EntityInsideableBlock).entityInside(player, block);
                 }
             }
-        }, 4)
+        }, 2)
 
         world.beforeEvents.entityHurt.subscribe(event => {
             if (event.damageSource.cause != "none" && event.damageSource.cause != "selfDestruct") {
