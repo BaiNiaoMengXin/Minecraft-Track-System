@@ -33,9 +33,9 @@ export class Train extends TrainBase {
 
     private canDeploy: boolean = false;
     private trainPositions: Array<Map<UUID, number>> | undefined;
-	private oldSpeed: number = 0;
+    private oldSpeed: number = 0;
     private oldRailProgress: number = 0;
-	private oldDoorValue: number = 0;
+    private oldDoorValue: number = 0;
 
     private trainEntities: Array<Entity | undefined> = [];
 
@@ -55,17 +55,17 @@ export class Train extends TrainBase {
     public constructor(id: number, sidingId: number, railLength: number, trainId: string, baseTrainType: string, trainCars: number, path: PathData[], distances: number[], repeatIndex1: number, repeatIndex2: number, accelerationConstant: number, timeSegments: TimeSegment[], isManual: boolean, maxManualSpeed: number, manualToAutomaticTime: number);
 
     public constructor(
-            sidingId: number, railLength: number, timeSegments: TimeSegment[],
-			path: PathData[], distances: number[], repeatIndex1: number, repeatIndex2: number,
-			accelerationConstant: number, isManual: boolean, maxManualSpeed: number, manualToAutomaticTime: number,
-			map: Record<string, unknown>
+        sidingId: number, railLength: number, timeSegments: TimeSegment[],
+        path: PathData[], distances: number[], repeatIndex1: number, repeatIndex2: number,
+        accelerationConstant: number, isManual: boolean, maxManualSpeed: number, manualToAutomaticTime: number,
+        map: Record<string, unknown>
     )
 
     public constructor(
-            arg1: number, arg2: number, arg3: number | TimeSegment[],
-			arg4: string | PathData[], arg5: string | number[], arg6: number, arg7: PathData[] | number,
-			arg8: number[] | number, arg9: number | boolean, arg10: number, arg11: number,
-			arg12: TimeSegment[] | Record<string, unknown>, isManual?: boolean, maxManualSpeed?: number, manualToAutomaticTime?: number
+        arg1: number, arg2: number, arg3: number | TimeSegment[],
+        arg4: string | PathData[], arg5: string | number[], arg6: number, arg7: PathData[] | number,
+        arg8: number[] | number, arg9: number | boolean, arg10: number, arg11: number,
+        arg12: TimeSegment[] | Record<string, unknown>, isManual?: boolean, maxManualSpeed?: number, manualToAutomaticTime?: number
     ) {
         if (manualToAutomaticTime != undefined) {
             super(arg1, arg2, arg3 as number, arg4 as string, arg5 as string, arg6, arg7 as PathData[], arg8 as number[], arg9 as number, arg10, arg11, isManual!, maxManualSpeed!, manualToAutomaticTime);
@@ -173,9 +173,9 @@ export class Train extends TrainBase {
         doorLeftOpen: boolean, doorRightOpen: boolean, realSpacing: number
     ): void {
         this.vehicleRiding.mountRider(this.routeId, carX, carY, carZ, realSpacing, this.width, carYaw, carPitch, doorLeftOpen || doorRightOpen, this.isManualAllowed || doorLeftOpen || doorRightOpen, ridingCar, player => !this.isManualAllowed || doorLeftOpen || doorRightOpen || Train.isHoldingKey(player), player => {
-        	if (Train.isHoldingKey(player)) {
-        		this.manualCoolDown = 0;
-        	}
+            if (Train.isHoldingKey(player)) {
+                this.manualCoolDown = 0;
+            }
         }, player => this.justMounted.add(player.id));
 
         const soundPos = { x: carX, y: carY, z: carZ };
@@ -203,58 +203,58 @@ export class Train extends TrainBase {
         const playerNearby: boolean = world.getAllPlayers().some(player => this.isPlayerRiding(player) || trainAABB.contains(player.location));
 
         if (ticksElapsed > 0) {
-            if (this.ridingEntities.size !> 0) {
-            const headIndex = this.getIndex(0, this.spacing, false);
-            const stopIndex = this.path[headIndex].stopIndex - 1;
+            if (this.ridingEntities.size! > 0) {
+                const headIndex = this.getIndex(0, this.spacing, false);
+                const stopIndex = this.path[headIndex].stopIndex - 1;
 
-            const speed = this.speed * 20;
-            const routeIds = MTS.railwayData.dataCache.sidingIdToDepot.get(this.sidingId)!.routeIds;
+                const speed = this.speed * 20;
+                const routeIds = MTS.railwayData.dataCache.sidingIdToDepot.get(this.sidingId)!.routeIds;
                 let thisRoute: Route = null as any;
                 let nextRoute: Route = null as any;
                 let thisStation: Station = null as any;
                 let nextStation: Station = null as any;
                 let lastStation: Station = null as any;
-            RailwayData.useRoutesAndStationsFromIndex(stopIndex, routeIds, MTS.railwayData.dataCache, (currentStationIndex, thisRoute1, nextRoute1, thisStation1, nextStation1, lastStation1) => {
-				thisRoute = thisRoute1;
+                RailwayData.useRoutesAndStationsFromIndex(stopIndex, routeIds, MTS.railwayData.dataCache, (currentStationIndex, thisRoute1, nextRoute1, thisStation1, nextStation1, lastStation1) => {
+                    thisRoute = thisRoute1;
                     nextRoute = nextRoute1 as any;
                     thisStation = thisStation1 as any;
                     nextStation = nextStation1 as any;
                     lastStation = lastStation1 as any;
-			})
+                })
 
 
                 let actionText: RawMessage;
-                        if (speed > 5 || thisRoute == null || thisStation == null || lastStation == null) {
+                if (speed > 5 || thisRoute == null || thisStation == null || lastStation == null) {
                     actionText = {
-                                translate: "gui.mts.vehicle_speed",
-                                with: [
-                                    String(RailwayData.round(speed, 1)),
-                                    String(RailwayData.round(speed * 3.6, 1))
-                                ]
+                        translate: "gui.mts.vehicle_speed",
+                        with: [
+                            String(RailwayData.round(speed, 1)),
+                            String(RailwayData.round(speed * 3.6, 1))
+                        ]
                     };
-                        } else {
-                            switch (~~((system.currentTick / 20) % 3)) {
-                                default:
+                } else {
+                    switch (~~((system.currentTick / 20) % 3)) {
+                        default:
                             actionText = Train.getStationText(thisStation, "this");
-                                    break;
-                                case 1:
-                                    if (nextStation == null) {
+                            break;
+                        case 1:
+                            if (nextStation == null) {
                                 actionText = Train.getStationText(thisStation, "this");
-                                    } else {
+                            } else {
                                 actionText = Train.getStationText(nextStation, "next");
-                                    }
-                                    break;
-                                case 2:
-                            actionText = Train.getStationText(lastStation, "last_" + thisRoute.transportMode.toString().toLowerCase());
-                                    break;
                             }
+                            break;
+                        case 2:
+                            actionText = Train.getStationText(lastStation, "last_" + thisRoute.transportMode.toString().toLowerCase());
+                            break;
+                    }
                 }
 
 
                 let driverActionText: string | undefined;
                 if (this.isCurrentlyManual) {
                     const speedText = RailwayData.round(speed * 3.6, 1) + " km/h\n";
-                    
+
                     const hotbarTexts = [
                         (this.doorValue == 0 && this.manualNotch == -2 ? "§6" : "§7") + "B2 ",
                         (this.doorValue == 0 && this.manualNotch == -1 ? "§6" : "§7") + "B1 ",
@@ -278,7 +278,7 @@ export class Train extends TrainBase {
                         const isLightRailRoute = thisRoute.isLightRailRoute;
                         messages.push({
                             translate: isLightRailRoute ? "gui.mts.next_station_light_rail_announcement_cjk" : "gui.mts.next_station_announcement_cjk",
-                            with: [ nextStation.name ]
+                            with: [nextStation.name]
                         });
 
                         const mergedInterchangeRoutes = Train.getInterchangeRouteNames(nextStation, thisRoute, nextRoute);
@@ -295,7 +295,7 @@ export class Train extends TrainBase {
                             if (connectingStationMergedInterchangeRoutes != null) {
                                 connectingStationList.push({
                                     translate: "gui.mts.connecting_station_interchange_announcement_part_cjk",
-                                    with: [ connectingStation.name ]
+                                    with: [connectingStation.name]
                                 });
                             }
                         });
@@ -316,7 +316,7 @@ export class Train extends TrainBase {
                                     messages.push({
                                         translate: "gui.mts.next_route_" + modeString + "_light_rail_announcement_cjk",
                                         with: ["1", ...nextFinalStation.name.split(/\\|\|/)[0]]
-                                });
+                                    });
                                 } else {
                                     messages.push({
                                         translate: "gui.mts.next_route_" + modeString + "_announcement_cjk",
@@ -385,13 +385,13 @@ export class Train extends TrainBase {
 
     protected override isRailBlocked(checkIndex: number): boolean {
         if (!this.transportMode.continuousMovement && this.trainPositions != undefined && checkIndex < this.path.length) {
-        	const pathData = this.path[checkIndex];
-        	const railProduct = pathData.getRailProduct();
-        	for (const trainPositionsMap of this.trainPositions) {
-        		if (trainPositionsMap.has(railProduct) && trainPositionsMap.get(railProduct) != this.id) {
-        			return true;
-        		}
-        	}
+            const pathData = this.path[checkIndex];
+            const railProduct = pathData.getRailProduct();
+            for (const trainPositionsMap of this.trainPositions) {
+                if (trainPositionsMap.has(railProduct) && trainPositionsMap.get(railProduct) != this.id) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -462,47 +462,47 @@ export class Train extends TrainBase {
             let addSchedule: (() => void) | undefined = undefined;
             this.routeId = 0;
             for (let i = startingIndex; i < this.timeSegments.length + (this.isRepeat() ? this.timeSegments.length : 0); i++) {
-            	const timeSegment = this.timeSegments[i % this.timeSegments.length];
+                const timeSegment = this.timeSegments[i % this.timeSegments.length];
 
-            	if (timeSegment.savedRailBaseId != 0) {
-            		if (timeSegment.routeId == 0) {
-            			RailwayData.useRoutesAndStationsFromIndex(this.path[this.getIndex(timeSegment.endRailProgress, true)].stopIndex - 1, depot.routeIds, dataCache, (currentStationIndex, thisRoute, nextRoute, thisStation, nextStation, lastStation) => {
-            				timeSegment.routeId = thisRoute.id;
-            				timeSegment.currentStationIndex = currentStationIndex;
-            			});
-            		}
+                if (timeSegment.savedRailBaseId != 0) {
+                    if (timeSegment.routeId == 0) {
+                        RailwayData.useRoutesAndStationsFromIndex(this.path[this.getIndex(timeSegment.endRailProgress, true)].stopIndex - 1, depot.routeIds, dataCache, (currentStationIndex, thisRoute, nextRoute, thisStation, nextStation, lastStation) => {
+                            timeSegment.routeId = thisRoute.id;
+                            timeSegment.currentStationIndex = currentStationIndex;
+                        });
+                    }
 
-            		const platformId = timeSegment.savedRailBaseId;
-            		if (!schedulesForPlatform.has(platformId)) {
-            			schedulesForPlatform.set(platformId, []);
-            		}
+                    const platformId = timeSegment.savedRailBaseId;
+                    if (!schedulesForPlatform.has(platformId)) {
+                        schedulesForPlatform.set(platformId, []);
+                    }
 
-            		if (secondRound) {
-            			offsetTime = offsetTimeTemp - timeSegment.endTime;
-            			secondRound = false;
-            		} else if (addSchedule != undefined) {
-            			addSchedule();
-            		}
+                    if (secondRound) {
+                        offsetTime = offsetTimeTemp - timeSegment.endTime;
+                        secondRound = false;
+                    } else if (addSchedule != undefined) {
+                        addSchedule();
+                    }
 
-            		if (this.isOnRoute || nextDepartureTicks >= 0) {
-            			const arrivalMillis = currentMillis + ((timeSegment.endTime + offsetTime - currentTime) * Depot.MILLIS_PER_TICK);
-            			addSchedule = () => schedulesForPlatform.get(platformId)?.push(new ScheduleEntry(arrivalMillis, this.trainCars, timeSegment.routeId, timeSegment.currentStationIndex));
-            			if (!this.isRepeat()) {
-            				addSchedule();
-            				addSchedule = undefined;
-            			}
-            		}
+                    if (this.isOnRoute || nextDepartureTicks >= 0) {
+                        const arrivalMillis = currentMillis + ((timeSegment.endTime + offsetTime - currentTime) * Depot.MILLIS_PER_TICK);
+                        addSchedule = () => schedulesForPlatform.get(platformId)?.push(new ScheduleEntry(arrivalMillis, this.trainCars, timeSegment.routeId, timeSegment.currentStationIndex));
+                        if (!this.isRepeat()) {
+                            addSchedule();
+                            addSchedule = undefined;
+                        }
+                    }
 
-            		offsetTimeTemp = timeSegment.endTime;
-            	}
+                    offsetTimeTemp = timeSegment.endTime;
+                }
 
-            	if (this.routeId == 0) {
-            		this.routeId = timeSegment.routeId;
-            	}
+                if (this.routeId == 0) {
+                    this.routeId = timeSegment.routeId;
+                }
 
-            	if (i == this.timeSegments.length - 1) {
-            		secondRound = true;
-            	}
+                if (i == this.timeSegments.length - 1) {
+                    secondRound = true;
+                }
             }
         }
 
@@ -567,30 +567,30 @@ export class Train extends TrainBase {
         }
     }
 
-	public speedChange() {
-		return this.speed - this.oldSpeed;
-	}
+    public speedChange() {
+        return this.speed - this.oldSpeed;
+    }
 
-	public justOpening() {
-		return this.oldDoorValue == 0 && this.doorValue > 0;
-	}
+    public justOpening() {
+        return this.oldDoorValue == 0 && this.doorValue > 0;
+    }
 
-	public justClosing(doorCloseTime: number) {
-		return this.oldDoorValue >= doorCloseTime && this.doorValue < doorCloseTime;
-	}
+    public justClosing(doorCloseTime: number) {
+        return this.oldDoorValue >= doorCloseTime && this.doorValue < doorCloseTime;
+    }
 
     private getPreviousStoppingIndex(headIndex: number) {
-		for (let i = headIndex; i >= 0; i--) {
-			if (this.path[i].dwellTime > 0 && this.path[i].rail.railType == RailType.PLATFORM) {
-				return i;
-			}
-		}
-		return 0;
-	}
+        for (let i = headIndex; i >= 0; i--) {
+            if (this.path[i].dwellTime > 0 && this.path[i].rail.railType == RailType.PLATFORM) {
+                return i;
+            }
+        }
+        return 0;
+    }
 
-	private static getStationText(station: Station, textKey: string): RawMessage {
-		if (station != null) {
-			return {
+    private static getStationText(station: Station, textKey: string): RawMessage {
+        if (station != null) {
+            return {
                 translate: "gui.mts." + textKey + "_station_cjk",
                 with: {
                     rawtext: [
@@ -598,10 +598,10 @@ export class Train extends TrainBase {
                     ]
                 }
             };
-		} else {
-			return {};
-		}
-	}
+        } else {
+            return {};
+        }
+    }
 
     public static showShiftProgressBar(player: Player) {
         if (!MTS.railwayData.railwayDataCoolDownModule.playerShiftCoolDowns.has(player)) {
@@ -627,18 +627,18 @@ export class Train extends TrainBase {
         }
     }
 
-	public static getInterchangeRouteNames(station: Station, thisRoute: Route, nextRoute: Route | null) {
-		const thisRouteSplit = thisRoute.name.split(/\\|\|/)[0];
-		const nextRouteSplit = nextRoute == null ? null : nextRoute.name.split(/\\|\|/)[0];
-		const routesInStation = MTS.railwayData.dataCache.stationIdToRoutes.get(station.id);
-		if (routesInStation != undefined) {
-			const interchangeRoutes = Array.from(routesInStation.values()).filter(interchangeRoute => {
-				const routeName = interchangeRoute.split(/\\|\|/)[0];
-				return routeName != thisRouteSplit && routeName != nextRouteSplit;
-			}).map(interchangeRoute => interchangeRoute);
-			return IGui.mergeStationsWithCommas(interchangeRoutes);
-		} else {
-			return null;
-		}
-	}
+    public static getInterchangeRouteNames(station: Station, thisRoute: Route, nextRoute: Route | null) {
+        const thisRouteSplit = thisRoute.name.split(/\\|\|/)[0];
+        const nextRouteSplit = nextRoute == null ? null : nextRoute.name.split(/\\|\|/)[0];
+        const routesInStation = MTS.railwayData.dataCache.stationIdToRoutes.get(station.id);
+        if (routesInStation != undefined) {
+            const interchangeRoutes = Array.from(routesInStation.values()).filter(interchangeRoute => {
+                const routeName = interchangeRoute.split(/\\|\|/)[0];
+                return routeName != thisRouteSplit && routeName != nextRouteSplit;
+            }).map(interchangeRoute => interchangeRoute);
+            return IGui.mergeStationsWithCommas(interchangeRoutes);
+        } else {
+            return null;
+        }
+    }
 }
