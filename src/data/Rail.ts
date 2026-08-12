@@ -637,7 +637,7 @@ export class RailActions {
 
     private createTunnel(): boolean {
         return this.create(true, editPos => {
-            const pos = { x: ~~editPos.x, y: ~~editPos.y, z: ~~editPos.z };
+            const pos = { x: Math.floor(editPos.x), y: Math.floor(editPos.y), z: Math.floor(editPos.z) };
             if (!this.blacklistedPos.has(pos) && RailActions.canPlace(this.dimension, pos)) {
                 this.dimension.setBlockType(pos, "minecraft:air");
                 this.blacklistedPos.add(pos);
@@ -647,7 +647,7 @@ export class RailActions {
 
     private createTunnelWall(): boolean {
         return this.create(false, editPos => {
-            const pos = { x: ~~editPos.x, y: ~~editPos.y, z: ~~editPos.z };
+            const pos = { x: Math.floor(editPos.x), y: Math.floor(editPos.y), z: Math.floor(editPos.z) };
             if (!this.blacklistedPos.has(pos) && RailActions.canPlace(this.dimension, pos)) {
                 this.dimension.setBlockPermutation(pos, this.permutation);
                 this.blacklistedPos.add(pos);
@@ -657,7 +657,7 @@ export class RailActions {
 
     private createBridge(): boolean {
         return this.create(false, editPos => {
-            const pos = { x: ~~editPos.x, y: ~~editPos.y, z: ~~editPos.z };
+            const pos = { x: Math.floor(editPos.x), y: Math.floor(editPos.y), z: Math.floor(editPos.z) };
             const isTopHalf = editPos.y - Math.floor(editPos.y) >= 0.5;
             this.blacklistedPos.add(RailActions.getHalfPos(pos, isTopHalf));
 
@@ -721,9 +721,9 @@ export class RailActions {
 
     private static getHalfPos(pos: Vector3, isTopHalf: boolean) {
         return {
-            x: ~~pos.x,
-            y: ~~(pos.y * 2 + (isTopHalf ? 1 : 0)),
-            z: ~~pos.z
+            x: Math.floor(pos.x),
+            y: Math.floor(pos.y * 2 + (isTopHalf ? 1 : 0)),
+            z: Math.floor(pos.z)
         };
     }
 }
