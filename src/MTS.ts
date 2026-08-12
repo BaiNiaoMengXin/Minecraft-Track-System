@@ -234,14 +234,15 @@ export namespace MTS {
             }
         }, { entityFilter: { families: ["mts"] } });
 
+
+        world.beforeEvents.playerLeave.subscribe(event => {
+            if (world.getAllPlayers().length <= 1) {
+                railwayData.fullSave();
+            }
+        });
         system.runInterval(() => {
             world.sendMessage("auto saving Minecraft Track System game data...");// debug
             railwayData.autoSave();
         }, 20 * 60 * 5);
-        system.beforeEvents.shutdown.subscribe(() => {
-            system.run(() => {
-                railwayData.fullSave();
-            });
-        })
     })()
 }
