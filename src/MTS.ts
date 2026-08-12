@@ -85,6 +85,8 @@ export namespace MTS {
         registeredBlock.set("mts:lift_buttons_1", Blocks.LIFT_BUTTONS_1);
         registeredBlock.set("mts:lift_track_floor_1", Blocks.LIFT_TRACK_FLOOR_1);
 
+        registeredBlock.set("mts:ticket_barrier_entrance_1", Blocks.TICKET_BARRIER_ENTRANCE_1);
+        registeredBlock.set("mts:ticket_barrier_exit_1", Blocks.TICKET_BARRIER_EXIT_1);
         registeredBlock.set("mts:ticket_machine", Blocks.TICKET_MACHINE);
         registeredBlock.set("mts:ticket_processor", Blocks.TICKET_PROCESSOR);
         registeredBlock.set("mts:ticket_processor_entrance", Blocks.TICKET_PROCESSOR_ENTRANCE);
