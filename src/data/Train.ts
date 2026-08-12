@@ -1,4 +1,4 @@
-import { Block, Entity, EntityComponentTypes, EntityHealthComponent, EntityType, LocationInUnloadedChunkError, Player, RawMessage, SpawnEntityOptions, system, Vector2, Vector3, world } from "@minecraft/server";
+import { Block, EffectType, Entity, EntityComponentTypes, EntityHealthComponent, EntityType, LocationInUnloadedChunkError, Player, RawMessage, SpawnEntityOptions, system, Vector2, Vector3, world } from "@minecraft/server";
 import { TrainBase } from "./TrainBase";
 import { Siding, TimeSegment } from "./Siding";
 import { CollisionDetector, currentTimeMillis, EntityModelStructure } from "./Base";
@@ -30,6 +30,8 @@ import { RailwayDataCoolDownModule } from "./RailwayDataCoolDownModule";
 import { RailType } from "./RailType";
 
 export class Train extends TrainBase {
+
+    private isInvalid = false;
 
     private canDeploy: boolean = false;
     private trainPositions: Array<Map<UUID, number>> | undefined;
@@ -92,26 +94,23 @@ export class Train extends TrainBase {
         const siding = MTS.railwayData.dataCache.sidingIdMap.get(this.sidingId);
 
         if (siding !== undefined) {
-            const dimension = world.getDimension("overworld");
-            let isUseTickingArea = false;
-            if (!RailwayData.chunkLoaded(siding.getMidPos(true))) {
-                if (this.path.length == 0) return;
+            if (this.path.length == 0) return;
 
-                await this.path[0].rail.createTickingArea(String(this.id), dimension.id);
-                isUseTickingArea = true;
+            const dimension = world.getDimension("overworld");
+            let spawnPos: Vector3 = this.path[0].startingPos.asJson();
+            if (!RailwayData.chunkLoaded(this.path[0].startingPos) || !RailwayData.chunkLoaded(this.path[0].endingPos)) {
+                spawnPos = MTS.COMMON_TICKING_AREA_CENTER_POS;
+                this.isInvalid = true;
             }
 
             for (let i = 0; i < this.trainCars; i++) {
                 try {
-                    const entity = dimension.spawnEntity<string>(this.trainModels.getModelFormIndex(this.trainCars, i)!, this.path[0].startingPos.asJson());
+                    const entity = dimension.spawnEntity<string>(this.trainModels.getModelFormIndex(this.trainCars, i)!, spawnPos);
                     this.trainEntities.push(entity)
                 } catch (error) {
                     this.trainEntities.push(undefined);
                     console.error(error)
                 }
-            }
-            if (isUseTickingArea) {
-                world.tickingAreaManager.removeTickingArea(String(this.id))
             }
         }
     }
@@ -192,17 +191,15 @@ export class Train extends TrainBase {
             entity.teleport(carPos);
             entity.setProperty("mts:x_rotation", -Mth.toDegrees(carPitch) * 10);
             entity.setProperty("mts:y_rotation", -Mth.toDegrees(carYaw) * 10);
-            entity.setProperty("mts:z_rotation", 0);
             const doorState = (this.doorValue < (this.trainSound instanceof JonTrainSound ? this.trainSound.config.doorCloseSoundTime : (this.trainSound as BveTrainSound).config.soundCfg.doorCloseSoundLength) && this.doorValue < this.oldDoorValue) ? 0 : ((doorLeftOpen ? 1 : 0) + (doorRightOpen ? 2 : 0));
             entity.setProperty("mts:door_state", doorState);
         }
     }
 
     protected override handlePositions(positions: Vec3[], ticksElapsed: number): boolean {
-        const trainAABB = new AABB(positions[0], positions[positions.length - 1]).inflate(Train.TRAIN_UPDATE_DISTANCE);
-        const playerNearby: boolean = world.getAllPlayers().some(player => this.isPlayerRiding(player) || trainAABB.contains(player.location));
+        const playerNearby = this.checkInvalid(positions);
 
-        if (ticksElapsed > 0) {
+        if (playerNearby && ticksElapsed > 0) {
             if (this.ridingEntities.size! > 0) {
                 const headIndex = this.getIndex(0, this.spacing, false);
                 const stopIndex = this.path[headIndex].stopIndex - 1;
@@ -579,6 +576,49 @@ export class Train extends TrainBase {
         return this.oldDoorValue >= doorCloseTime && this.doorValue < doorCloseTime;
     }
 
+    private checkInvalid(positions: Vec3[]): boolean {
+        // const trainAABB = new AABB(positions[0], positions[positions.length - 1]).inflate(Train.TRAIN_UPDATE_DISTANCE);
+        // const playerNearby = this.ridingEntities.size > 0 || world.getAllPlayers().some(player => trainAABB.contains(player.location));
+        const dimension = world.getDimension("overworld")
+        const playerNearby = this.ridingEntities.size > 0 || (dimension.isChunkLoaded(positions[0]) || dimension.isChunkLoaded(positions[positions.length - 1]));
+
+        if (!playerNearby && !this.isInvalid) {
+            this.isInvalid = true;
+            console.log("out of loaded chunks")
+            for (const entity of this.trainEntities) {
+                entity?.teleport(MTS.COMMON_TICKING_AREA_CENTER_POS);
+            }
+        } else if (playerNearby && this.isInvalid) {
+            this.isInvalid = false;
+            console.log("into the loaded chunks")
+        }
+
+        return playerNearby;
+    }
+
+
+    public checkInvalid1(willLeavePlayerId: string): void {
+        const playerNearby = this.ridingEntities.size > 0 || world.getAllPlayers().some(player => {
+            if (player.id != willLeavePlayerId) {
+                const pos = this.trainEntities[0]!.location;
+                const pos2 = this.trainEntities[this.trainEntities.length - 1]!.location;
+                const playerPos = player.location;
+
+                return 48 < (Math.abs(pos.x - playerPos.x) + Math.abs(pos.y - playerPos.y) + Math.abs(pos.z - playerPos.z)) ||
+                    48 < (Math.abs(pos2.x - playerPos.x) + Math.abs(pos2.y - playerPos.y) + Math.abs(pos2.z - playerPos.z));
+            }
+            return false;
+        });
+
+        if (!playerNearby && !this.isInvalid) {
+            this.isInvalid = true;
+            console.log("out of loaded chunks")
+            for (const entity of this.trainEntities) {
+                entity?.teleport(MTS.COMMON_TICKING_AREA_CENTER_POS);
+            }
+        }
+    }
+
     private getPreviousStoppingIndex(headIndex: number) {
         for (let i = headIndex; i >= 0; i--) {
             if (this.path[i].dwellTime > 0 && this.path[i].rail.railType == RailType.PLATFORM) {
@@ -640,5 +680,9 @@ export class Train extends TrainBase {
         } else {
             return null;
         }
+    }
+
+    public getIsInvalid(): boolean {
+        return this.isInvalid;
     }
 }

@@ -453,6 +453,10 @@ export class Siding extends SavedRailBase implements IReducedSaveData, IDispose 
 			}
 		}
 	}
+
+	public getTrainIterators() {
+		return this.trains[Symbol.iterator]();
+	}
 }
 
 export class TimeSegment {

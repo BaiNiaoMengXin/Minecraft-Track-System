@@ -262,7 +262,13 @@ export namespace MTS {
         });
 
         world.beforeEvents.playerLeave.subscribe(event => {
-            if (world.getAllPlayers().length <= 1) {
+            if (world.getAllPlayers().length > 1) {
+                for (const siding of railwayData.sidings) {
+                    for (const train of siding.getTrainIterators()) {
+                        train.checkInvalid1(event.player.id);
+                    }
+                };
+            } else {
                 railwayData.fullSave();
             }
         });
