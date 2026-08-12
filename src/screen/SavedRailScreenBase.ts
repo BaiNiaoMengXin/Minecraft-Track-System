@@ -49,7 +49,7 @@ export abstract class SavedRailScreenBase<T extends SavedRailBase> {
 		if (this.showScheduleControls) {
 			this.customForm.label(dwellTimeLabel).spacer();
 
-			this.customForm.slider({ translate: "gui.mts.arrival_min "}, this.sliderDwellTimeMin, 0, ~~(Platform.MAX_DWELL_TIME / 2 / SavedRailScreenBase.SECONDS_PER_MINUTE), { step: 1 });
+			this.customForm.slider({ translate: "gui.mts.arrival_min" }, this.sliderDwellTimeMin, 0, ~~(Platform.MAX_DWELL_TIME / 2 / SavedRailScreenBase.SECONDS_PER_MINUTE), { step: 1 });
 			this.customForm.slider({ translate: "gui.mts.arrival_sec" }, this.sliderDwellTimeSec, 0, SavedRailScreenBase.SECONDS_PER_MINUTE * 2 - 1, { step: 1 });
 		}
 	}

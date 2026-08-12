@@ -9,7 +9,7 @@ export class PlatformScreen extends SavedRailScreenBase<Platform> {
 	private static readonly DWELL_TIME_TEXT: UIRawMessage = { translate: "gui.mts.dwell_time" };
 
 	public constructor(savedRailBase: Platform, transportMode: TransportMode, dashboardScreen: TrainDashboardClient) {
-		super(savedRailBase, transportMode, dashboardScreen, PlatformScreen.DWELL_TIME_TEXT, "gui.mtr.platform_number");
+		super(savedRailBase, transportMode, dashboardScreen, PlatformScreen.DWELL_TIME_TEXT, "gui.mts.platform_number");
 	}
 
 	public override onClose(): void {

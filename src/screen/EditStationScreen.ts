@@ -29,7 +29,7 @@ export class EditStationScreen extends EditAreaScreenBase<Station> {
 	private static readonly EXIT_DESTINATIONS_TEXT: UIRawMessage = { translate: "gui.mtr.exit_destinations" };
 
 	public constructor(station: Station, dashboardScreen: TrainDashboardClient, onCloseCallback: () => void) {
-		super(station, dashboardScreen, "gui.mtr.station_name", onCloseCallback);
+		super(station, dashboardScreen, "gui.mts.station_name", onCloseCallback);
 		// this.textFieldZone = new BetterTextField(EditStationScreen.STATION_ZONE_TEXT, TextFieldFilter.INTEGER, String(this.data.zone), 6);
 		// this.textFieldExitParentLetter = new BetterTextField(TextFieldFilter.LETTER, "A", 1);
 		// this.textFieldExitParentNumber = new BetterTextField(TextFieldFilter.POSITIVE_INTEGER, "1", 2);
