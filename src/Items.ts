@@ -1,5 +1,7 @@
 import { RailType } from "data/RailType";
 import { ItemBridgeCreator } from "item/ItemBridgeCreator";
+import { ItemLiftButtonsLinkModifier } from "item/ItemLiftButtonsLinkModifier";
+import { ItemLiftRefresher } from "item/ItemLiftRefresher";
 import { ItemRailModifier } from "item/ItemRailModifier";
 import { ItemSignalModifier } from "item/ItemSignalModifier";
 import { ItemTunnelCreator } from "item/ItemTunnelCreator";
@@ -8,6 +10,9 @@ import { DyeColor } from "util/DyeColor";
 
 export namespace Items {
 
+	export const LIFT_BUTTONS_LINK_CONNECTOR = new ItemLiftButtonsLinkModifier(true);
+	export const LIFT_BUTTONS_LINK_REMOVER = new ItemLiftButtonsLinkModifier(false);
+	export const LIFT_REFRESHER = new ItemLiftRefresher();
     export const RAIL_CONNECTOR_20 = new ItemRailModifier(true, false, true, false, RailType.WOODEN);
     export const RAIL_CONNECTOR_20_ONE_WAY = new ItemRailModifier(true, false, true, true, RailType.WOODEN);
     export const RAIL_CONNECTOR_40 = new ItemRailModifier(true, false, true, false, RailType.STONE);

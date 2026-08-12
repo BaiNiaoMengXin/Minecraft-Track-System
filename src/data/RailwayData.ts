@@ -24,6 +24,7 @@ import { RailwayDataPathGenerationModle } from "./RailwayDataPathGenerationModle
 import { RailwayDataRailActionsModule } from "./RailwayDataRailActionsModule";
 import { RailwayDataCoolDownModule } from "./RailwayDataCoolDownModule";
 import { RailwayDataDriveTrainModule } from "./RailwayDataDriveTrainModule";
+import { Lift } from "./Lift";
 import { DisposableSet } from "util/DisposableSet";
 
 export class RailwayData {
@@ -33,7 +34,8 @@ export class RailwayData {
 	public readonly sidings: DisposableSet<Siding> = new DisposableSet();
 	public readonly routes: Set<Route> = new Set();
 	public readonly depots: Set<Depot> = new Set();
-	public readonly dataCache: DataCache = new DataCache(this.stations, this.platforms, this.sidings, this.routes, this.depots);
+	public readonly lifts: DisposableSet<Lift> = new DisposableSet();
+	public readonly dataCache: DataCache = new DataCache(this.stations, this.platforms, this.sidings, this.routes, this.depots, this.lifts);
 
 	public readonly railwayDataCoolDownModule: RailwayDataCoolDownModule;
 	public readonly railwayDataPathGenerationMoudle: RailwayDataPathGenerationModle;
@@ -111,6 +113,8 @@ export class RailwayData {
 		});
 		this.depots.forEach(depot => depot.deployTrain(this));
 
+		this.lifts.forEach(lift => lift.tick());
+
 		this.railwayDataCoolDownModule.tick();
 		this.railwayDataDriveTrainModule.tick();
 		this.railwayDataRailActionsModule.tick();
@@ -151,6 +155,11 @@ export class RailwayData {
 	public removeRailConnection(player: Player, pos1: BlockPos, pos2: BlockPos): void {
 		RailwayData.removeRailConnection(this.rails, pos1, pos2);
 		this.validateData();
+	}
+
+	public removeLiftFloorTrack(pos: BlockPos): void {
+		RailwayData.removeLiftFloorTrack(this.lifts, pos);
+		this.dataCache.sync();
 	}
 
 	public hasSavedRail(pos: BlockPos): boolean {
@@ -261,6 +270,15 @@ export class RailwayData {
 		} catch (e) {
 			console.error(e);
 		}
+	}
+
+	public static removeLiftFloorTrack(lifts: DisposableSet<Lift>, pos: BlockPos): void {
+		for (const lift of lifts) {
+			if (lift.hasFloor(pos)) {
+				lifts.delete(lift);
+			}
+		}
+		this.validateLifts(lifts);
 	}
 
 	public static removeRailConnection(rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>, pos1: BlockPos, pos2: BlockPos): void {
@@ -402,6 +420,14 @@ export class RailwayData {
 			rails.delete(v)
 		});
 		railsNodesToRemove.forEach(pos => RailwayData.removeNode(rails, pos));
+	}
+
+	public static validateLifts(lifts: DisposableSet<Lift>): void {
+		for (const lift of lifts) {
+			if (lift.isInvalidLift()) {
+				lifts.delete(lift);
+			}
+		}
 	}
 
 	private static removeSavedRail<T extends SavedRailBase>(savedRailBases: Set<T>, rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
