@@ -1,4 +1,4 @@
-import { BlockVolume, Entity, EntityComponentTypes, Player, system, world } from "@minecraft/server";
+import { BlockVolume, Entity, EntityComponentTypes, Player, system, TickingArea, Vector3, world } from "@minecraft/server";
 import { BlockBase } from "block/BlockBase";
 import { EntityInsideTriggeredBlock } from "block/EntityInsideTriggeredBlock";
 import { Blocks } from "Blocks";
@@ -17,6 +17,8 @@ export namespace MTS {
     export const railwayData: RailwayData = new RailwayData();
 
     let railsToStandardRender: Set<Rail> = new Set();
+    let commonTickingAreaForEntities: TickingArea | undefined = undefined;
+    export const COMMON_TICKING_AREA_CENTER_POS: Vector3 = { x: 7, y: 7, z: 7 };
 
     const RAIL_RENDER_DURATION = 10;
 
@@ -234,6 +236,27 @@ export namespace MTS {
             }
         }, { entityFilter: { families: ["mts"] } });
 
+
+        world.afterEvents.worldLoad.subscribe(() => {
+            const promise = world.tickingAreaManager.createTickingArea("mts_public_ticking_area", {
+                from: { x: 0, y: 0, z: 0 },
+                to: { x: 15, y: 15, z: 15 },
+                dimension: world.getDimension("overworld")
+            });
+            promise.catch(reason => {
+                world.sendMessage("Minecraft Track System load data failed(cannot create ticking-area)!: " + reason);
+            });
+            promise.then(() => {
+                commonTickingAreaForEntities = world.tickingAreaManager.getTickingArea("mts_public_ticking_area")!;
+                system.runTimeout(() => {
+                    if (typeof commonTickingAreaForEntities == "undefined") {
+                        world.sendMessage("Minecraft Track System load data failed(cannot create ticking-area)!");
+                    } else {
+                        MTS.railwayData.load();
+                    }
+                }, 50);
+            });
+        });
 
         world.beforeEvents.playerLeave.subscribe(event => {
             if (world.getAllPlayers().length <= 1) {
