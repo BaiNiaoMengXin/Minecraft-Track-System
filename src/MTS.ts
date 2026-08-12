@@ -80,10 +80,13 @@ export namespace MTS {
     export const registeredBlock: Map<string, BlockBase> = new Map();
 
     (function init() {
+        registeredItem.set("mts:item_escalator", Items.ESCALATOR);
         registeredItem.set("mts:lift_buttons_link_connector", Items.LIFT_BUTTONS_LINK_CONNECTOR);
         registeredItem.set("mts:lift_buttons_link_remover", Items.LIFT_BUTTONS_LINK_REMOVER);
         registeredItem.set("mts:lift_refresher", Items.LIFT_REFRESHER);
 
+        registeredBlock.set("mts:escalator_side", Blocks.ESCALATOR_SIDE);
+        registeredBlock.set("mts:escalator_step", Blocks.ESCALATOR_STEP);
         registeredBlock.set("mts:lift_buttons_1", Blocks.LIFT_BUTTONS_1);
         registeredBlock.set("mts:lift_track_floor_1", Blocks.LIFT_TRACK_FLOOR_1);
 

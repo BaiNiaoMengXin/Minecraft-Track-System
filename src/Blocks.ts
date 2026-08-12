@@ -1,3 +1,5 @@
+import { BlockEscalatorSide } from "block/BlockEscalatorSide";
+import { BlockEscalatorStep } from "block/BlockEscalatorStep";
 import { BlockLiftButtons } from "block/BlockLiftButtons";
 import { BlockLiftTrackFloor } from "block/BlockLiftTrackFloor";
 import { BlockTicketBarrier } from "block/BlockTicketBarrier";
@@ -7,6 +9,8 @@ import { BlockTicketProcessorEnquiry } from "block/BlockTicketProcessorEnquiry";
 
 export namespace Blocks {
 
+	export const ESCALATOR_SIDE = new BlockEscalatorSide();
+	export const ESCALATOR_STEP = new BlockEscalatorStep();
 	export const LIFT_BUTTONS_1 = new BlockLiftButtons();
 	export const LIFT_TRACK_FLOOR_1 = new BlockLiftTrackFloor();
 

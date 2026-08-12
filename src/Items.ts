@@ -1,5 +1,6 @@
 import { RailType } from "data/RailType";
 import { ItemBridgeCreator } from "item/ItemBridgeCreator";
+import { ItemEscalator } from "item/ItemEscalator";
 import { ItemLiftButtonsLinkModifier } from "item/ItemLiftButtonsLinkModifier";
 import { ItemLiftRefresher } from "item/ItemLiftRefresher";
 import { ItemRailModifier } from "item/ItemRailModifier";
@@ -10,6 +11,7 @@ import { DyeColor } from "util/DyeColor";
 
 export namespace Items {
 
+	export const ESCALATOR = new ItemEscalator();
 	export const LIFT_BUTTONS_LINK_CONNECTOR = new ItemLiftButtonsLinkModifier(true);
 	export const LIFT_BUTTONS_LINK_REMOVER = new ItemLiftButtonsLinkModifier(false);
 	export const LIFT_REFRESHER = new ItemLiftRefresher();
