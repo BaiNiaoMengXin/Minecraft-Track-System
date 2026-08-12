@@ -24,6 +24,7 @@ import { MessagePackHelper } from "./MessagePackHelper";
 import { UUID } from "jLib/UUID";
 import { MTS } from "MTS";
 import { IDispose } from "util/IDispose";
+import { Config } from "Config";
 
 export class Siding extends SavedRailBase implements IReducedSaveData, IDispose {
 
@@ -245,13 +246,17 @@ export class Siding extends SavedRailBase implements IReducedSaveData, IDispose 
 		const railProgressSet: number[] = [];
 		const trainsToRemove: Train[] = [];
 		for (const train of this.trains) {
+			const isInvalid = train.getIsInvalid();
+			if (isInvalid && system.currentTick % Config.ticksElapsedIfTrainInvaild != 0) {
+				continue;
+			}
+
 			if (train.isCurrentlyManual_() && MTS.railwayData.railwayDataDriveTrainModule.drive(train)) {
 				// trainsToSync.push(train);
 			}
 
-			if (train.simulateTrain(1, this.depot, dataCache, trainPositions, schedulesForPlatform)) {
+			if (train.simulateTrain(isInvalid ? Config.ticksElapsedIfTrainInvaild : 1, this.depot, dataCache, trainPositions, schedulesForPlatform)) {
 				// trainsToSync.push(train);
-				console.log("[Siding.simulateTrain] DEBUG: simulateTrain sucesss")
 			}
 
 			if (train.closeToDepot(train.spacing * this.trainCars)) {
