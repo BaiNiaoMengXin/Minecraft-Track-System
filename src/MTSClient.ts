@@ -1,6 +1,5 @@
 import { Player, world } from "@minecraft/server";
 import { BetterMap } from "data/BetterMap";
-import { MTS } from "MTS";
 import { TrainDashboardClient } from "screen/TrainDashboardClient";
 
 export namespace MTSClient {
@@ -18,5 +17,9 @@ export namespace MTSClient {
             }
             dashBoardScreens.get(player)!.use();
         }
+    });
+
+    world.beforeEvents.playerLeave.subscribe(event => {
+        dashBoardScreens.delete(event.player);
     });
 }
