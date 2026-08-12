@@ -189,15 +189,20 @@ export namespace MTS {
         });
 
         world.beforeEvents.playerBreakBlock.subscribe(event => {
-            system.run(() => {
+            if (event.block.typeId.startsWith("mts:")) {
                 registeredBlock.get(event.block.typeId)?.playerWillDestroy(event);
-            })
+            }
         });
 
         world.beforeEvents.playerInteractWithBlock.subscribe(event => {
-            system.run(() => {
-                registeredBlock.get(event.block.typeId)?.use(event);
-            });
+            if (event.block.typeId.startsWith("mts:")) {
+                if (MTS.railwayData.railwayDataCoolDownModule.canInteract(event.player)) {
+                    system.run(() => {
+                        registeredBlock.get(event.block.typeId)?.use(event);
+                    });
+                }
+                MTS.railwayData.railwayDataCoolDownModule.onPlayerWillInteract(event.player);
+            }
         });
 
         const entityInsideableBlockTypes: Array<string> = []
@@ -206,6 +211,7 @@ export namespace MTS {
                 entityInsideableBlockTypes.push(typeId);
             }
         });
+
         system.runInterval(() => {
             const dimension = world.getDimension("overworld");
 
