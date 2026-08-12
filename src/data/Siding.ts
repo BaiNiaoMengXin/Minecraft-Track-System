@@ -23,8 +23,10 @@ import { Integer } from "jLib/Math";
 import { MessagePackHelper } from "./MessagePackHelper";
 import { UUID } from "jLib/UUID";
 import { MTS } from "MTS";
+import { IDispose } from "util/IDispose";
 
-export class Siding extends SavedRailBase implements IReducedSaveData {
+export class Siding extends SavedRailBase implements IReducedSaveData, IDispose {
+
 	private depot: Depot | null = null;
 	private trainId: string = "";
 	private baseTrainType: string = "";
@@ -109,6 +111,10 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
             acceleration_constant: this.accelerationConstant,
 			path: Array.from(this.path, data => data.toMessagePack())
 		} as const;
+	}
+
+	public dispose(): void {
+		this.clearTrains();
 	}
 
 	public setUnlimitedTrains(unlimitedTrains: boolean, maxTrains: number, isManual: boolean, maxManualSpeed: number, accelerationConstant: number, newDwellTime: number, clearTrains: boolean): void {

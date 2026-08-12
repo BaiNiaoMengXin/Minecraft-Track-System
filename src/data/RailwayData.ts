@@ -24,12 +24,13 @@ import { RailwayDataPathGenerationModle } from "./RailwayDataPathGenerationModle
 import { RailwayDataRailActionsModule } from "./RailwayDataRailActionsModule";
 import { RailwayDataCoolDownModule } from "./RailwayDataCoolDownModule";
 import { RailwayDataDriveTrainModule } from "./RailwayDataDriveTrainModule";
+import { DisposableSet } from "util/DisposableSet";
 
 export class RailwayData {
 
 	public readonly stations: Set<Station> = new Set();
 	public readonly platforms: Set<Platform> = new Set();
-	public readonly sidings: Set<Siding> = new Set();
+	public readonly sidings: DisposableSet<Siding> = new DisposableSet();
 	public readonly routes: Set<Route> = new Set();
 	public readonly depots: Set<Depot> = new Set();
 	public readonly dataCache: DataCache = new DataCache(this.stations, this.platforms, this.sidings, this.routes, this.depots);
@@ -406,9 +407,6 @@ export class RailwayData {
 	private static removeSavedRail<T extends SavedRailBase>(savedRailBases: Set<T>, rails: BetterMap<BlockPos, BetterMap<BlockPos, Rail>>): void {
 		for (const savedRailBase of savedRailBases) {
 			if (savedRailBase.isInvalidSavedRail(rails)) {
-				if (savedRailBase instanceof Siding) {
-					savedRailBase.clearTrains();
-				}
 				savedRailBases.delete(savedRailBase);
 			}
 		};
