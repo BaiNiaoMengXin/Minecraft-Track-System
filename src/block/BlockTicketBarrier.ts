@@ -2,9 +2,9 @@ import { Block, Entity, Player, system, Vector3 } from "@minecraft/server";
 import { TicketSystem } from "data/TicketSystem";
 import { Direction } from "util/math/Direction";
 import { Vec3 } from "util/math/Vec3";
-import { EntityInsideableBlock } from "./EntityInsideableBlock";
+import { EntityInsideTriggeredBlock } from "./EntityInsideTriggeredBlock";
 
-export class BlockTicketBarrier extends EntityInsideableBlock {
+export class BlockTicketBarrier extends EntityInsideTriggeredBlock {
 
 	private static readonly STATE_OPEN = "mts:open"
 

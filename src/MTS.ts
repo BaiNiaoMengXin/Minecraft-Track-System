@@ -1,6 +1,6 @@
 import { BlockVolume, Entity, EntityComponentTypes, Player, system, world } from "@minecraft/server";
 import { BlockBase } from "block/BlockBase";
-import { EntityInsideableBlock } from "block/EntityInsideableBlock";
+import { EntityInsideTriggeredBlock } from "block/EntityInsideTriggeredBlock";
 import { Blocks } from "Blocks";
 import { Rail } from "data/Rail";
 import { RailType } from "data/RailType";
@@ -194,7 +194,7 @@ export namespace MTS {
 
         const entityInsideableBlockTypes: Array<string> = []
         registeredBlock.forEach((instance, typeId) => {
-            if ((instance as EntityInsideableBlock).isEntityInsideableBlock) {
+            if ((instance as EntityInsideTriggeredBlock).isEntityInsideTriggeredBlock) {
                 entityInsideableBlockTypes.push(typeId);
             }
         });
@@ -209,7 +209,7 @@ export namespace MTS {
                 );
                 for (const pos of blocks.getBlockLocationIterator()) {
                     const block = dimension.getBlock(pos)!;
-                    (registeredBlock.get(block.typeId) as EntityInsideableBlock).entityInside(player, block);
+                    (registeredBlock.get(block.typeId) as EntityInsideTriggeredBlock).entityInside(player, block);
                 }
             }
         }, 2)
