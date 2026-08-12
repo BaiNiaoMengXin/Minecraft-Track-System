@@ -99,6 +99,7 @@ export class RailwayData {
 			world.setDynamicProperty(RailwayData.KEY_DATA_VERSION, RailwayData.DATA_VERSION);
 			world.setDynamicProperty(RailwayData.KEY_USE_TIME_SYNC, this.useTimeSync);
 		} catch (e) {
+			console.error("[ERROR] saveMisc failed: " + e);
 		}
 	}
 
@@ -374,9 +375,9 @@ export class RailwayData {
 
 	public static newBlockPos(arg1: number | Vector3, y?: number, z?: number): BlockPos {
 		if (typeof arg1 === 'number') {
-			return new BlockPos(arg1, y!, z!);
+			return new BlockPos(Math.floor(arg1), Math.floor(y!), Math.floor(z!));
 		}
-		return new BlockPos(arg1.x, arg1.y, arg1.y);
+		return new BlockPos(Math.floor(arg1.x), Math.floor(arg1.y), Math.floor(arg1.y));
 	}
 
 	public static offsetBlockPos(pos: BlockPos, x: number, y: number, z: number): BlockPos {
