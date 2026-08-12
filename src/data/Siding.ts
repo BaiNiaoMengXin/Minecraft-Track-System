@@ -276,7 +276,11 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
 		}
 
 		if (trainsToRemove.length != 0) {
-			trainsToRemove.forEach(item => this.trains.remove(item));
+			trainsToRemove.forEach(item => {
+				if (this.trains.remove(item)) {
+					item.dispose();
+				}
+			});
 		}
 	}
 
@@ -355,7 +359,13 @@ export class Siding extends SavedRailBase implements IReducedSaveData {
 		}
 
 		if (this.path.length != 1) {
-			this.trains.removeIf(train => (train.id == this.id) == this.unlimitedTrains);
+			this.trains.removeIf(train => {
+				if ((train.id == this.id) == this.unlimitedTrains) {
+					train.dispose();
+					return true;
+				}
+				return false;
+			});
 		}
 	}
 
