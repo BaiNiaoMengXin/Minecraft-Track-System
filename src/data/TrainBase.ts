@@ -82,7 +82,7 @@ export abstract class TrainBase extends NameColorDataBase {
 			baseTrainType = baseTrainType.startsWith("base_") ? baseTrainType.replace("base_", "train_") : baseTrainType;
 			// TODO temporary code end
 			this.baseTrainType = baseTrainType;
-			this.transportMode = TransportMode.TRAIN;
+			this.transportMode = TrainType.getTransportMode(baseTrainType);
 			this.spacing = TrainType.getSpacing(baseTrainType);
 			this.width = TrainType.getWidth(baseTrainType);
 			this.trainCars = arg6;

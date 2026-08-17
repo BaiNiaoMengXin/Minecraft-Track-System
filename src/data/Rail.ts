@@ -12,30 +12,30 @@ import { BlockNode } from "block/BlockNode";
 
 export class Rail extends SerializedDataBase {
     
-	public railType: RailType;
-	public transportMode: TransportMode;
-	public facingStart: RailAngle;
-	public facingEnd: RailAngle;
+	public railType!: RailType;
+	public transportMode!: TransportMode;
+	public facingStart!: RailAngle;
+	public facingEnd!: RailAngle;
 
-    private h1: number;
-    private k1: number;
-    private r1: number;
-    private tStart1: number;
-    private tEnd1: number;
+    private h1!: number;
+    private k1!: number;
+    private r1!: number;
+    private tStart1!: number;
+    private tEnd1!: number;
 
-	private h2: number;
-    private k2: number;
-    private r2: number;
-    private tStart2: number;
-    private tEnd2: number;
+	private h2!: number;
+    private k2!: number;
+    private r2!: number;
+    private tStart2!: number;
+    private tEnd2!: number;
 
-    private yStart: number;
-    private yEnd: number;
+    private yStart!: number;
+    private yEnd!: number;
 
-    private reverseT1 : boolean;
-    private isStraight1 : boolean;
-    private reverseT2 : boolean;
-    private isStraight2 : boolean;
+    private reverseT1! : boolean;
+    private isStraight1! : boolean;
+    private reverseT2! : boolean;
+    private isStraight2! : boolean;
 
 
     private readonly entities: Set<Entity> = new Set();
@@ -63,26 +63,6 @@ export class Rail extends SerializedDataBase {
     constructor(arg1: BlockPos | Record<string, unknown>, facingStart?: RailAngle, posEnd?: BlockPos, facingEnd?: RailAngle, railType?: RailType, transportMode?: TransportMode) {
         super();
         
-        this.railType = RailType.NONE;
-        this.transportMode = TransportMode.TRAIN;
-        this.facingStart = RailAngle.E;
-        this.facingEnd = RailAngle.E;
-        this.h1 = 0;
-        this.k1 = 0;
-        this.r1 = 0;
-        this.tStart1 = 0;
-        this.tEnd1 = 0;
-        this.h2 = 0;
-        this.k2 = 0;
-        this.r2 = 0;
-        this.tStart2 = 0;
-        this.tEnd2 = 0;
-        this.yStart = 0;
-        this.yEnd = 0;
-        this.reverseT1 = false;
-        this.isStraight1 = false;
-        this.reverseT2 = false;
-        this.isStraight2 = false;
         if (arg1 instanceof BlockPos) {
             this.reSet(arg1, facingStart!, posEnd!, facingEnd!, railType!, transportMode!);
         } else {
@@ -716,7 +696,8 @@ export class RailActions {
     }
 
     private static canPlace(dimension: Dimension, pos: Vector3): boolean {
-        return dimension.getBlock(pos)?.typeId != BlockNode.RAIL_NODE_BLOCK_KEY_NAME;
+        const block = dimension.getBlock(pos);
+        return block != undefined && !BlockNode.isNode(block);
     }
 
     private static getHalfPos(pos: Vector3, isTopHalf: boolean) {

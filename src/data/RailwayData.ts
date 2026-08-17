@@ -148,7 +148,7 @@ export class RailwayData {
 		return this.signalBlocks.add(0, color, PathData.getRailProduct(posStart, posEnd));
 	}
 
-	public removeNode(player: Player, pos: BlockPos, transportMode: TransportMode): void {
+	public removeNode(player: Player, pos: BlockPos): void {
 		RailwayData.removeNode(this.rails, pos);
 		this.validateData();
 	}
@@ -408,7 +408,7 @@ export class RailwayData {
 		const railsNodesToRemove = new Array<BlockPos>();
 		rails.forEach((railMap, startPos) => {
 			const chunkLoaded = RailwayData.chunkLoaded(startPos);
-			if (chunkLoaded && !(world.getDimension("overworld").getBlock(startPos.asJson())!.typeId == BlockNode.RAIL_NODE_BLOCK_KEY_NAME)) {
+			if (chunkLoaded && !BlockNode.isNode(world.getDimension("overworld").getBlock(startPos.asJson())!)) {
 				railsNodesToRemove.push(startPos);
 			}
 

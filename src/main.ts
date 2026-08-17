@@ -25,15 +25,15 @@ world.afterEvents.worldLoad.subscribe(event => {
 world.beforeEvents.playerBreakBlock.subscribe((event) => {
     const { block, player } = event;
     
-    if (block.typeId === BlockNode.RAIL_NODE_BLOCK_KEY_NAME) {
-        system.run(() => MTS.railwayData.removeNode(player, new BlockPos(block.location.x, block.location.y, block.location.z), TransportMode.TRAIN));
+    if (BlockNode.isNode(block)) {
+        system.run(() => MTS.railwayData.removeNode(player, new BlockPos(block.location.x, block.location.y, block.location.z)));
     }
 });
 
 world.afterEvents.playerPlaceBlock.subscribe((event) => {
     const { block, player } = event;
     
-    if (block.typeId === BlockNode.RAIL_NODE_BLOCK_KEY_NAME) {
+    if (BlockNode.isNode(block)) {
         BlockNode.updateRailNodeState(player, new BlockPos(block.location));
     }
 });

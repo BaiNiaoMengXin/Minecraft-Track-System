@@ -27,9 +27,9 @@ export abstract class ItemNodeModifierSelectableBlockBase extends ItemNodeModifi
 			if (event.source instanceof Player) {
 				const player = event.source;
 				if (player != null && (player.inputInfo.getButtonState(InputButton.Sneak) == ButtonState.Pressed || player.isSneaking)) {
-					const permutation = player.dimension.getBlock(event.block.location)!.permutation;
+					const permutation = event.block.permutation;
 					let newPermutation: BlockPermutation;
-					if (permutation.type.id == BlockNode.RAIL_NODE_BLOCK_KEY_NAME) {
+					if (BlockNode.isNode(event.block)) {
 						newPermutation = BlockPermutation.resolve("minecraft:air");
 					} else {
 						newPermutation = permutation;

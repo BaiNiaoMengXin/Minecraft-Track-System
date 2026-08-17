@@ -1,4 +1,4 @@
-import { BlockPermutation, ItemComponentUseOnEvent, ItemStack, Player, Vector3, world } from "@minecraft/server";
+import { BlockPermutation, ItemComponentUseOnEvent, ItemStack, Player, system, Vector3, world } from "@minecraft/server";
 import { ItemBlockClickingBase } from "./ItemBlockClickingBase";
 import { TransportMode } from "data/TransportMode";
 import { BlockNode } from "block/BlockNode";
@@ -24,21 +24,30 @@ export abstract class ItemNodeModifierBase extends ItemBlockClickingBase {
 	}
 
 	protected override onStartClick(event: ItemComponentUseOnEvent, newItemStack: ItemStack): void {
-		// TODO temporary code
-		newItemStack.setDynamicProperty(ItemNodeModifierBase.DYN_PROP_TRANSPORT_MODE, TransportMode.TRAIN.toString());
-		// TODO temporary code end
+		newItemStack.setDynamicProperty(ItemNodeModifierBase.DYN_PROP_TRANSPORT_MODE, BlockNode.getTransportMode(event.block).toString());
 	}
 
-	protected override onEndClick(event: ItemComponentUseOnEvent, posEnd: BlockPos, newItemStack: ItemStack): void {
+	protected override async onEndClick(event: ItemComponentUseOnEvent, posEnd: BlockPos, newItemStack: ItemStack): Promise<void> {
 		const posStart = new BlockPos(event.block.location);
+		const transportModeStart = BlockNode.getTransportMode(event.block);
+		const permutationStart = event.block.permutation;
 		const dimiension = world.getDimension('overworld');
-		const permutationStart = dimiension.getBlock(posStart.asJson())?.permutation;
-		const permutationEnd = dimiension.getBlock(posEnd.asJson())?.permutation;
+		const player = event.source as Player;
 
-		// TODO temporary code
-		if (permutationStart && permutationEnd && TransportMode.TRAIN.toString() == event.itemStack.getDynamicProperty(ItemNodeModifierBase.DYN_PROP_TRANSPORT_MODE)) {
-			const player = event.source as Player;
+		let playerOriginPos: Vector3 | undefined;
+		
+		while (!dimiension.isChunkLoaded(posEnd.asJson())) {
+			if (playerOriginPos == undefined)  {
+				playerOriginPos = player.location;
+				player.sendMessage({ translate: "unloadedchunk.message.warning" });
+			}
+			player.teleport(posEnd.asJson());
+			await system.waitTicks(1);
+		}
+		const blockEnd = dimiension.getBlock(posEnd.asJson())!;
+		const permutationEnd = blockEnd.permutation;
 
+		if (BlockNode.isNode(blockEnd) && transportModeStart.toString() == event.itemStack.getDynamicProperty(ItemNodeModifierBase.DYN_PROP_TRANSPORT_MODE)) {
 			if (this.isConnector) {
 				if (!posStart.equals(posEnd)) {
 					const angle1 = BlockNode.getAngle(permutationStart);
@@ -48,23 +57,25 @@ export abstract class ItemNodeModifierBase extends ItemBlockClickingBase {
 					const railAngleStart = RailAngle.fromAngle(angle1 + (RailAngle.similarFacing(angleDifference, angle1) ? 0 : 180));
 					const railAngleEnd = RailAngle.fromAngle(angle2 + (RailAngle.similarFacing(angleDifference, angle2) ? 180 : 0));
 
-					this.onConnect(TransportMode.TRAIN, permutationStart, permutationEnd, posStart, posEnd, railAngleStart, railAngleEnd, player);
-					// TODO temporary code end
+					this.onConnect(transportModeStart, permutationStart, permutationEnd, posStart, posEnd, railAngleStart, railAngleEnd, player);
 				}
 			} else {
 				this.onRemove(posStart, posEnd, player);
 			}
 		}
+
+		if (playerOriginPos != undefined) {
+			player.teleport(playerOriginPos);
+		}
 	}
 
 	protected override clickCondition(event: ItemComponentUseOnEvent): boolean {
-		if (event.block.typeId == BlockNode.RAIL_NODE_BLOCK_KEY_NAME) {
-			// TODO
-			/* if (blockNode.transportMode == TransportMode.AIRPLANE) {
-				return forAirplaneNode;
-			} else { */
-			return TransportMode.TRAIN.continuousMovement ? this.forContinuousMovementNode : this.forNonContinuousMovementNode;
-			//}
+		if (BlockNode.isNode(event.block)) {
+			if (BlockNode.getTransportMode(event.block) == TransportMode.AIRPLANE) {
+				return this.forAirplaneNode;
+			} else {
+				return BlockNode.getTransportMode(event.block).continuousMovement ? this.forContinuousMovementNode : this.forNonContinuousMovementNode;
+			}
 		} else {
 			return false;
 		}

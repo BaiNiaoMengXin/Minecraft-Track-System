@@ -117,6 +117,8 @@ export namespace MTS {
         registeredItem.set("mts:rail_connector_platform", Items.RAIL_CONNECTOR_PLATFORM);
         registeredItem.set("mts:rail_connector_siding", Items.RAIL_CONNECTOR_SIDING);
         registeredItem.set("mts:rail_connector_turn_back", Items.RAIL_CONNECTOR_TURN_BACK);
+        registeredItem.set("mts:rail_connector_cable_car", Items.RAIL_CONNECTOR_CABLE_CAR);
+        registeredItem.set("mts:rail_connector_runway", Items.RAIL_CONNECTOR_RUNWAY);
         registeredItem.set("mts:rail_remover", Items.RAIL_REMOVER);
         registeredItem.set("mts:signal_connector_white", Items.SIGNAL_CONNECTOR_WHITE);
         registeredItem.set("mts:signal_connector_orange", Items.SIGNAL_CONNECTOR_ORANGE);

@@ -1,10 +1,11 @@
-import { BlockPermutation, Player, world } from "@minecraft/server";
+import { Block, BlockPermutation, Player, world } from "@minecraft/server";
 import { RailAngle } from "data/RailAngle";
+import { TransportMode } from "data/TransportMode";
 import { BlockPos } from "util/math/BlockPos";
 
 export class BlockNode {
 
-    public static readonly RAIL_NODE_BLOCK_KEY_NAME = "mts:rail_node";
+    public static readonly TAG_NODE = "mts:node";
 
     public static readonly FACING = "mts:facing";
     public static readonly IS_22_5 = "mts:is_22_5";
@@ -25,7 +26,7 @@ export class BlockNode {
         const block = dimension.getBlock(pos.asJson());
 
         const quadrant = RailAngle.getQuadrant(player.getRotation().y, true);
-        const blockPermutation = BlockPermutation.resolve(this.RAIL_NODE_BLOCK_KEY_NAME, {
+        const blockPermutation = BlockPermutation.resolve(block!.typeId, {
             [this.FACING]: quadrant % 8 >= 4,
             [this.IS_45]: quadrant % 4 >= 2,
             [this.IS_22_5]: quadrant % 2 >= 1,
@@ -36,5 +37,18 @@ export class BlockNode {
 
     public static getAngle(blockPermutation: BlockPermutation): number {
         return ((blockPermutation.getState(BlockNode.FACING as any) as boolean) ? 0 : 90) + ((blockPermutation.getState(BlockNode.IS_22_5 as any) as boolean) ? 22.5 : 0) + ((blockPermutation.getState(BlockNode.IS_45 as any) as boolean) ? 45 : 0);
+    }
+
+    public static getTransportMode(block: Block): TransportMode {
+        for (const transportMode of TransportMode.values()) {
+            if (block.hasTag("mts:" + transportMode.toString().toLowerCase())) {
+                transportMode;
+            }
+        }
+        throw new RangeError("");
+    }
+
+    public static isNode(block: Block) {
+        return block.hasTag(this.TAG_NODE);
     }
 }
