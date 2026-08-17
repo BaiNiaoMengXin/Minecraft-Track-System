@@ -35,10 +35,10 @@ import { RailActionsScreen } from "./RailActionsScreen";
 
 export class DashboardScreen {
 
-    public static readonly ITEM_TYPE_ID = "mts:railway_dashboard";
+    public readonly itemTypeId: string;
 
-    private transportMode = TransportMode.TRAIN;
-    
+    private readonly transportMode: TransportMode;
+
     public selectedTab = DashboardScreen.SelectedTab.NONE;
     public isOnAwait = false;
     public isNew = false;
@@ -54,11 +54,13 @@ export class DashboardScreen {
 
     private dataCache: DataCache;
 
-    public constructor(player: Player) {
+    public constructor(player: Player, itemTypeId: string, transportMode: TransportMode) {
         this.dataCache = MTS.railwayData.dataCache;
         this.player = player;
+        this.itemTypeId = itemTypeId;
+        this.transportMode = transportMode;
 
-        this.indexPage = new CustomForm(player, "铁路仪表板");
+        this.indexPage = new CustomForm(player, { translate: "item." + itemTypeId });
         this.indexPage.closeButton();
         this.indexPage.button({ translate: "gui.mts.stations" }, () => {
             this.selectedTab = DashboardScreen.SelectedTab.STATIONS;
@@ -148,7 +150,7 @@ export class DashboardScreen {
         }
 
         this.sitesPages = new CustomForm(this.player, { translate: `gui.mts.${addButtonLabelKeyBase}s` }).closeButton();
-        
+
         this.sitesPages.button({ translate: "gui.mts.add_" + addButtonLabelKeyBase }, () => {
             this.isNew = true;
             this.editingSite = this.selectedTab == DashboardScreen.SelectedTab.STATIONS ? new Station() : (this.selectedTab == DashboardScreen.SelectedTab.ROUTES ? new Route(TransportMode.TRAIN) : new Depot(TransportMode.TRAIN));
@@ -188,7 +190,7 @@ export class DashboardScreen {
             }
         }));
     }
-    
+
     public updateSelectStationsPage(c: () => void) {
         this.selectStationsPage = new CustomForm(this.player, "").closeButton().button("完成", () => {
             this.selectStationsPage.close()
@@ -222,7 +224,7 @@ export class DashboardScreen {
             });
         });
     }
-    
+
     public showSelectStationsPage(x: () => void) {
         system.run(() => this.selectStationsPage.show().then(async (onfulfilled) => {
             if (onfulfilled == "ClientClosed") {
@@ -237,7 +239,7 @@ export class DashboardScreen {
             }
         }));
     }
-    
+
     public waitForSavedRailSelectResult(isSiding: boolean, showNotInMaps: boolean): Promise<SavedRailBase> {
         // TODOOOOOOOOO!!!
 
@@ -299,7 +301,7 @@ export class DashboardScreen {
             }, 4)
 
             const callback = world.afterEvents.itemUse.subscribe(event => {
-                if (event.source.id === this.player.id && event.itemStack && event.itemStack.typeId === DashboardScreen.ITEM_TYPE_ID && resultSavedRail) {
+                if (event.source.id === this.player.id && event.itemStack && event.itemStack.typeId === this.itemTypeId && resultSavedRail) {
                     world.afterEvents.itemUse.unsubscribe(callback);
                     system.clearRun(intervalId);
                     resolve(resultSavedRail);

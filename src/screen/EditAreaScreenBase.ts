@@ -30,7 +30,7 @@ export abstract class EditAreaScreenBase<T extends AreaBase> extends EditNameCol
 		this.dashboardScreen.isOnAwait = true;
 
 		const callback = world.afterEvents.itemUse.subscribe(event => {
-			if (event.source.id === this.dashboardScreen.player.id && event.itemStack && event.itemStack.typeId === DashboardScreen.ITEM_TYPE_ID) {
+			if (event.source.id === this.dashboardScreen.player.id && event.itemStack && event.itemStack.typeId === this.dashboardScreen.itemTypeId) {
 				if (!this.selectedCornnerStart) {
 					this.selectedCornnerStart = true;
 				} else {
