@@ -1,13 +1,14 @@
 import { CustomForm, ObservableBoolean, ObservableNumber, ObservableUIRawMessage } from "@minecraft/server-ui";
-import { TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 import { MTS } from "MTS";
 import { system } from "@minecraft/server";
 import { Config } from "Config";
+import { DeleteConfirmationScreen } from "./DeleteConfirmationScreen";
 
 export class ConfigScreen {
 
 	private readonly customForm: CustomForm;
-	private readonly dashboardScreen: TrainDashboardClient;
+	private readonly dashboardScreen: DashboardScreen;
 
 	private readonly toggleUseTimeSync: ObservableBoolean;
 
@@ -16,15 +17,13 @@ export class ConfigScreen {
 	private readonly sliderTicksElapsedIfTrainInvaildLabel = new ObservableUIRawMessage({});
 
 
-	public constructor(dashboardScreen: TrainDashboardClient) {
+	public constructor(dashboardScreen: DashboardScreen) {
 		this.customForm = new CustomForm(dashboardScreen.player, { translate: "gui.mts.mts_options" }).closeButton();
 		this.dashboardScreen = dashboardScreen;
 
 		this.toggleUseTimeSync = new ObservableBoolean(MTS.railwayData.getUseTimeSync(), { clientWritable: true });
 		this.customForm.toggle({ translate: "gui.mts.use_time_sync" }, this.toggleUseTimeSync);
 		this.toggleUseTimeSync.subscribe(toggled => MTS.railwayData.setUseTimeSync(toggled));
-
-
 
 		this.sliderTicksElapsedIfTrainInvaild = new ObservableNumber(Config.ticksElapsedIfTrainInvaild, { clientWritable: true });
 		this.customForm.slider({ translate: "gui.mts.tick_elapsed_when_out_of_loaded_chunks" }, this.sliderTicksElapsedIfTrainInvaild, 2, 35, { step: 1, description: this.sliderTicksElapsedIfTrainInvaildLabel });

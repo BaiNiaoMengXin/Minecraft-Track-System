@@ -1,6 +1,6 @@
 import { CustomForm, UIRawMessage } from "@minecraft/server-ui";
 import { NameColorDataBase } from "data/NameColorDataBase";
-import { DashboardScreen, TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 import { BetterTextField } from "./BetterTextField";
 import { DeleteConfirmationScreen } from "./DeleteConfirmationScreen";
 import { IGui } from "data/IGui";
@@ -12,14 +12,14 @@ export abstract class EditNameColorScreenBase<T extends NameColorDataBase> {
 
 	protected readonly customForm: CustomForm;
 	protected readonly data: T;
-	protected readonly dashboardScreen: TrainDashboardClient;
+	protected readonly dashboardScreen: DashboardScreen;
 	private readonly onCloseCallback: () => void;
 
 	private readonly textFieldName: BetterTextField;
 
 	private static readonly NAME_MAX_LENGTH = 64;
 
-	public constructor(data: T, dashboardScreen: TrainDashboardClient, nameKey: string, onCloseCallback: () => void) {
+	public constructor(data: T, dashboardScreen: DashboardScreen, nameKey: string, onCloseCallback: () => void) {
 		this.data = data;
 		this.dashboardScreen = dashboardScreen;
 		this.onCloseCallback = onCloseCallback;

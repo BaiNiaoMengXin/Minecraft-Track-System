@@ -3,7 +3,7 @@ import { EditNameColorScreenBase } from "./EditNameColorScreenBase";
 import { Siding } from "data/Siding";
 import { CustomForm, ObservableBoolean, ObservableNumber, ObservableString, ObservableUIRawMessage, UIRawMessage } from "@minecraft/server-ui";
 import { TransportMode } from "data/TransportMode";
-import { TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 import { MTS } from "MTS";
 import { IGui } from "data/IGui";
 import { RailwayData } from "data/RailwayData";
@@ -30,7 +30,7 @@ export class EditDepotScreen extends EditAreaScreenBase<Depot> {
 
 	private static readonly cruisingAltitudeText: UIRawMessage = { translate: "gui.mts.cruising_altitude" };
 
-	public constructor(depot: Depot, transportMode: TransportMode, dashboardScreen: TrainDashboardClient, onCloseCallback: () => void) {
+	public constructor(depot: Depot, transportMode: TransportMode, dashboardScreen: DashboardScreen, onCloseCallback: () => void) {
 		super(depot, dashboardScreen, "gui.mts.depot_name", onCloseCallback);
 
 		this.sidingsInDepot = MTS.railwayData.dataCache.requestDepotIdToSidings(depot.id);

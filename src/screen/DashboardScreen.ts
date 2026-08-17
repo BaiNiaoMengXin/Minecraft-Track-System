@@ -33,16 +33,7 @@ import { ConfigScreen } from "./ConfigScreen";
 import { RailActionsScreen } from "./RailActionsScreen";
 
 
-export namespace DashboardScreen {
-    export enum SelectedTab {
-        NONE,
-        STATIONS,
-        ROUTES,
-        DEPOTS
-    }
-}
-
-export class TrainDashboardClient {
+export class DashboardScreen {
 
     public static readonly ITEM_TYPE_ID = "mts:railway_dashboard";
 
@@ -308,12 +299,21 @@ export class TrainDashboardClient {
             }, 4)
 
             const callback = world.afterEvents.itemUse.subscribe(event => {
-                if (event.source.id === this.player.id && event.itemStack && event.itemStack.typeId === TrainDashboardClient.ITEM_TYPE_ID && resultSavedRail) {
+                if (event.source.id === this.player.id && event.itemStack && event.itemStack.typeId === DashboardScreen.ITEM_TYPE_ID && resultSavedRail) {
                     world.afterEvents.itemUse.unsubscribe(callback);
                     system.clearRun(intervalId);
                     resolve(resultSavedRail);
                 }
             });
         })
+    }
+}
+
+export namespace DashboardScreen {
+    export enum SelectedTab {
+        NONE,
+        STATIONS,
+        ROUTES,
+        DEPOTS
     }
 }

@@ -2,13 +2,13 @@ import { Platform } from "data/Platform";
 import { SavedRailScreenBase } from "./SavedRailScreenBase";
 import { UIRawMessage } from "@minecraft/server-ui";
 import { TransportMode } from "data/TransportMode";
-import { TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 
 export class PlatformScreen extends SavedRailScreenBase<Platform> {
 
 	private static readonly DWELL_TIME_TEXT: UIRawMessage = { translate: "gui.mts.dwell_time" };
 
-	public constructor(savedRailBase: Platform, transportMode: TransportMode, dashboardScreen: TrainDashboardClient) {
+	public constructor(savedRailBase: Platform, transportMode: TransportMode, dashboardScreen: DashboardScreen) {
 		super(savedRailBase, transportMode, dashboardScreen, PlatformScreen.DWELL_TIME_TEXT, "gui.mts.platform_number");
 	}
 

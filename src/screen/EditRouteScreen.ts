@@ -3,7 +3,7 @@ import { EditNameColorScreenBase } from "./EditNameColorScreenBase";
 import { RouteType } from "data/RouteType";
 import { BetterTextField } from "./BetterTextField";
 import { ObservableBoolean, ObservableUIRawMessage } from "@minecraft/server-ui";
-import { TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 import { MTS } from "MTS";
 import { system } from "@minecraft/server";
 
@@ -21,7 +21,7 @@ export class EditRouteScreen extends EditNameColorScreenBase<Route> {
 
 	private readonly isCircular: boolean;
 
-	public constructor(route: Route, dashboardScreen: TrainDashboardClient, onCloseCallback: () => void) {
+	public constructor(route: Route, dashboardScreen: DashboardScreen, onCloseCallback: () => void) {
 		super(route, dashboardScreen, "gui.mts.route_name", onCloseCallback);
 
 		this.customForm.button({ translate: "gui.mts.edit_route" }, () => {

@@ -2,7 +2,7 @@ import { Station } from "data/Station";
 import { EditAreaScreenBase } from "./EditAreaScreenBase";
 import { ObservableBoolean, UIRawMessage } from "@minecraft/server-ui";
 import { BetterTextField, TextFieldFilter } from "./BetterTextField";
-import { TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 import { NameColorDataBase } from "data/NameColorDataBase";
 
 export class EditStationScreen extends EditAreaScreenBase<Station> {
@@ -28,7 +28,7 @@ export class EditStationScreen extends EditAreaScreenBase<Station> {
 	private static readonly EXIT_PARENTS_TEXT: UIRawMessage = { translate: "gui.mtr.exit_parents" };
 	private static readonly EXIT_DESTINATIONS_TEXT: UIRawMessage = { translate: "gui.mtr.exit_destinations" };
 
-	public constructor(station: Station, dashboardScreen: TrainDashboardClient, onCloseCallback: () => void) {
+	public constructor(station: Station, dashboardScreen: DashboardScreen, onCloseCallback: () => void) {
 		super(station, dashboardScreen, "gui.mts.station_name", onCloseCallback);
 		// this.textFieldZone = new BetterTextField(EditStationScreen.STATION_ZONE_TEXT, TextFieldFilter.INTEGER, String(this.data.zone), 6);
 		// this.textFieldExitParentLetter = new BetterTextField(TextFieldFilter.LETTER, "A", 1);

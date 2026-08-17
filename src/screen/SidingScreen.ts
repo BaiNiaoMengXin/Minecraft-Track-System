@@ -2,7 +2,7 @@ import { Siding } from "data/Siding";
 import { SavedRailScreenBase } from "./SavedRailScreenBase";
 import { CustomForm, ObservableBoolean, ObservableNumber, ObservableString, ObservableUIRawMessage, UIRawMessage } from "@minecraft/server-ui";
 import { TransportMode } from "data/TransportMode";
-import { TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 import { BetterTextField, TextFieldFilter } from "./BetterTextField";
 import { Train } from "data/Train";
 import { RailwayData } from "data/RailwayData";
@@ -40,7 +40,7 @@ export class SidingScreen extends SavedRailScreenBase<Siding> {
 	private static readonly ACCELERATION_UNIT_CONVERSION_1 = 20 * 20; // m/tick^2 to m/s^2
 	private static readonly ACCELERATION_UNIT_CONVERSION_2 = SidingScreen.ACCELERATION_UNIT_CONVERSION_1 * 3.6; // m/tick^2 to km/h/s
 
-	public constructor(siding: Siding, transportMode: TransportMode, dashboardScreen: TrainDashboardClient) {
+	public constructor(siding: Siding, transportMode: TransportMode, dashboardScreen: DashboardScreen) {
 		super(siding, transportMode, dashboardScreen, SidingScreen.MANUAL_TO_AUTOMATIC_TIME, "gui.mts.siding_number");
 		this.transportMode = transportMode;
 

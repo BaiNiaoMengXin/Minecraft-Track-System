@@ -1,6 +1,6 @@
 import { ActionFormData } from "@minecraft/server-ui";
 import { MTS } from "MTS";
-import { TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 import { RailwayData } from "data/RailwayData";
 import { system } from "@minecraft/server";
 import { DeleteConfirmationScreen } from "./DeleteConfirmationScreen";
@@ -52,11 +52,11 @@ export class RailActionsScreen {
 export class RailActionsScreen {
 
 	private readonly form: ActionFormData;
-	private readonly dashboardScreen: TrainDashboardClient;
+	private readonly dashboardScreen: DashboardScreen;
 
 	private readonly cacheList: Array<number> = [];
 
-	public constructor(dashboardScreen: TrainDashboardClient) {
+	public constructor(dashboardScreen: DashboardScreen) {
 		this.form = new ActionFormData().title({ translate: "gui.mts.rail_actions" });
 		this.dashboardScreen = dashboardScreen;
 

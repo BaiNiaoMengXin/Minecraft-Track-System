@@ -1,6 +1,6 @@
 import { CustomForm, ObservableNumber, ObservableString, ObservableUIRawMessage, UIRawMessage } from "@minecraft/server-ui";
 import { SavedRailBase } from "data/SavedRailBase";
-import { TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 import { TransportMode } from "data/TransportMode";
 import { Platform } from "data/Platform";
 import { BetterTextField, TextFieldFilter } from "./BetterTextField";
@@ -8,7 +8,7 @@ import { BetterTextField, TextFieldFilter } from "./BetterTextField";
 export abstract class SavedRailScreenBase<T extends SavedRailBase> {
 
 	protected readonly customForm: CustomForm;
-	protected readonly dashboardScreen: TrainDashboardClient;
+	protected readonly dashboardScreen: DashboardScreen;
 
 	protected readonly savedRailBase: T;
 	protected readonly showScheduleControls: boolean;
@@ -23,7 +23,7 @@ export abstract class SavedRailScreenBase<T extends SavedRailBase> {
 	private static readonly MAX_SAVED_RAIL_NUMBER_VALUE = 9;
 	private static readonly MIN_SAVED_RAIL_NUMBER_VALUE = 0;
 
-	public constructor(savedRailBase: T, transportMode: TransportMode, dashboardScreen: TrainDashboardClient, dwellTimeLabel: UIRawMessage, numberStringKey: string) {
+	public constructor(savedRailBase: T, transportMode: TransportMode, dashboardScreen: DashboardScreen, dwellTimeLabel: UIRawMessage, numberStringKey: string) {
 		this.customForm = new CustomForm(dashboardScreen.player, "").closeButton();
 
 		this.savedRailBase = savedRailBase;

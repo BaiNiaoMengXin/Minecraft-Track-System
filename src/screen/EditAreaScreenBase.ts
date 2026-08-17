@@ -2,7 +2,7 @@ import { debugDrawer, DebugLine } from "@minecraft/debug-utilities";
 import { Player, system, VectorXZ, world } from "@minecraft/server";
 import { AreaBase } from "data/AreaBase";
 import { EditNameColorScreenBase } from "./EditNameColorScreenBase";
-import { TrainDashboardClient } from "./TrainDashboardClient";
+import { DashboardScreen } from "./DashboardScreen";
 
 export abstract class EditAreaScreenBase<T extends AreaBase> extends EditNameColorScreenBase<T> {
 
@@ -13,7 +13,7 @@ export abstract class EditAreaScreenBase<T extends AreaBase> extends EditNameCol
 
 	private _runIntervalId: number = -1;
 
-	public constructor(data: T, dashboardScreen: TrainDashboardClient, nameKey: string, onCloseCallback: () => void) {
+	public constructor(data: T, dashboardScreen: DashboardScreen, nameKey: string, onCloseCallback: () => void) {
 		super(data, dashboardScreen, nameKey, onCloseCallback);
 
 		this.customForm.button({ translate: "gui.mts.edit_area" }, () => this.startEditingArea());
@@ -30,7 +30,7 @@ export abstract class EditAreaScreenBase<T extends AreaBase> extends EditNameCol
 		this.dashboardScreen.isOnAwait = true;
 
 		const callback = world.afterEvents.itemUse.subscribe(event => {
-			if (event.source.id === this.dashboardScreen.player.id && event.itemStack && event.itemStack.typeId === TrainDashboardClient.ITEM_TYPE_ID) {
+			if (event.source.id === this.dashboardScreen.player.id && event.itemStack && event.itemStack.typeId === DashboardScreen.ITEM_TYPE_ID) {
 				if (!this.selectedCornnerStart) {
 					this.selectedCornnerStart = true;
 				} else {
