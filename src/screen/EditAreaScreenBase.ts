@@ -1,10 +1,8 @@
-import { UIRawMessage } from "@minecraft/server-ui";
-import { TrainDashboardClient } from "./TrainDashboardClient";
-import { EditNameColorScreenBase } from "./EditNameColorScreenBase";
+import { debugDrawer, DebugLine } from "@minecraft/debug-utilities";
 import { Player, system, VectorXZ, world } from "@minecraft/server";
 import { AreaBase } from "data/AreaBase";
-import { ParticleSystem, particleType } from "rail/ParticleSystem";
-import { debugDrawer, DebugLine } from "@minecraft/debug-utilities";
+import { EditNameColorScreenBase } from "./EditNameColorScreenBase";
+import { TrainDashboardClient } from "./TrainDashboardClient";
 
 export abstract class EditAreaScreenBase<T extends AreaBase> extends EditNameColorScreenBase<T> {
 
@@ -19,6 +17,12 @@ export abstract class EditAreaScreenBase<T extends AreaBase> extends EditNameCol
 		super(data, dashboardScreen, nameKey, onCloseCallback);
 
 		this.customForm.button({ translate: "gui.mts.edit_area" }, () => this.startEditingArea());
+		if (!dashboardScreen.isNew) {
+			const center = data.getCenter();
+			if (center) {
+				this.customForm.label({ translate: "gui.mts.locate_pos", with: [`x: ${center.getX()}, z: ${center.getZ()}`] }).spacer();
+			}
+		}
 	}
 
 	private startEditingArea(): void {
